@@ -1,0 +1,33 @@
+{
+  "name": "backend-openapi",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "npx tsc && node ./dist/index.js",
+    "lint": "eslint . --ext .js"
+  },
+  "license": "MIT",
+  "author": "Dmitry Zhukov",
+  "keywords": [
+    "backend",
+    "openapi",
+    "web spider",
+    "web crawler"
+  ],
+  "dependencies": {
+    "@types/express": "^4.17.17",
+    "@types/mysql": "^2.15.21",
+    "@types/node": "^20.4.0",
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-openapi-validator": "^5.0.4",
+    "morgan": "^1.10.0",
+    "mysql": "^2.18.1",
+    "typescript": "^5.1.6"
+  },
+  "devDependencies": {
+    "eslint": "^8.44.0",
+    "nodemon": "^2.0.22"
+  }
+}

@@ -4,7 +4,7 @@ info:
   description: HTTP-based endpoint
   version: '1.0.0'
 paths:
-  /records:
+  /api/v1/records:
     get:
       operationId: getAllRecords
       responses:
@@ -34,7 +34,7 @@ paths:
                 $ref: '#/components/schemas/RecordId'
         '5XX':
           description: 'Internal Server Error'
-  /records/{id}:
+  /api/v1/records/{id}:
     put:
       operationId: updateRecord
       parameters:

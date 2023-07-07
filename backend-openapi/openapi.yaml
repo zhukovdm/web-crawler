@@ -1,0 +1,140 @@
+openapi: '3.0.0'
+info:
+  title: web-crawler
+  description: HTTP-based endpoint
+  version: '1.0.0'
+paths:
+  /records:
+    get:
+      operationId: getAllRecords
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecordFull'
+        '5XX':
+          description: 'Internal Server Error'
+    post:
+      operationId: createRecord
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordBase'
+      responses:
+        '200':
+          description: 'Created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecordId'
+        '5XX':
+          description: 'Internal Server Error'
+  /records/{id}:
+    put:
+      operationId: updateRecord
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            $ref: '#/components/schemas/RecordBase'
+      responses:
+        '204':
+          description: 'Updated'
+        '400':
+          description: 'Malformed ID.'
+        '404':
+          description: 'Not Found'
+        '5XX':
+          description: 'Unexpected Server Error'
+    delete:
+      operationId: deleteRecord
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            $ref: '#/components/schemas/RecordId'
+      responses:
+        '204':
+          description: 'Deleted'
+        '404':
+          description: 'Not Found'
+        '500':
+          description: 'Internal Server Error'
+components:
+  schemas:
+    RecordId:
+      type: integer
+      format: int64
+      minimum: 1
+    RecordTag:
+      type: string
+      minLength: 1
+    RecordBase:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          description: 'Entry point of crawling.'
+          example: 'http://www.example.com/'
+        label:
+          type: string
+          description: 'User-defined label.'
+          minLength: 1
+          example: 'Example website'
+        active:
+          type: boolean
+          description: 'Active records are crawled based on the periodicity.'
+        period:
+          type: integer
+          format: int64
+          minimum: 1
+          description: 'Periodicity of crawling in minutes.'
+          example: 10
+        regexp:
+          type: string
+          description: 'Boundary regular expression.'
+          minLength: 1
+          example: '*'
+        tags:
+          type: array
+          description: 'User-defined keywords.'
+          items:
+            $ref: '#/components/schemas/RecordTag'
+          example: [ 'first', 'test', 'example' ]
+      required:
+        - url
+        - label
+        - active
+        - period
+        - regexp
+        - tags
+    ExecutionStatus:
+      type: string
+      enum:
+        - 'CREATED'
+        - 'QUEUED'
+        - 'RUNNING'
+        - 'FAILED'
+        - 'FINISHED'
+    RecordExec:
+      type: object
+      properties:
+        lastExecTime:
+          type: string
+          format: date-time
+          description: 'Time of the last execution.'
+        lastExecStatus:
+          $ref: '#/components/schemas/ExecutionStatus'
+    RecordFull:
+      allOf:
+        - $ref: '#/components/schemas/RecordId'
+        - $ref: '#/components/schemas/RecordBase'
+        - $ref: '#/components/schemas/RecordExec'

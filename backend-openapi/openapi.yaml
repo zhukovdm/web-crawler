@@ -46,8 +46,6 @@ paths:
       responses:
         '204':
           description: 'Updated'
-        '400':
-          description: 'Malformed ID.'
         '404':
           description: 'Not Found'
         '5XX':
@@ -65,7 +63,7 @@ paths:
           description: 'Deleted'
         '404':
           description: 'Not Found'
-        '500':
+        '5XX':
           description: 'Internal Server Error'
 components:
   schemas:

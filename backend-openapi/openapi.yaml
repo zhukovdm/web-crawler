@@ -38,11 +38,16 @@ paths:
     put:
       operationId: updateRecord
       parameters:
-        - in: path
-          name: id
+        - name: id
+          in: path
           required: true
           schema:
-            $ref: '#/components/schemas/RecordBase'
+            $ref: '#/components/schemas/RecordId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordBase'
       responses:
         '204':
           description: 'Updated'
@@ -53,8 +58,8 @@ paths:
     delete:
       operationId: deleteRecord
       parameters:
-        - in: path
-          name: id
+        - name: id
+          in: path
           required: true
           schema:
             $ref: '#/components/schemas/RecordId'

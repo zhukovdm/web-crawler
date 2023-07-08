@@ -1,15 +1,16 @@
 import {
-  // RecordBaseType,
-  RecordExecType
+  RecordBaseType,
+  RecordExecType,
+  RecordIdType
 } from "./types";
 
-export interface IModel {
+export interface IRecordModel {
 
   getAllRecords(): Promise<RecordExecType[]>;
 
-  // createRecord(base: RecordBaseType): Promise<number>;
+  createRecord(record: RecordBaseType): Promise<RecordIdType>;
 
-  // updateRecord(id: number): Promise<void>;
+  updateRecord(id: number, record: RecordBaseType): Promise<number>;
 
-  // deleteRecord(id: number): Promise<void>;
+  deleteRecord(id: number): Promise<number>;
 }

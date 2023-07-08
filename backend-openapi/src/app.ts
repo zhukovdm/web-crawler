@@ -2,10 +2,10 @@ require("dotenv").config();
 
 import morgan from "morgan";
 import bodyParser from "body-parser";
-import express, { Response } from "express";
+import express from "express";
 import * as validator from "express-openapi-validator";
-import { MySqlModel } from "./model";
-import { RecordBaseType } from "./domain/types";
+import { MySqlModel } from "./models/model";
+import { RecordController } from "./controllers/recordController";
 
 const {
   PORT,
@@ -21,38 +21,20 @@ wapp.use(morgan("dev"));
 wapp.use(bodyParser.json());
 wapp.use(validator.middleware({ apiSpec: API_SPEC }));
 
-function handleInternalServerError(res: Response, ex: any) {
-  res.status(500).json(ex.message);
-}
-
-wapp.get("/api/v1/records", async (_, res: Response) => {
-  try {
-    const records = await model.getAllRecords();
-    res.status(200).json(records);
-  }
-  catch (ex) { handleInternalServerError(res, ex); }
+wapp.get("/api/v1/records", async (req, res) => {
+  RecordController.getAllRecords(req, res, model);
 });
 
 wapp.post("/api/v1/records", async (req, res) => {
-  try {
-    const obj = await model.createRecord(req.body as RecordBaseType);
-    res.status(201).json(obj);
-  }
-  catch (ex) { handleInternalServerError(res, ex); }
+  RecordController.createRecord(req, res, model);
 });
 
 wapp.put("/api/v1/records/:id", (req, res) => {
-  try {
-
-  }
-  catch (ex) { handleInternalServerError(res, ex); }
+  RecordController.updateRecord(req, res, model);
 });
 
 wapp.delete("/api/v1/records/:id", (req, res) => {
-  try {
-
-  }
-  catch (ex) { handleInternalServerError(res, ex); }
+  RecordController.deleteRecord(req, res, model);
 });
 
 wapp.use((err: any, req: any, res: any, nxt: any) => {

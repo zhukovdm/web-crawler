@@ -66,45 +66,44 @@ BEGIN
 END$
 
 CREATE PROCEDURE `createRecord` (
-  IN  `url`     VARCHAR(2048),
-  IN  `regexp`  VARCHAR(1024),
-  IN  `period`  INT,
-  IN  `label`   VARCHAR(1024),
-  IN  `active`  TINYINT,
-  IN  `tags`    JSON
+  IN  `p_url`     VARCHAR(2048),
+  IN  `p_regexp`  VARCHAR(1024),
+  IN  `p_period`  INT,
+  IN  `p_label`   VARCHAR(1024),
+  IN  `p_active`  TINYINT,
+  IN  `p_tags`    JSON
 )
 BEGIN
-  INSERT INTO `record`
-    (`url`, `regexp`, `period`, `label`, `active`, `tags`) VALUES
-    (`url`, `regexp`, `period`, `label`, `active`, `tags`);
+  INSERT INTO `record` (`url`, `regexp`, `period`, `label`, `active`, `tags`) VALUES
+    (`p_url`, `p_regexp`, `p_period`, `p_label`, `p_active`, `p_tags`);
 END$
 
 CREATE PROCEDURE `updateRecord` (
-  IN  `id`      BIGINT,
-  IN  `url`     VARCHAR(2048),
-  IN  `regexp`  VARCHAR(1024),
-  IN  `period`  INT,
-  IN  `label`   VARCHAR(1024),
-  IN  `active`  TINYINT,
-  IN  `tags`    JSON
+  IN  `p_id`      BIGINT,
+  IN  `p_url`     VARCHAR(2048),
+  IN  `p_regexp`  VARCHAR(1024),
+  IN  `p_period`  INT,
+  IN  `p_label`   VARCHAR(1024),
+  IN  `p_active`  TINYINT,
+  IN  `p_tags`    JSON
 )
 BEGIN
   UPDATE `record`
   SET
-    `url`    = `url`,
-    `regexp` = `regexp`,
-    `period` = `period`,
-    `label`  = `label`,
-    `active` = `active`,
-    `tags`   = `tags`
-  WHERE `id` = `id`;
+    `url`    = `p_url`,
+    `regexp` = `p_regexp`,
+    `period` = `p_period`,
+    `label`  = `p_label`,
+    `active` = `p_active`,
+    `tags`   = `p_tags`
+  WHERE `id` = `p_id`;
 END$
 
 CREATE PROCEDURE `deleteRecord` (
-  IN `id`       BIGINT
+  IN `p_id`       BIGINT
 )
 BEGIN
-  DELETE FROM `record` WHERE `id` = `id`;
+  DELETE FROM `record` WHERE `id` = `p_id`;
 END$
 
 DELIMITER ;

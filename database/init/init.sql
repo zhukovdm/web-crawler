@@ -58,26 +58,53 @@ BEGIN
       `e0`.`startTime`,
       `e0`.`endTime`
     FROM `execution` AS `e0` LEFT JOIN `execution` AS `e1`
-      ON `e0`.`recordId` = `e1`.`recordId` AND (`e0`.`startTime` < `e1`.`startTime` OR (`e0`.`startTime` = `e1`.`startTime` AND `e0`.`id` < `e1`.`id`))
+      ON `e0`.`recordId` = `e1`.`recordId`
+        AND (`e0`.`startTime` < `e1`.`startTime` OR (`e0`.`startTime` = `e1`.`startTime` AND `e0`.`id` < `e1`.`id`))
     WHERE `e1`.startTime IS NULL
   ) AS `e`
   ON `r`.`id` = `e`.`recordId`;
 END$
 
 CREATE PROCEDURE `createRecord` (
-    IN  `url`       VARCHAR(2048),
-    IN  `regexp`    VARCHAR(1024),
-    IN  `period`    INT,
-    IN  `label`     VARCHAR(1024),
-    IN  `active`    TINYINT,
-    IN  `tags`      JSON,
-    OUT `id`        BIGINT
+  IN  `url`     VARCHAR(2048),
+  IN  `regexp`  VARCHAR(1024),
+  IN  `period`  INT,
+  IN  `label`   VARCHAR(1024),
+  IN  `active`  TINYINT,
+  IN  `tags`    JSON
 )
 BEGIN
   INSERT INTO `record`
     (`url`, `regexp`, `period`, `label`, `active`, `tags`) VALUES
     (`url`, `regexp`, `period`, `label`, `active`, `tags`);
-  SELECT LAST_INSERT_ID() INTO `id`;
+END$
+
+CREATE PROCEDURE `updateRecord` (
+  IN  `id`      BIGINT,
+  IN  `url`     VARCHAR(2048),
+  IN  `regexp`  VARCHAR(1024),
+  IN  `period`  INT,
+  IN  `label`   VARCHAR(1024),
+  IN  `active`  TINYINT,
+  IN  `tags`    JSON
+)
+BEGIN
+  UPDATE `record`
+  SET
+    `url`    = `url`,
+    `regexp` = `regexp`,
+    `period` = `period`,
+    `label`  = `label`,
+    `active` = `active`,
+    `tags`   = `tags`
+  WHERE `id` = `id`;
+END$
+
+CREATE PROCEDURE `deleteRecord` (
+  IN `id`       BIGINT
+)
+BEGIN
+  DELETE FROM `record` WHERE `id` = `id`;
 END$
 
 DELIMITER ;

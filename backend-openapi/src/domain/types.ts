@@ -15,7 +15,7 @@ export type RecordBaseType = {
   regexp: string;
   period: number;
   label: string;
-  active: boolean;
+  active: number;
   tags: string[];
 };
 

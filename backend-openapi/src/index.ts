@@ -4,25 +4,15 @@ import morgan from "morgan";
 import bodyParser from "body-parser";
 import express, { Response } from "express";
 import * as validator from "express-openapi-validator";
-import { MySqlModel } from "./model/model";
+import { MySqlModel } from "./model";
+import { RecordBaseType } from "./domain/types";
 
 const {
   PORT,
-  API_SPEC,
-  MODEL_HOST,
-  MODEL_PORT,
-  MODEL_USER,
-  MODEL_DATABASE,
-  MODEL_PASSWORD
+  API_SPEC
 } = process.env;
 
-const model = new MySqlModel({
-  host: MODEL_HOST,
-  port: parseInt(MODEL_PORT),
-  user: MODEL_USER,
-  database: MODEL_DATABASE,
-  password: MODEL_PASSWORD
-});
+const model = MySqlModel.getInstance(process.env);
 
 const wapp = express();
 wapp.disable("x-powered-by");
@@ -43,10 +33,10 @@ wapp.get("/api/v1/records", async (_, res: Response) => {
   catch (ex) { handleInternalServerError(res, ex); }
 });
 
-wapp.post("/api/v1/records", (req, res) => {
+wapp.post("/api/v1/records", async (req, res) => {
   try {
-
-    res.status(200).json({ id: 1 });
+    const obj = await model.createRecord(req.body as RecordBaseType);
+    res.status(201).json(obj);
   }
   catch (ex) { handleInternalServerError(res, ex); }
 });

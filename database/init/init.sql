@@ -7,10 +7,10 @@ USE `db`;
 
 CREATE TABLE IF NOT EXISTS `record` (
   `id`        BIGINT NOT NULL AUTO_INCREMENT,
-  `url`       VARCHAR(250) NOT NULL,
-  `regexp`     VARCHAR(100) NOT NULL,
+  `url`       VARCHAR(2048) NOT NULL,
+  `regexp`    VARCHAR(1024) NOT NULL,
   `period`    INT NOT NULL, -- minutes!
-  `label`     VARCHAR(100) NOT NULL,
+  `label`     VARCHAR(1024) NOT NULL,
   `active`    TINYINT NOT NULL,
   `tags`      JSON NOT NULL,
   PRIMARY KEY (`id`)
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `execution` (
               NOT NULL DEFAULT 'CREATED',
   `startTime` DATETIME NOT NULL,
   `endTime`   DATETIME,
-  `crawlCnt`  INT NOT NULL DEFAULT 0,
+  `linkCount` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`recordId`) REFERENCES `record`(`id`)
     ON DELETE CASCADE
@@ -32,33 +32,55 @@ CREATE TABLE IF NOT EXISTS `execution` (
 
 -- Stored procedures -----------------------------------------------------------
 
--- Get all records with status and time of the last execution.
+DELIMITER $
+
+-- Get all records with status and times of the last execution.
 -- https://stackoverflow.com/a/28090544
 
-CREATE PROCEDURE `get_all_records` ()
-SELECT
-  `r`.`id` AS `id`,
-  `r`.`url` AS `url`,
-  `r`.`regexp` AS `regexp`,
-  `r`.`period` AS `period`,
-  `r`.`label` AS `label`,
-  `r`.`active` AS `active`,
-  `r`.`tags` AS `tags`,
-  `e`.`status` AS `lastExecStatus`,
-  `e`.`endTime` AS `lastExecEndTime`,
-  `e`.`startTime` AS `lastExecStartTime`
-FROM `record` AS `r` LEFT JOIN (
+CREATE PROCEDURE `getAllRecords` ()
+BEGIN
   SELECT
-    -- e0.`id`,
-    `e0`.`recordId`,
-    `e0`.`status`,
-    `e0`.`startTime`,
-    `e0`.`endTime`
-  FROM `execution` AS `e0` LEFT JOIN `execution` AS `e1`
-    ON `e0`.`recordId` = `e1`.`recordId` AND (`e0`.`startTime` < `e1`.`startTime` OR (`e0`.`startTime` = `e1`.`startTime` AND `e0`.`id` < `e1`.`id`))
-  WHERE `e1`.startTime IS NULL
-) AS `e`
-ON `r`.`id` = `e`.`recordId`;
+    `r`.`id`        AS `id`,
+    `r`.`url`       AS `url`,
+    `r`.`regexp`    AS `regexp`,
+    `r`.`period`    AS `period`,
+    `r`.`label`     AS `label`,
+    `r`.`active`    AS `active`,
+    `r`.`tags`      AS `tags`,
+    `e`.`status`    AS `lastExecStatus`,
+    `e`.`endTime`   AS `lastExecEndTime`,
+    `e`.`startTime` AS `lastExecStartTime`
+  FROM `record` AS `r` LEFT JOIN (
+    SELECT
+      -- e0.`id`,
+      `e0`.`recordId`,
+      `e0`.`status`,
+      `e0`.`startTime`,
+      `e0`.`endTime`
+    FROM `execution` AS `e0` LEFT JOIN `execution` AS `e1`
+      ON `e0`.`recordId` = `e1`.`recordId` AND (`e0`.`startTime` < `e1`.`startTime` OR (`e0`.`startTime` = `e1`.`startTime` AND `e0`.`id` < `e1`.`id`))
+    WHERE `e1`.startTime IS NULL
+  ) AS `e`
+  ON `r`.`id` = `e`.`recordId`;
+END$
+
+CREATE PROCEDURE `createRecord` (
+    IN  `url`       VARCHAR(2048),
+    IN  `regexp`    VARCHAR(1024),
+    IN  `period`    INT,
+    IN  `label`     VARCHAR(1024),
+    IN  `active`    TINYINT,
+    IN  `tags`      JSON,
+    OUT `id`        BIGINT
+)
+BEGIN
+  INSERT INTO `record`
+    (`url`, `regexp`, `period`, `label`, `active`, `tags`) VALUES
+    (`url`, `regexp`, `period`, `label`, `active`, `tags`);
+  SELECT LAST_INSERT_ID() INTO `id`;
+END$
+
+DELIMITER ;
 
 -- Data samples ----------------------------------------------------------------
 

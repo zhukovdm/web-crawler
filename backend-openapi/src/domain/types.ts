@@ -1,9 +1,9 @@
 type ExecStatus
   = "CREATED"
   | "QUEUED"
-  | "RUNNING"
-  | "FAILED"
+  | "CRAWLING"
   | "FINISHED"
+  | "FAILED"
   ;
 
 export type RecordIdType = {
@@ -12,16 +12,17 @@ export type RecordIdType = {
 
 export type RecordBaseType = {
   url: string;
+  regexp: string;
+  period: number;
   label: string;
   active: boolean;
-  period: number;
-  regexp: string;
   tags: string[];
 };
 
 export type RecordExecType = {
-  lastExecTime?: string;
-  lastExecStatus?: ExecStatus
+  lastExecStatus: ExecStatus | null;
+  lastExecEndTime: Date | null;
+  lastExecStartTime: Date | null;
 };
 
 export type RecordFullType

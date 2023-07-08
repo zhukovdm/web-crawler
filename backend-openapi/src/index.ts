@@ -13,7 +13,7 @@ const {
   MODEL_PORT,
   MODEL_USER,
   MODEL_DATABASE,
-  MODEL_PASSWORD,
+  MODEL_PASSWORD
 } = process.env;
 
 const model = new MySqlModel({
@@ -37,7 +37,8 @@ function handleInternalServerError(res: Response, ex: any) {
 
 wapp.get("/api/v1/records", async (_, res: Response) => {
   try {
-    res.status(200).json(await model.getAllRecords());
+    const records = await model.getAllRecords();
+    res.status(200).json(records);
   }
   catch (ex) { handleInternalServerError(res, ex); }
 });

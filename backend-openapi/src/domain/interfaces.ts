@@ -1,5 +1,5 @@
 import {
-  RecordBaseType,
+  // RecordBaseType,
   RecordExecType
 } from "./types";
 
@@ -12,4 +12,4 @@ export interface IModel {
   // updateRecord(id: number): Promise<void>;
 
   // deleteRecord(id: number): Promise<void>;
-};
+}

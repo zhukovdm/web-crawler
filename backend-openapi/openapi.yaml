@@ -42,7 +42,7 @@ paths:
           in: path
           required: true
           schema:
-            $ref: '#/components/schemas/RecordId'
+            $ref: '#/components/schemas/EntityId'
       requestBody:
         content:
           application/json:
@@ -62,7 +62,7 @@ paths:
           in: path
           required: true
           schema:
-            $ref: '#/components/schemas/RecordId'
+            $ref: '#/components/schemas/EntityId'
       responses:
         '204':
           description: 'Deleted'
@@ -72,10 +72,17 @@ paths:
           description: 'Internal Server Error'
 components:
   schemas:
-    RecordId:
+    EntityId:
       type: integer
       format: int64
       minimum: 1
+    RecordId:
+      type: object
+      properties:
+        recId:
+          $ref: '#/components/schemas/EntityId'
+      required:
+        - recId
     RecordTag:
       type: string
       minLength: 1
@@ -153,11 +160,6 @@ components:
         - lastExecStartTime
     RecordFull:
       allOf:
-        - type: object
-          properties:
-            recId:
-              $ref: '#/components/schemas/RecordId'
-          required:
-            - recId
+        - $ref: '#/components/schemas/RecordId'
         - $ref: '#/components/schemas/RecordBase'
         - $ref: '#/components/schemas/RecordExec'

@@ -100,12 +100,9 @@ components:
           minLength: 1
           example: 'Example website'
         active:
-          type: integer
-          format: int32
-          minimum: 0
-          maximum: 1
+          type: boolean
           description: 'Active records are crawled based on the periodicity.'
-          example: 0
+          example: true
         period:
           type: integer
           format: int64
@@ -131,18 +128,15 @@ components:
         - regexp
         - tags
     ExecutionStatus:
-      type: string
-      enum:
-        - 'CREATED'
-        - 'PLANNED'
-        - 'WAITING'
-        - 'CRAWLING'
-        - 'FINISHED'
+      type: number
+      format: int32
+      minimum: 0
+      maximum: 3
     ExecutionTime:
       type: string
       format: date-time
       nullable: true
-    RecordExec:
+    RecordExecRef:
       type: object
       properties:
         lastExecStatus:
@@ -162,4 +156,4 @@ components:
       allOf:
         - $ref: '#/components/schemas/RecordId'
         - $ref: '#/components/schemas/RecordBase'
-        - $ref: '#/components/schemas/RecordExec'
+        - $ref: '#/components/schemas/RecordExecRef'

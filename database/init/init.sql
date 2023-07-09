@@ -13,21 +13,22 @@ CREATE TABLE IF NOT EXISTS `record` (
   `label`     VARCHAR(1024) NOT NULL,
   `active`    TINYINT NOT NULL,
   `tags`      JSON NOT NULL,
-  PRIMARY KEY (`recId`)
+  PRIMARY KEY (`recId`),
+  CHECK (`active` >= 0 AND `active` <= 1)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
 CREATE TABLE IF NOT EXISTS `execution` (
   `exeId`     BIGINT NOT NULL AUTO_INCREMENT,
   `recId`     BIGINT NOT NULL,
-  `status`    ENUM('CREATED', 'PLANNED', 'WAITING', 'CRAWLING', 'FINISHED')
-              NOT NULL DEFAULT 'CREATED',
+  `status`    TINYINT NOT NULL DEFAULT 0,
   `startTime` DATETIME NOT NULL,
   `endTime`   DATETIME,
   `linkCount` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`exeId`),
   FOREIGN KEY (`recId`) REFERENCES `record`(`recId`)
     ON DELETE CASCADE
-    ON UPDATE CASCADE
+    ON UPDATE CASCADE,
+  CHECK (`status` >= 0 AND `status` <= 3)
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
 
 -- Stored procedures -----------------------------------------------------------
@@ -37,7 +38,7 @@ DELIMITER $
 -- Get all records with status and times of the last execution.
 -- https://stackoverflow.com/a/28090544
 
-CREATE PROCEDURE `getAllRecords` ()
+CREATE PROCEDURE IF NOT EXISTS `getAllRecords` ()
 BEGIN
   SELECT
     `r`.`recId`     AS `recId`,
@@ -65,44 +66,29 @@ BEGIN
   ON `r`.`recId` = `e`.`recId`;
 END$
 
-CREATE PROCEDURE `createRecord` (
+CREATE PROCEDURE IF NOT EXISTS `createRecord` (
   IN  `i_url`       VARCHAR(2048),
   IN  `i_regexp`    VARCHAR(1024),
   IN  `i_period`    INT,
   IN  `i_label`     VARCHAR(1024),
   IN  `i_active`    TINYINT,
   IN  `i_tags`      JSON,
-  IN  `i_startTime` DATETIME,
-  OUT `o_recId`     BIGINT,
-  OUT `o_exeId`     BIGINT
-)
+  OUT `o_recId`     BIGINT)
 BEGIN
-  DECLARE EXIT HANDLER FOR SQLEXCEPTION
-  BEGIN
-    ROLLBACK;
-    RESIGNAL;
-  END;
-  START TRANSACTION;
-    INSERT INTO `record` (`url`, `regexp`, `period`, `label`, `active`, `tags`) VALUES
-      (`i_url`, `i_regexp`, `i_period`, `i_label`, `i_active`, `i_tags`);
-    SELECT LAST_INSERT_ID () INTO `o_recId`;
-    IF `i_active` > 0 THEN
-      INSERT INTO `execution` (`recId`, `startTime`) VALUES
-        (`o_recId`, `i_startTime`);
-      SELECT LAST_INSERT_ID () INTO `o_exeId`;
-    END IF;
-  COMMIT;
-END$$
+  INSERT INTO `record` (`url`, `regexp`, `period`, `label`, `active`, `tags`) VALUES
+    (`i_url`, `i_regexp`, `i_period`, `i_label`, `i_active`, `i_tags`);
+  SELECT LAST_INSERT_ID () INTO `o_recId`;
+END$
 
-CREATE PROCEDURE `updateRecord` (
+CREATE PROCEDURE IF NOT EXISTS `updateRecord` (
   IN  `i_recId`   BIGINT,
   IN  `i_url`     VARCHAR(2048),
   IN  `i_regexp`  VARCHAR(1024),
   IN  `i_period`  INT,
   IN  `i_label`   VARCHAR(1024),
   IN  `i_active`  TINYINT,
-  IN  `i_tags`    JSON
-)
+  IN  `i_tags`    JSON,
+  OUT `o_count`   INT)
 BEGIN
   UPDATE `record`
   SET
@@ -113,16 +99,22 @@ BEGIN
     `active` = `i_active`,
     `tags`   = `i_tags`
   WHERE `recId` = `i_recId`;
-END$$
+  SELECT ROW_COUNT() INTO `o_count`;
+END$
 
-CREATE PROCEDURE `deleteRecord` (
-  IN `i_recId`    BIGINT
-)
+CREATE PROCEDURE IF NOT EXISTS `deleteRecord` (
+  IN  `i_recId`   BIGINT,
+  OUT `o_count`   INT)
 BEGIN
   DELETE FROM `record` WHERE `recId` = `i_recId`;
-END$$
+  SELECT ROW_COUNT() INTO `o_count`;
+END$
 
 DELIMITER ;
+
+-- Ensure consistent state -----------------------------------------------------
+
+DELETE FROM `execution` WHERE `active` != 'FINISHED';
 
 -- Data samples ----------------------------------------------------------------
 
@@ -130,9 +122,3 @@ INSERT INTO `record` (`url`, `regexp`, `period`, `label`, `active`, `tags`) VALU
   ('http://www.example1.com', '^abcd$', 1, 'Example web 1', 0, JSON_ARRAY('a', 'b')),
   ('http://www.example2.com', '[0-9]+', 2, 'Example web 2', 1, JSON_ARRAY('b', 'c')),
   ('http://www.example3.com', '[a-z]*', 3, 'Example web 3', 1, JSON_ARRAY('c', 'd'));
-
-INSERT INTO `execution` (`recId`, `startTime`) VALUES
-  (1, '2020-01-01 00:00:00'),
-  (1, '2020-01-01 01:00:00'),
-  (1, '2020-01-01 01:00:00'),
-  (2, '2020-01-01 02:00:00');

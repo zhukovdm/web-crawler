@@ -131,20 +131,33 @@ components:
         - 'WAITING'
         - 'CRAWLING'
         - 'FINISHED'
+    ExecutionTime:
+      type: string
+      format: date-time
+      nullable: true
     RecordExec:
       type: object
       properties:
-        lastExecTime:
-          type: string
-          format: date-time
-          description: 'Time of the last execution.'
         lastExecStatus:
           $ref: '#/components/schemas/ExecutionStatus'
+          description: 'Current status of the last execution.'
+        lastExecEndTime:
+          $ref: '#/components/schemas/ExecutionTime'
+          description: 'End time of the last execution.'
+        lastExecStartTime:
+          $ref: '#/components/schemas/ExecutionTime'
+          description: 'End time of the last execution.'
+      required:
+        - lastExecStatus
+        - lastExecEndTime
+        - lastExecStartTime
     RecordFull:
       allOf:
         - type: object
           properties:
             recId:
               $ref: '#/components/schemas/RecordId'
+          required:
+            - recId
         - $ref: '#/components/schemas/RecordBase'
         - $ref: '#/components/schemas/RecordExec'

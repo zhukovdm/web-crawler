@@ -4,8 +4,10 @@ import morgan from "morgan";
 import bodyParser from "body-parser";
 import express from "express";
 import * as validator from "express-openapi-validator";
-import { MySqlModel } from "./models/model";
-import { RecordController } from "./controllers/recordController";
+import { MySqlModel } from "./services/mysql-model";
+import {
+  RecordController
+} from "./controllers/record-controller";
 
 const { PORT, API_SPEC } = process.env;
 

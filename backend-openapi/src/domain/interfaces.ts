@@ -22,3 +22,8 @@ export interface IExecutionModel {
 
   createExecution(exeId: number): Promise<void>;
 }
+
+export interface IPlanner {
+
+  
+}

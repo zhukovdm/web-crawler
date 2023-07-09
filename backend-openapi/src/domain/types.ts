@@ -1,13 +1,8 @@
-type ExecStatus
-  = "CREATED"
-  | "QUEUED"
-  | "CRAWLING"
-  | "FINISHED"
-  | "FAILED"
-  ;
+export type ExecStatus =
+  "CREATED" | "PLANNED" | "WAITING" | "CRAWLING" | "FINISHED";
 
 export type RecordIdType = {
-  id: number;
+  recId: number;
 };
 
 export type RecordBaseType = {
@@ -25,8 +20,5 @@ export type RecordExecType = {
   lastExecStartTime: Date | null;
 };
 
-export type RecordFullType
-  = RecordIdType
-  & RecordBaseType
-  & RecordExecType
-  ;
+export type RecordFullType =
+  RecordIdType & RecordBaseType & RecordExecType;

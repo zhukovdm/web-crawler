@@ -22,8 +22,8 @@ CALL getAllRecords ();
 `;
 
 const CREATE_RECORD_QUERY: string = `
-CALL createRecord (?, ?, ?, ?, ?, ?);
-SELECT LAST_INSERT_ID() AS id;
+CALL createRecord (?, ?, ?, ?, ?, ?, ?, @recId, @exeId);
+SELECT @recId AS recId, @exeId AS exeId;
 `;
 
 const UPDATE_RECORD_QUERY: string = `
@@ -77,6 +77,14 @@ export class MySqlModel implements IRecordModel {
     return [r.url, r.regexp, r.period, r.label, r.active, JSON.stringify(r.tags)];
   }
 
+  /**
+   * Get current time in YYYY-MM-DD HH:MM:SS.
+   */
+  private static getCurrentTime(): string {
+    const d = new Date();
+    return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`;
+  }
+
   public async getAllRecords(): Promise<RecordFullType[]> {
     return new Promise((res, rej) => {
       this.pool.query(GET_ALL_RECORDS_QUERY, [], (err, results) => {
@@ -88,20 +96,23 @@ export class MySqlModel implements IRecordModel {
     });
   }
 
-  public async createRecord(r: RecordBaseType): Promise<RecordIdType> {
+  public async createRecord(r: RecordBaseType): Promise<RecordIdType & { exeId: number }> {
     return new Promise((res, rej) => {
-      this.pool.query(CREATE_RECORD_QUERY, MySqlModel.unpackRecordBase(r), (err, results) => {
+      this.pool.query(CREATE_RECORD_QUERY, [
+        ...MySqlModel.unpackRecordBase(r), MySqlModel.getCurrentTime()
+      ], (err, results) => {
         if (err) { rej(err); }
         else {
-          res({ id: results[1][0].id });
+          const { recId, exeId } = results[1][0];
+          res({ recId: recId, exeId: exeId });
         }
       });
     });
   }
 
-  public async updateRecord(id: number, r: RecordBaseType): Promise<number> {
+  public async updateRecord(r: RecordFullType): Promise<number> {
     return new Promise((res, rej) => {
-      this.pool.query(UPDATE_RECORD_QUERY, [id, ...MySqlModel.unpackRecordBase(r)], (err, results) => {
+      this.pool.query(UPDATE_RECORD_QUERY, [r.recId, ...MySqlModel.unpackRecordBase(r)], (err, results) => {
         if (err) { rej(err); }
         else {
           res(results[1][0].count);
@@ -110,9 +121,9 @@ export class MySqlModel implements IRecordModel {
     });
   }
 
-  public async deleteRecord(id: number): Promise<number> {
+  public async deleteRecord(r: RecordIdType): Promise<number> {
     return new Promise((res, rej) => {
-      this.pool.query(DELETE_RECORD_QUERY, [id], (err, results) => {
+      this.pool.query(DELETE_RECORD_QUERY, [r.recId], (err, results) => {
         if (err) { rej(err); }
         else {
           res(results[1][0].count);

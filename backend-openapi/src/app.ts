@@ -7,10 +7,7 @@ import * as validator from "express-openapi-validator";
 import { MySqlModel } from "./models/model";
 import { RecordController } from "./controllers/recordController";
 
-const {
-  PORT,
-  API_SPEC
-} = process.env;
+const { PORT, API_SPEC } = process.env;
 
 const model = MySqlModel.getInstance(process.env);
 
@@ -29,11 +26,11 @@ wapp.post("/api/v1/records", async (req, res) => {
   RecordController.createRecord(req, res, model);
 });
 
-wapp.put("/api/v1/records/:id", (req, res) => {
+wapp.put("/api/v1/records/:recId", (req, res) => {
   RecordController.updateRecord(req, res, model);
 });
 
-wapp.delete("/api/v1/records/:id", (req, res) => {
+wapp.delete("/api/v1/records/:recId", (req, res) => {
   RecordController.deleteRecord(req, res, model);
 });
 

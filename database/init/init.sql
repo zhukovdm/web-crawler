@@ -5,120 +5,236 @@ USE `db`;
 
 -- Create relations ------------------------------------------------------------
 
-CREATE TABLE IF NOT EXISTS `record` (
-  `recId`     BIGINT NOT NULL AUTO_INCREMENT,
-  `url`       VARCHAR(2048) NOT NULL,
-  `regexp`    VARCHAR(1024) NOT NULL,
-  `period`    INT NOT NULL, -- minutes!
-  `label`     VARCHAR(1024) NOT NULL,
-  `active`    TINYINT NOT NULL,
-  `tags`      JSON NOT NULL,
+CREATE TABLE IF NOT EXISTS `rec` (
+  `recId`       BIGINT NOT NULL AUTO_INCREMENT,
+  `url`         VARCHAR(2048) NOT NULL,
+  `regexp`      VARCHAR(1024) NOT NULL,
+  `period`      INT NOT NULL, -- minutes!
+  `label`       VARCHAR(1024) NOT NULL,
+  `active`      INT NOT NULL,
+  `tags`        JSON NOT NULL,
   PRIMARY KEY (`recId`),
   CHECK (`active` >= 0 AND `active` <= 1)
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE = InnoDB;
 
-CREATE TABLE IF NOT EXISTS `execution` (
-  `exeId`     BIGINT NOT NULL AUTO_INCREMENT,
-  `recId`     BIGINT NOT NULL,
-  `status`    TINYINT NOT NULL DEFAULT 0,
-  `startTime` DATETIME NOT NULL,
-  `endTime`   DATETIME,
-  `linkCount` INT NOT NULL DEFAULT 0,
+CREATE TABLE IF NOT EXISTS `exe` (
+  `exeId`       BIGINT NOT NULL AUTO_INCREMENT,
+  `recId`       BIGINT NOT NULL,
+  `status`      ENUM('WAITING', 'PLANNED', 'CRAWLING', 'FINISHED')
+                NOT NULL DEFAULT 'WAITING',
+  `createTime`  DATETIME NOT NULL,
+  `finishTime`  DATETIME,
   PRIMARY KEY (`exeId`),
-  FOREIGN KEY (`recId`) REFERENCES `record`(`recId`)
+  FOREIGN KEY (`recId`) REFERENCES `rec`(`recId`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
-  CHECK (`status` >= 0 AND `status` <= 3)
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+  CHECK (ISNULL(`finishTime`) OR `createTime` < `finishTime`)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `nod` (
+  `nodId`       BIGINT NOT NULL AUTO_INCREMENT,
+  `exeId`       BIGINT NOT NULL,
+  `url`         VARCHAR(2048) NOT NULL,
+  `title`       VARCHAR(1024),
+  `crawlTime`   DATETIME,
+  PRIMARY KEY (`nodId`),
+  FOREIGN KEY (`exeId`) REFERENCES `exe`(`exeId`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `lnk` (
+  `lnkId`       BIGINT NOT NULL AUTO_INCREMENT,
+  `nodFr`       BIGINT NOT NULL,
+  `nodTo`       BIGINT NOT NULL,
+  PRIMARY KEY (`lnkId`),
+  FOREIGN KEY (`nodFr`) REFERENCES `nod`(`nodId`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  FOREIGN KEY (`nodTo`) REFERENCES `nod`(`nodId`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE = InnoDB;
 
 -- Stored procedures -----------------------------------------------------------
 
 DELIMITER $
 
--- Get all records with status and times of the last execution.
--- https://stackoverflow.com/a/28090544
-
+/**
+ * Get all records with the status, create / finish time of the last execution.
+ * https://stackoverflow.com/a/28090544
+ */
 CREATE PROCEDURE IF NOT EXISTS `getAllRecords` ()
 BEGIN
   SELECT
-    `r`.`recId`     AS `recId`,
-    `r`.`url`       AS `url`,
-    `r`.`regexp`    AS `regexp`,
-    `r`.`period`    AS `period`,
-    `r`.`label`     AS `label`,
-    `r`.`active`    AS `active`,
-    `r`.`tags`      AS `tags`,
-    `e`.`status`    AS `lastExecStatus`,
-    `e`.`endTime`   AS `lastExecEndTime`,
-    `e`.`startTime` AS `lastExecStartTime`
-  FROM `record` AS `r` LEFT JOIN (
+    `r`.`recId`       AS `recId`,
+    `r`.`url`         AS `url`,
+    `r`.`regexp`      AS `regexp`,
+    `r`.`period`      AS `period`,
+    `r`.`label`       AS `label`,
+    `r`.`active`      AS `active`,
+    `r`.`tags`        AS `tags`,
+    `e`.`status`      AS `lastExecStatus`,
+    `e`.`createTime`  AS `lastExecCreateTime`,
+    `e`.`finishTime`  AS `lastExecFinishTime`
+  FROM `rec` AS `r` LEFT JOIN (
     SELECT
       -- e0.`exeId`,
       `e0`.`recId`,
       `e0`.`status`,
-      `e0`.`startTime`,
-      `e0`.`endTime`
-    FROM `execution` AS `e0` LEFT JOIN `execution` AS `e1`
-      ON `e0`.`recId` = `e1`.`recId`
-        AND (`e0`.`startTime` < `e1`.`startTime` OR (`e0`.`startTime` = `e1`.`startTime` AND `e0`.`exeId` < `e1`.`exeId`))
-    WHERE `e1`.startTime IS NULL
+      `e0`.`createTime`,
+      `e0`.`finishTime`
+    FROM `exe` AS `e0` LEFT JOIN `exe` AS `e1`
+      ON `e0`.`recId` = `e1`.`recId` AND (
+        `e0`.`createTime` < `e1`.`createTime` OR (
+          `e0`.`createTime` = `e1`.`createTime` AND `e0`.`exeId` < `e1`.`exeId`))
+    WHERE `e1`.`createTime` IS NULL
   ) AS `e`
   ON `r`.`recId` = `e`.`recId`;
 END$
 
+/**
+ * Create new record. If the record is active, also create an execution.
+ */
 CREATE PROCEDURE IF NOT EXISTS `createRecord` (
-  IN  `i_url`       VARCHAR(2048),
-  IN  `i_regexp`    VARCHAR(1024),
-  IN  `i_period`    INT,
-  IN  `i_label`     VARCHAR(1024),
-  IN  `i_active`    TINYINT,
-  IN  `i_tags`      JSON,
-  OUT `o_recId`     BIGINT)
+  IN  `i_url`         VARCHAR(2048),
+  IN  `i_regexp`      VARCHAR(1024),
+  IN  `i_period`      INT,
+  IN  `i_label`       VARCHAR(1024),
+  IN  `i_active`      INT,
+  IN  `i_tags`        JSON,
+  IN  `i_createTime`  DATETIME,
+  OUT `o_recId`       BIGINT,
+  OUT `o_exeId`       BIGINT)
 BEGIN
-  INSERT INTO `record` (`url`, `regexp`, `period`, `label`, `active`, `tags`) VALUES
-    (`i_url`, `i_regexp`, `i_period`, `i_label`, `i_active`, `i_tags`);
-  SELECT LAST_INSERT_ID () INTO `o_recId`;
+  DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+      ROLLBACK;
+      RESIGNAL;
+    END;
+  START TRANSACTION;
+    INSERT INTO `rec` (`url`, `regexp`, `period`, `label`, `active`, `tags`) VALUES
+      (`i_url`, `i_regexp`, `i_period`, `i_label`, `i_active`, `i_tags`);
+    SELECT LAST_INSERT_ID () INTO `o_recId`;
+    IF (`i_active` = 1) THEN
+      INSERT INTO `exe` (`recId`, `createTime`) VALUES
+        (`o_recId`, `i_createTime`);
+      SELECT LAST_INSERT_ID () INTO `o_exeId`;
+    END IF;
+  COMMIT;
 END$
 
+/**
+ * Ensure new state of the target record. Create new execution if the record
+ * is active and no ongoing execution exists. Remove waiting executions if the
+ * record has been deactivated.
+ */
 CREATE PROCEDURE IF NOT EXISTS `updateRecord` (
-  IN  `i_recId`   BIGINT,
-  IN  `i_url`     VARCHAR(2048),
-  IN  `i_regexp`  VARCHAR(1024),
-  IN  `i_period`  INT,
-  IN  `i_label`   VARCHAR(1024),
-  IN  `i_active`  TINYINT,
-  IN  `i_tags`    JSON,
-  OUT `o_count`   INT)
+  IN  `i_recId`       BIGINT,
+  IN  `i_url`         VARCHAR(2048),
+  IN  `i_regexp`      VARCHAR(1024),
+  IN  `i_period`      INT,
+  IN  `i_label`       VARCHAR(1024),
+  IN  `i_active`      INT,
+  IN  `i_tags`        JSON,
+  IN  `i_createTime`  DATETIME,
+  OUT `o_count`       INT,
+  OUT `o_exeId`       BIGINT)
 BEGIN
-  UPDATE `record`
-  SET
-    `url`    = `i_url`,
-    `regexp` = `i_regexp`,
-    `period` = `i_period`,
-    `label`  = `i_label`,
-    `active` = `i_active`,
-    `tags`   = `i_tags`
-  WHERE `recId` = `i_recId`;
-  SELECT ROW_COUNT() INTO `o_count`;
+  DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+      ROLLBACK;
+      RESIGNAL;
+    END;
+  START TRANSACTION;
+    UPDATE `rec`
+    SET
+      `url`    = `i_url`,
+      `regexp` = `i_regexp`,
+      `period` = `i_period`,
+      `label`  = `i_label`,
+      `active` = `i_active`,
+      `tags`   = `i_tags`
+    WHERE `recId` = `i_recId`;
+    SELECT ROW_COUNT () INTO `o_count`;
+    IF (
+      `i_active` = 1 AND `o_count` > 0 AND
+      NOT EXISTS (SELECT 1 FROM `exe` WHERE `recId` = `i_recId` AND `status` != 'FINISHED')
+    ) THEN
+      INSERT INTO `exe` (`recId`, `createTime`) VALUES
+        (`i_recId`, `i_createTime`);
+      SELECT LAST_INSERT_ID () INTO `o_exeId`;
+    END IF;
+    IF (`i_active` = 0) THEN
+      DELETE FROM `exe`
+      WHERE `recId` = `i_recId` AND `status` = 'WAITING';
+    END IF;
+  COMMIT;
 END$
 
+/**
+ * Delete a record and all associated information.
+ */
 CREATE PROCEDURE IF NOT EXISTS `deleteRecord` (
   IN  `i_recId`   BIGINT,
   OUT `o_count`   INT)
 BEGIN
-  DELETE FROM `record` WHERE `recId` = `i_recId`;
-  SELECT ROW_COUNT() INTO `o_count`;
+  DELETE FROM `rec` WHERE `recId` = `i_recId`;
+  SELECT ROW_COUNT () INTO `o_count`;
+END$
+
+/**
+ * Get all executions with node count and label.
+ */
+CREATE PROCEDURE IF NOT EXISTS `getAllExecutions` ()
+BEGIN
+  SELECT
+    `e1`.`exeId`,
+    `r0`.`label`,
+    `e1`.`status`,
+    `e1`.`createTime`,
+    `e1`.`finishTime`,
+    `e1`.`nodCount`
+  FROM `rec` AS `r0` INNER JOIN (
+    SELECT
+      `e0`.*,
+      `n0`.`nodCount`
+    FROM `exe` AS `e0` INNER JOIN (
+      SELECT
+        `nod`.`exeId`,
+        COUNT(`nod`.`nodId`) AS `nodCount`
+      FROM `nod`
+      GROUP BY `exeId`
+    ) AS `n0`
+    ON `e0`.`exeId` = `n0`.`exeId`
+  ) AS `e1`
+  ON `r0`.`recId` = `e1`.`recId`;
+END$
+
+CREATE PROCEDURE IF NOT EXISTS `createNode` (
+  IN  `i_exeId`       BIGINT,
+  IN  `i_url`         VARCHAR(2048),
+  IN  `i_title`       VARCHAR(1024),
+  IN  `i_crawlTime`   DATETIME,
+  OUT `o_nodId`       BIGINT)
+BEGIN
+  INSERT INTO `nod` (`exeId`, `url`, `title`, `crawlTime`) VALUES
+    (`i_exeId`, `i_url`, `i_title`, `i_crawlTime`);
+  SELECT LAST_INSERT_ID () INTO `o_nodId`;
+END$
+
+CREATE PROCEDURE IF NOT EXISTS `createLink` (
+  IN  `i_nodFr`       BIGINT,
+  IN  `i_nodTo`       BIGINT,
+  OUT `o_lnkId`       BIGINT)
+BEGIN
+  INSERT INTO `lnk` (`nodFr`, `nodTo`) VALUES
+    (`i_nodFr`, `i_nodTo`);
+  SELECT LAST_INSERT_ID () INTO `o_lnkId`;
 END$
 
 DELIMITER ;
 
 -- Ensure consistent state -----------------------------------------------------
 
-DELETE FROM `execution` WHERE `active` != 'FINISHED';
-
--- Data samples ----------------------------------------------------------------
-
-INSERT INTO `record` (`url`, `regexp`, `period`, `label`, `active`, `tags`) VALUES
-  ('http://www.example1.com', '^abcd$', 1, 'Example web 1', 0, JSON_ARRAY('a', 'b')),
-  ('http://www.example2.com', '[0-9]+', 2, 'Example web 2', 1, JSON_ARRAY('b', 'c')),
-  ('http://www.example3.com', '[a-z]*', 3, 'Example web 3', 1, JSON_ARRAY('c', 'd'));
+DELETE FROM `exe` WHERE `status` != 'FINISHED';

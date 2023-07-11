@@ -127,35 +127,35 @@ components:
           format: uri
           description: 'Entry point of crawling.'
           example: 'http://www.example.com/'
+        regexp:
+          type: string
+          description: 'Boundary regular expression.'
+          minLength: 1
+          example: '*'
+        period:
+          type: integer
+          format: int32
+          minimum: 1
+          description: 'Periodicity of crawling (in minutes).'
+          example: 10
         label:
           $ref: '#/components/schemas/EntityLabel'
         active:
           type: boolean
           description: 'Active records are crawled based on the periodicity.'
           example: true
-        period:
-          type: integer
-          format: int64
-          minimum: 1
-          description: 'Periodicity of crawling in minutes.'
-          example: 10
-        regexp:
-          type: string
-          description: 'Boundary regular expression.'
-          minLength: 1
-          example: '*'
         tags:
           type: array
-          description: 'User-defined keywords.'
+          description: 'User-defined tags / keywords.'
           items:
             $ref: '#/components/schemas/RecordTag'
           example: [ 'a', 'b', 'c' ]
       required:
         - url
+        - regexp
+        - period
         - label
         - active
-        - period
-        - regexp
         - tags
     ExecutionStatus:
       type: string
@@ -214,6 +214,7 @@ components:
           format: int32
           minimum: 0
       required:
+        - recId
         - exeId
         - label
         - status

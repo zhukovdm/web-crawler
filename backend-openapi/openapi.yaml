@@ -164,23 +164,21 @@ components:
         - 'PLANNED'
         - 'CRAWLING'
         - 'FINISHED'
-    ExecutionTime:
+    NullableExecutionTime:
       type: string
       format: date-time
+      nullable: true
     RecordLastExec:
       type: object
       properties:
         lastExecStatus:
           $ref: '#/components/schemas/ExecutionStatus'
-          nullable: true
           description: 'Current status of the last execution.'
         lastExecCreateTime:
-          $ref: '#/components/schemas/ExecutionTime'
-          nullable: true
+          $ref: '#/components/schemas/NullableExecutionTime'
           description: 'Create time of the last execution.'
         lastExecFinishTime:
-          $ref: '#/components/schemas/ExecutionTime'
-          nullable: true
+          $ref: '#/components/schemas/NullableExecutionTime'
           description: 'End time of the last execution.'
       required:
         - lastExecStatus
@@ -203,11 +201,12 @@ components:
         status:
           $ref: '#/components/schemas/ExecutionStatus'
         createTime:
-          $ref: '#/components/schemas/ExecutionTime'
+          type: string
+          format: date-time
+          nullable: false
           description: 'Time of creation.'
         finishTime:
-          $ref: '#/components/schemas/ExecutionTime'
-          nullable: true
+          $ref: '#/components/schemas/NullableExecutionTime'
           description: 'Time of finished crawling.'
         nodCount:
           type: integer

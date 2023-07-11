@@ -32,3 +32,25 @@ CALL deleteRecord (
   @count
 );
 SELECT @count AS count;
+
+CALL createExecution(
+  1,
+  'WAITING',
+  '2023-01-01 00:00:00',
+  @exeId
+);
+SELECT @count AS count, @exeId AS exeId;
+
+CALL createNode (
+  1,
+  'http://www.example.com/',
+  'Example web 1'
+);
+SELECT @nodId AS nodId;
+
+CALL createLink (
+  1,
+  2,
+  @count
+);
+SELECT @count AS count;

@@ -15,12 +15,12 @@ INSERT INTO `exe` (`recId`, `status`, `createTime`, `finishTime`) VALUES
 
 -- nodes
 
-INSERT INTO `nod` (`exeId`, `url`) VALUES
-  (1, 'http://www.example1.com'),
-  (1, 'http://www.example2.com'),
-  (1, 'http://www.example3.com'),
-  (1, 'http://www.example4.com'),
-  (1, 'http://www.example5.com');
+INSERT INTO `nod` (`exeId`, `url`, `title`) VALUES
+  (1, 'http://www.example1.com', 'Example web 1'),
+  (1, 'http://www.example2.com', 'Example web 2'),
+  (1, 'http://www.example3.com', 'Example web 3'),
+  (1, 'http://www.example4.com', 'Example web 4'),
+  (1, 'http://www.example5.com', 'Example web 5');
 
 -- links
 

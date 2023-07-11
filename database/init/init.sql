@@ -116,14 +116,14 @@ BEGIN
   END;
 
   START TRANSACTION;
-  INSERT INTO `rec` (`url`, `regexp`, `period`, `label`, `active`, `tags`) VALUES
-    (`i_url`, `i_regexp`, `i_period`, `i_label`, `i_active`, `i_tags`);
-  SELECT LAST_INSERT_ID () INTO `o_recId`;
-  IF (`i_active` = 1) THEN
-    INSERT INTO `exe` (`recId`, `createTime`) VALUES
-      (`o_recId`, `i_createTime`);
-    SELECT LAST_INSERT_ID () INTO `o_exeId`;
-  END IF;
+    INSERT INTO `rec` (`url`, `regexp`, `period`, `label`, `active`, `tags`) VALUES
+      (`i_url`, `i_regexp`, `i_period`, `i_label`, `i_active`, `i_tags`);
+    SELECT LAST_INSERT_ID () INTO `o_recId`;
+    IF (`i_active` = 1) THEN
+      INSERT INTO `exe` (`recId`, `createTime`) VALUES
+        (`o_recId`, `i_createTime`);
+      SELECT LAST_INSERT_ID () INTO `o_exeId`;
+    END IF;
   COMMIT;
 
 END$
@@ -153,27 +153,27 @@ BEGIN
   END;
 
   START TRANSACTION;
-  SELECT COUNT(*) INTO `o_count` FROM `rec` WHERE `recId` = `i_recId`;
-  UPDATE `rec`
-    SET
-      `url`    = `i_url`,
-      `regexp` = `i_regexp`,
-      `period` = `i_period`,
-      `label`  = `i_label`,
-      `active` = `i_active`,
-      `tags`   = `i_tags`
-    WHERE `recId` = `i_recId`;
-  IF (
-    `i_active` = 1 AND `o_count` > 0 AND
-    NOT EXISTS (SELECT * FROM `exe` WHERE `recId` = `i_recId` AND `status` != 'FINISHED')
-  ) THEN
-    INSERT INTO `exe` (`recId`, `createTime`) VALUES
-      (`i_recId`, `i_createTime`);
-    SELECT LAST_INSERT_ID () INTO `o_exeId`;
-  END IF;
-  IF (`i_active` = 0 AND `o_count` > 0) THEN
-    DELETE FROM `exe` WHERE `recId` = `i_recId` AND `status` = 'WAITING';
-  END IF;
+    SELECT COUNT(*) INTO `o_count` FROM `rec` WHERE `recId` = `i_recId`;
+    UPDATE `rec`
+      SET
+        `url`    = `i_url`,
+        `regexp` = `i_regexp`,
+        `period` = `i_period`,
+        `label`  = `i_label`,
+        `active` = `i_active`,
+        `tags`   = `i_tags`
+      WHERE `recId` = `i_recId`;
+    IF (
+      `i_active` = 1 AND `o_count` > 0 AND
+      NOT EXISTS (SELECT * FROM `exe` WHERE `recId` = `i_recId` AND `status` != 'FINISHED')
+    ) THEN
+      INSERT INTO `exe` (`recId`, `createTime`) VALUES
+        (`i_recId`, `i_createTime`);
+      SELECT LAST_INSERT_ID () INTO `o_exeId`;
+    END IF;
+    IF (`i_active` = 0 AND `o_count` > 0) THEN
+      DELETE FROM `exe` WHERE `recId` = `i_recId` AND `status` = 'WAITING';
+    END IF;
   COMMIT;
 
 END$
@@ -223,7 +223,7 @@ BEGIN
 END$
 
 /**
- * Create execution with a given status.
+ * Create new execution with a given status.
  */
 CREATE PROCEDURE IF NOT EXISTS `createExecution` (
   IN  `i_recId`       BIGINT,
@@ -232,9 +232,13 @@ CREATE PROCEDURE IF NOT EXISTS `createExecution` (
   OUT `o_exeId`       BIGINT)
 BEGIN
 
-  INSERT INTO `exe` (`recId`, `status`, `createTime`) VALUES
-    (`i_recId`, `i_status`, `i_createTime`);
-  SELECT LAST_INSERT_ID () INTO `o_exeId`;
+  INSERT INTO `exe` (`recId`, `status`, `createTime`)
+    SELECT `recId` , `i_status`, `i_createTime` FROM `rec`
+      WHERE `recId` = `i_recId`;
+
+  IF (ROW_COUNT () > 0) THEN
+    SELECT LAST_INSERT_ID () INTO `o_exeId`;
+  END IF;
 
 END$
 
@@ -249,9 +253,13 @@ CREATE PROCEDURE IF NOT EXISTS `createNode` (
   OUT `o_nodId`       BIGINT)
 BEGIN
 
-  INSERT INTO `nod` (`exeId`, `url`, `title`, `crawlTime`) VALUES
-    (`i_exeId`, `i_url`, `i_title`, `i_crawlTime`);
-  SELECT LAST_INSERT_ID () INTO `o_nodId`;
+  INSERT INTO `nod` (`exeId`, `url`, `title`, `crawlTime`)
+    SELECT `exeId`, `i_url`, `i_title`, `i_crawlTime` FROM `exe`
+      WHERE `exeId` = `i_exeId`;
+  
+  IF (ROW_COUNT () > 0) THEN
+    SELECT LAST_INSERT_ID () INTO `o_nodId`;
+  END IF;
 
 END$
 
@@ -260,10 +268,20 @@ END$
  */
 CREATE PROCEDURE IF NOT EXISTS `createLink` (
   IN  `i_nodFr`       BIGINT,
-  IN  `i_nodTo`       BIGINT)
+  IN  `i_nodTo`       BIGINT,
+  OUT `o_count`       INT)
 BEGIN
 
-  INSERT INTO `lnk` (`nodFr`, `nodTo`) VALUES (`i_nodFr`, `i_nodTo`);
+  INSERT INTO `lnk` (`nodFr`, `nodTo`)
+    SELECT
+      `n0`.`nodId` AS `nodFr`,
+      `n1`.`nodId` AS `nodTo`
+    FROM
+      (SELECT `nodId` FROM `nod` WHERE `nodId` = `i_nodFr`) AS `n0`
+    CROSS JOIN
+      (SELECT `nodId` FROM `nod` WHERE `nodId` = `i_nodTo`) AS `n1`;
+
+  SELECT ROW_COUNT () INTO `o_count`;
 
 END$
 

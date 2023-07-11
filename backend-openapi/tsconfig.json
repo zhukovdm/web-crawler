@@ -1,8 +1,11 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
-    "target": "ES6",
+    "strict": true,
+    "module": "ESNext",
+    "target": "ES2017",
     "esModuleInterop": true,
+    "moduleResolution": "NodeNext",
+    "noFallthroughCasesInSwitch": true,
     "outDir": "./dist"
   },
   "include": [

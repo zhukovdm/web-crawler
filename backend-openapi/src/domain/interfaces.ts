@@ -1,4 +1,7 @@
 import {
+  ExecutionFullType,
+  ExecutionStatus,
+  NodeBaseType,
   RecordBaseType,
   RecordFullType,
   RecordIdType
@@ -8,34 +11,37 @@ export interface IRecordModel {
 
   getAllRecords(): Promise<RecordFullType[]>;
 
-  createRecord(record: RecordBaseType): Promise<RecordIdType>;
+  createRecord(record: RecordBaseType): Promise<{ recId: number, exeId: number | null }>;
 
-  updateRecord(record: RecordFullType): Promise<number>;
+  updateRecord(record: RecordIdType & RecordBaseType): Promise<{ updated: boolean, exeId: number | null }>;
 
-  deleteRecord(record: RecordIdType): Promise<number>;
+  deleteRecord(record: RecordIdType): Promise<{ deleted: boolean }>;
 }
 
 export interface IExecutionModel {
 
-  getAllExecutions(): Promise<void>;
+  /**
+   * Get a list of all executuions
+   */
+  getAllExecutions(): Promise<ExecutionFullType[]>;
 
-  createExecution(recId: number, exeId: number): Promise<void>;
+  /**
+   * Execute prioritized execution.
+   */
+  createExecution(recId: number, status: ExecutionStatus): Promise<{ created: boolean, exeId: number | null }>;
 }
 
-export interface IPlanner {
+export interface ICrawlerModel {
+
+  createNode(node: NodeBaseType): Promise<{ nodId: number | null }>;
+
+  createLink(nodFr: number, nodTo: number): Promise<{ created: boolean }>;
+}
+
+export interface IExecutor {
 
   /**
-   * Create one-time prioritized execution.
+   * Prioritize new execution.
    */
-  inject(recId: number): Promise<void>;
-
-  /**
-   * Dequeue deleted record.
-   */
-  dequeue(recId: number): Promise<void>;
-
-  /**
-   * Consider a record.
-   */
-  consider(recId: number, period: number, active: boolean): Promise<void>;
+  prepend(exeId: number): void;
 }

@@ -7,7 +7,6 @@ import {
   ExecutionFullType,
   ExecutionStatus,
   NodeBaseType,
-  NodeIdType,
   RecordBaseType,
   RecordFullType,
   RecordIdType
@@ -27,41 +26,34 @@ type MySqlPackType = {
 };
 
 const GET_ALL_RECORDS_QUERY: string = `
-CALL getAllRecords ();
-`;
+CALL getAllRecords ();`;
 
 const CREATE_RECORD_QUERY: string = `
 CALL createRecord (?, ?, ?, ?, ?, ?, ?, @recId, @exeId);
-SELECT @recId AS recId, @exeId AS exeId;
-`;
+SELECT @recId AS recId, @exeId AS exeId;`;
 
 const UPDATE_RECORD_QUERY: string = `
 CALL updateRecord (?, ?, ?, ?, ?, ?, ?, ?, @count, @exeId);
-SELECT @count AS count, @exeId AS exeId;
-`;
+SELECT @count AS count, @exeId AS exeId;`;
 
 const DELETE_RECORD_QUERY: string = `
 CALL deleteRecord (?, @count);
-SELECT @count AS count;
-`;
+SELECT @count AS count;`;
 
 const GET_ALL_EXECUTIONS_QUERY: string = `
-CALL getAllExecutions ();
-`;
+CALL getAllExecutions ();`;
 
 const CREATE_EXECUTION_QUERY: string = `
-CALL createExecution (?, ?, @exeId);
-SELECT @exeId AS exeId;
-`;
+CALL createExecution (?, ?, ?, @exeId);
+SELECT @exeId AS exeId;`;
 
 const CREATE_NODE_QUERY: string = `
 CALL createNode (?, ?, ?, ?, @nodId);
-SELECT @nodId AS nodId;
-`;
+SELECT @nodId AS nodId;`;
 
 const CREATE_LINK_QUERY: string = `
-CALL createLink (?, ?);
-`;
+CALL createLink (?, ?, @count);
+SELECT @count AS count;`;
 
 export class MySqlModel implements IRecordModel, IExecutionModel, ICrawlerModel {
 
@@ -93,6 +85,13 @@ export class MySqlModel implements IRecordModel, IExecutionModel, ICrawlerModel 
   }
 
   /**
+   * Get indices right!
+   */
+  private static getUnsafeOutputParams(results: any): any {
+    return { ...results[1][0] };
+  }
+
+  /**
    * Current time in `YYYY-MM-DD HH:MM:SS` format.
    */
   private static getCurrentTime(): string {
@@ -103,9 +102,10 @@ export class MySqlModel implements IRecordModel, IExecutionModel, ICrawlerModel 
   public async getAllRecords(): Promise<RecordFullType[]> {
     return new Promise((res, rej) => {
       this.pool.query(GET_ALL_RECORDS_QUERY, [], (err, results) => {
-        (err)
-          ? rej(err)
-          : res(results[0].map((row: any) => ({ ...row, tags: JSON.parse(row.tags), active: row.active === 1 })));
+        if (err) { rej(err); }
+        else {
+          res(results[0].map((row: any) => ({ ...row, tags: JSON.parse(row.tags), active: row.active === 1 })));
+        }
       });
     });
   }
@@ -117,32 +117,34 @@ export class MySqlModel implements IRecordModel, IExecutionModel, ICrawlerModel 
       ], (err, results) => {
         (err)
           ? rej(err)
-          : res({ ...results[1][0] });
+          : res(MySqlModel.getUnsafeOutputParams(results));
       });
     });
   }
 
-  public async updateRecord(r: RecordFullType): Promise<{ updated: boolean, exeId: number | null }> {
+  public async updateRecord(r: RecordIdType & RecordBaseType): Promise<{ updated: boolean, exeId: number | null }> {
     return new Promise((res, rej) => {
       this.pool.query(UPDATE_RECORD_QUERY, [r.recId, ...MySqlModel.unpackRecordBase(r)], (err, results) => {
-        (err)
-          ? rej(err)
-          : res({ ...results[1][0], updated: results[1][0].count > 0 });
+        if (err) { rej(err); }
+        else {
+          const params = MySqlModel.getUnsafeOutputParams(results);
+          res({ ...params, updated: params.count > 0 });
+        }
       });
     });
   }
 
-  public async deleteRecord(r: RecordIdType): Promise<{ deleted: boolean }> {
+  public async deleteRecord({ recId }: RecordIdType): Promise<{ deleted: boolean }> {
     return new Promise((res, rej) => {
-      this.pool.query(DELETE_RECORD_QUERY, [r.recId], (err, results) => {
+      this.pool.query(DELETE_RECORD_QUERY, [recId], (err, results) => {
         (err)
           ? rej(err)
-          : res({ deleted: results[1][0].count > 0 });
+          : res({ deleted: MySqlModel.getUnsafeOutputParams(results).count > 0 });
       });
     });
   }
 
-  public async getAllExecutions(): Promise<ExecutionFullType> {
+  public async getAllExecutions(): Promise<ExecutionFullType[]> {
     return new Promise((res, rej) => {
       this.pool.query(GET_ALL_EXECUTIONS_QUERY, [], (err, results) => {
         (err)
@@ -152,32 +154,34 @@ export class MySqlModel implements IRecordModel, IExecutionModel, ICrawlerModel 
     });
   }
 
-  public async createExecution(recId: number, status: ExecutionStatus): Promise<{ exeId: number }> {
+  public async createExecution(recId: number, status: ExecutionStatus): Promise<{ created: boolean, exeId: number | null }> {
     return new Promise((res, rej) => {
       this.pool.query(CREATE_EXECUTION_QUERY, [recId, status, MySqlModel.getCurrentTime()], (err, results) => {
-        (err)
-          ? rej(err)
-          : res({ ...results[0][1] });
+        if (err) { rej(err); }
+        else {
+          const { exeId } = MySqlModel.getUnsafeOutputParams(results);
+          res({ created: exeId !== null, exeId: exeId });
+        }
       });
     });
   }
 
-  public async createNode(n: NodeBaseType): Promise<NodeIdType> {
+  public async createNode(n: NodeBaseType): Promise<{ nodId: number | null }> {
     return new Promise((res, rej) => {
       this.pool.query(CREATE_NODE_QUERY, [n.exeId, n.url, n.title, n.crawlTime], (err, results) => {
         (err)
           ? rej(err)
-          : res({ ...results[0][1] });
+          : res(MySqlModel.getUnsafeOutputParams(results));
       });
     });
   }
 
-  public async createLink(nodFr: number, nodTo: number): Promise<void> {
+  public async createLink(nodFr: number, nodTo: number): Promise<{ created: boolean }> {
     return new Promise((res, rej) => {
-      this.pool.query(CREATE_LINK_QUERY, [nodFr, nodTo], (err, _) => {
+      this.pool.query(CREATE_LINK_QUERY, [nodFr, nodTo], (err, results) => {
         (err)
           ? rej(err)
-          : res();
+          : res({ created: MySqlModel.getUnsafeOutputParams(results).count > 0 });
       });
     });
   }

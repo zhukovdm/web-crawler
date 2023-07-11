@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS `nod` (
   `nodId`       BIGINT NOT NULL AUTO_INCREMENT,
   `exeId`       BIGINT NOT NULL,
   `url`         VARCHAR(2048) NOT NULL,
-  `title`       VARCHAR(1024),
+  `title`       VARCHAR(1024) NOT NULL,
   `crawlTime`   DATETIME,
   PRIMARY KEY (`nodId`),
   FOREIGN KEY (`exeId`) REFERENCES `exe`(`exeId`)
@@ -44,10 +44,9 @@ CREATE TABLE IF NOT EXISTS `nod` (
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS `lnk` (
-  `lnkId`       BIGINT NOT NULL AUTO_INCREMENT,
   `nodFr`       BIGINT NOT NULL,
   `nodTo`       BIGINT NOT NULL,
-  PRIMARY KEY (`lnkId`),
+  PRIMARY KEY (`nodFr`, `nodTo`),
   FOREIGN KEY (`nodFr`) REFERENCES `nod`(`nodId`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
@@ -66,6 +65,7 @@ DELIMITER $
  */
 CREATE PROCEDURE IF NOT EXISTS `getAllRecords` ()
 BEGIN
+
   SELECT
     `r`.`recId`       AS `recId`,
     `r`.`url`         AS `url`,
@@ -91,6 +91,7 @@ BEGIN
     WHERE `e1`.`createTime` IS NULL
   ) AS `e`
   ON `r`.`recId` = `e`.`recId`;
+
 END$
 
 /**
@@ -107,21 +108,24 @@ CREATE PROCEDURE IF NOT EXISTS `createRecord` (
   OUT `o_recId`       BIGINT,
   OUT `o_exeId`       BIGINT)
 BEGIN
+
   DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-      ROLLBACK;
-      RESIGNAL;
-    END;
+  BEGIN
+    ROLLBACK;
+    RESIGNAL;
+  END;
+
   START TRANSACTION;
-    INSERT INTO `rec` (`url`, `regexp`, `period`, `label`, `active`, `tags`) VALUES
-      (`i_url`, `i_regexp`, `i_period`, `i_label`, `i_active`, `i_tags`);
-    SELECT LAST_INSERT_ID () INTO `o_recId`;
-    IF (`i_active` = 1) THEN
-      INSERT INTO `exe` (`recId`, `createTime`) VALUES
-        (`o_recId`, `i_createTime`);
-      SELECT LAST_INSERT_ID () INTO `o_exeId`;
-    END IF;
+  INSERT INTO `rec` (`url`, `regexp`, `period`, `label`, `active`, `tags`) VALUES
+    (`i_url`, `i_regexp`, `i_period`, `i_label`, `i_active`, `i_tags`);
+  SELECT LAST_INSERT_ID () INTO `o_recId`;
+  IF (`i_active` = 1) THEN
+    INSERT INTO `exe` (`recId`, `createTime`) VALUES
+      (`o_recId`, `i_createTime`);
+    SELECT LAST_INSERT_ID () INTO `o_exeId`;
+  END IF;
   COMMIT;
+
 END$
 
 /**
@@ -141,13 +145,16 @@ CREATE PROCEDURE IF NOT EXISTS `updateRecord` (
   OUT `o_count`       INT,
   OUT `o_exeId`       BIGINT)
 BEGIN
+
   DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-      ROLLBACK;
-      RESIGNAL;
-    END;
+  BEGIN
+    ROLLBACK;
+    RESIGNAL;
+  END;
+
   START TRANSACTION;
-    UPDATE `rec`
+  SELECT COUNT(*) INTO `o_count` FROM `rec` WHERE `recId` = `i_recId`;
+  UPDATE `rec`
     SET
       `url`    = `i_url`,
       `regexp` = `i_regexp`,
@@ -156,20 +163,19 @@ BEGIN
       `active` = `i_active`,
       `tags`   = `i_tags`
     WHERE `recId` = `i_recId`;
-    SELECT ROW_COUNT () INTO `o_count`;
-    IF (
-      `i_active` = 1 AND `o_count` > 0 AND
-      NOT EXISTS (SELECT 1 FROM `exe` WHERE `recId` = `i_recId` AND `status` != 'FINISHED')
-    ) THEN
-      INSERT INTO `exe` (`recId`, `createTime`) VALUES
-        (`i_recId`, `i_createTime`);
-      SELECT LAST_INSERT_ID () INTO `o_exeId`;
-    END IF;
-    IF (`i_active` = 0) THEN
-      DELETE FROM `exe`
-      WHERE `recId` = `i_recId` AND `status` = 'WAITING';
-    END IF;
+  IF (
+    `i_active` = 1 AND `o_count` > 0 AND
+    NOT EXISTS (SELECT * FROM `exe` WHERE `recId` = `i_recId` AND `status` != 'FINISHED')
+  ) THEN
+    INSERT INTO `exe` (`recId`, `createTime`) VALUES
+      (`i_recId`, `i_createTime`);
+    SELECT LAST_INSERT_ID () INTO `o_exeId`;
+  END IF;
+  IF (`i_active` = 0 AND `o_count` > 0) THEN
+    DELETE FROM `exe` WHERE `recId` = `i_recId` AND `status` = 'WAITING';
+  END IF;
   COMMIT;
+
 END$
 
 /**
@@ -179,8 +185,10 @@ CREATE PROCEDURE IF NOT EXISTS `deleteRecord` (
   IN  `i_recId`   BIGINT,
   OUT `o_count`   INT)
 BEGIN
+
   DELETE FROM `rec` WHERE `recId` = `i_recId`;
   SELECT ROW_COUNT () INTO `o_count`;
+
 END$
 
 /**
@@ -188,7 +196,9 @@ END$
  */
 CREATE PROCEDURE IF NOT EXISTS `getAllExecutions` ()
 BEGIN
+
   SELECT
+    `r0`.`recId`,
     `e1`.`exeId`,
     `r0`.`label`,
     `e1`.`status`,
@@ -209,8 +219,28 @@ BEGIN
     ON `e0`.`exeId` = `n0`.`exeId`
   ) AS `e1`
   ON `r0`.`recId` = `e1`.`recId`;
+
 END$
 
+/**
+ * Create execution with a given status.
+ */
+CREATE PROCEDURE IF NOT EXISTS `createExecution` (
+  IN  `i_recId`       BIGINT,
+  IN  `i_status`      ENUM('WAITING', 'PLANNED', 'CRAWLING', 'FINISHED'),
+  IN  `i_createTime`  DATETIME,
+  OUT `o_exeId`       BIGINT)
+BEGIN
+
+  INSERT INTO `exe` (`recId`, `status`, `createTime`) VALUES
+    (`i_recId`, `i_status`, `i_createTime`);
+  SELECT LAST_INSERT_ID () INTO `o_exeId`;
+
+END$
+
+/**
+ * Create new crawled node.
+ */
 CREATE PROCEDURE IF NOT EXISTS `createNode` (
   IN  `i_exeId`       BIGINT,
   IN  `i_url`         VARCHAR(2048),
@@ -218,19 +248,23 @@ CREATE PROCEDURE IF NOT EXISTS `createNode` (
   IN  `i_crawlTime`   DATETIME,
   OUT `o_nodId`       BIGINT)
 BEGIN
+
   INSERT INTO `nod` (`exeId`, `url`, `title`, `crawlTime`) VALUES
     (`i_exeId`, `i_url`, `i_title`, `i_crawlTime`);
   SELECT LAST_INSERT_ID () INTO `o_nodId`;
+
 END$
 
+/**
+ * Create directed link between two crawled nodes.
+ */
 CREATE PROCEDURE IF NOT EXISTS `createLink` (
   IN  `i_nodFr`       BIGINT,
-  IN  `i_nodTo`       BIGINT,
-  OUT `o_lnkId`       BIGINT)
+  IN  `i_nodTo`       BIGINT)
 BEGIN
-  INSERT INTO `lnk` (`nodFr`, `nodTo`) VALUES
-    (`i_nodFr`, `i_nodTo`);
-  SELECT LAST_INSERT_ID () INTO `o_lnkId`;
+
+  INSERT INTO `lnk` (`nodFr`, `nodTo`) VALUES (`i_nodFr`, `i_nodTo`);
+
 END$
 
 DELIMITER ;

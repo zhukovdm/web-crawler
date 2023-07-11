@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
     "strict": true,
-    "module": "ESNext",
+    "module": "NodeNext",
     "target": "ES2017",
     "esModuleInterop": true,
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "Node",
     "noFallthroughCasesInSwitch": true,
     "outDir": "./dist"
   },

@@ -70,12 +70,45 @@ paths:
           description: 'Not Found'
         '5XX':
           description: 'Internal Server Error'
+  /api/v1/executions:
+    get:
+      operationId: getAllExecutions
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExecutionFull'
+        '5XX':
+          description: 'Internal Server Error'
+    post:
+      operationId: createExecution
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordId'
+      responses:
+        '204':
+          description: 'Created'
+        '404':
+          description: 'Not Found'
+        '5XX':
+          description: 'Internal Server Error'
 components:
   schemas:
     EntityId:
       type: integer
       format: int64
       minimum: 1
+    EntityLabel:
+      type: string
+      description: 'User-defined label.'
+      minLength: 1
+      example: 'Example website'
     RecordId:
       type: object
       properties:
@@ -95,10 +128,7 @@ components:
           description: 'Entry point of crawling.'
           example: 'http://www.example.com/'
         label:
-          type: string
-          description: 'User-defined label.'
-          minLength: 1
-          example: 'Example website'
+          $ref: '#/components/schemas/EntityLabel'
         active:
           type: boolean
           description: 'Active records are crawled based on the periodicity.'
@@ -128,25 +158,29 @@ components:
         - regexp
         - tags
     ExecutionStatus:
-      type: number
-      format: int32
-      minimum: 0
-      maximum: 3
+      type: string
+      enum:
+        - 'CREATED'
+        - 'PLANNED'
+        - 'CRAWLING'
+        - 'FINISHED'
     ExecutionTime:
       type: string
       format: date-time
-      nullable: true
-    RecordExecRef:
+    RecordLastExec:
       type: object
       properties:
         lastExecStatus:
           $ref: '#/components/schemas/ExecutionStatus'
+          nullable: true
           description: 'Current status of the last execution.'
-        lastExecEndTime:
+        lastExecCreateTime:
           $ref: '#/components/schemas/ExecutionTime'
-          description: 'End time of the last execution.'
-        lastExecStartTime:
+          nullable: true
+          description: 'Create time of the last execution.'
+        lastExecFinishTime:
           $ref: '#/components/schemas/ExecutionTime'
+          nullable: true
           description: 'End time of the last execution.'
       required:
         - lastExecStatus
@@ -156,4 +190,33 @@ components:
       allOf:
         - $ref: '#/components/schemas/RecordId'
         - $ref: '#/components/schemas/RecordBase'
-        - $ref: '#/components/schemas/RecordExecRef'
+        - $ref: '#/components/schemas/RecordLastExec'
+    ExecutionFull:
+      type: object
+      properties:
+        recId:
+          $ref: '#/components/schemas/EntityId'
+        exeId:
+          $ref: '#/components/schemas/EntityId'
+        label:
+          $ref: '#/components/schemas/EntityLabel'
+        status:
+          $ref: '#/components/schemas/ExecutionStatus'
+        createTime:
+          $ref: '#/components/schemas/ExecutionTime'
+          description: 'Time of creation.'
+        finishTime:
+          $ref: '#/components/schemas/ExecutionTime'
+          nullable: true
+          description: 'Time of finished crawling.'
+        nodCount:
+          type: integer
+          format: int32
+          minimum: 0
+      required:
+        - exeId
+        - label
+        - status
+        - createTime
+        - finishTime
+        - nodCount

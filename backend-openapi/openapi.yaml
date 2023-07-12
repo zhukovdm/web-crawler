@@ -108,6 +108,7 @@ components:
       type: string
       description: 'User-defined label.'
       minLength: 1
+      maxLength: 1024
       example: 'Example website'
     RecordId:
       type: object
@@ -119,6 +120,7 @@ components:
     RecordTag:
       type: string
       minLength: 1
+      maxLength: 64
     RecordBase:
       type: object
       properties:
@@ -126,18 +128,20 @@ components:
           type: string
           format: uri
           description: 'Entry point of crawling.'
+          maxLength: 2048
           example: 'http://www.example.com/'
         regexp:
           type: string
           description: 'Boundary regular expression.'
           minLength: 1
+          maxLength: 1024
           example: '*'
         period:
           type: integer
           format: int32
           minimum: 1
           description: 'Periodicity of crawling (in minutes).'
-          example: 10
+          example: 3
         label:
           $ref: '#/components/schemas/EntityLabel'
         active:
@@ -162,6 +166,7 @@ components:
       enum:
         - 'CREATED'
         - 'PLANNED'
+        - 'FAILURE'
         - 'CRAWLING'
         - 'FINISHED'
     NullableExecutionTime:
@@ -203,7 +208,6 @@ components:
         createTime:
           type: string
           format: date-time
-          nullable: false
           description: 'Time of creation.'
         finishTime:
           $ref: '#/components/schemas/NullableExecutionTime'

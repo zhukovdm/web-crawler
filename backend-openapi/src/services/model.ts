@@ -38,6 +38,9 @@ SELECT @count AS count;`;
 const GET_ALL_EXECUTIONS_QUERY: string = `
 CALL getAllExecutions ();`;
 
+const DELETE_INCOMPLETE_EXECUTIONS: string = `
+CALL deleteIncompleteExecutions ();`;
+
 const CREATE_EXECUTION_QUERY: string = `
 CALL createExecution (?, ?, @exeId);
 SELECT @exeId AS exeId;`;
@@ -149,6 +152,14 @@ export class MySqlModel implements IRecordModel, IExecutionModel, ICrawlerModel 
         (err)
           ? rej(err)
           : res(results[0]);
+      });
+    });
+  }
+
+  public async deleteIncompleteExecutions(): Promise<void> {
+    return new Promise((res, rej) => {
+      this.pool.query(DELETE_INCOMPLETE_EXECUTIONS, [], (err) => {
+        (err) ? rej(err) : res();
       });
     });
   }

@@ -17,12 +17,12 @@ import { ExecutionController } from "./controllers/execution-controller";
   const wapp = express();
   wapp.disable("x-powered-by");
 
-  const { PORT, API_SPEC } = process.env;
+  const { OPENAPI_PORT, OPENAPI_SPEC } = process.env;
 
   wapp
     .use(morgan("dev"))
     .use(bodyParser.json())
-    .use(validator.middleware({ apiSpec: API_SPEC! }));
+    .use(validator.middleware({ apiSpec: OPENAPI_SPEC! }));
 
   wapp.get("/api/v1/records", async (req, res) => {
     await RecordController.getAllRecords(req, res, model);
@@ -55,7 +55,7 @@ import { ExecutionController } from "./controllers/execution-controller";
     });
   });
 
-  wapp.listen(PORT, () => {
-    console.log(`backend-openapi is listening on port ${PORT}.`);
+  wapp.listen(OPENAPI_PORT!, () => {
+    console.log(`backend-openapi is listening on port ${OPENAPI_PORT!}.`);
   });
 })();

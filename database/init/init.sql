@@ -163,7 +163,9 @@ BEGIN
     -- statuses other than 'FINISHED' mean the record will be repeated
     IF (
       `i_active` = 1 AND `o_count` > 0 AND
-      NOT EXISTS (SELECT * FROM `exe` WHERE `recId` = `i_recId` AND `status` != 'FINISHED')
+      NOT EXISTS (
+        SELECT * FROM `exe`
+        WHERE `recId` = `i_recId` AND (`status` != 'FAILURE' OR `status` != 'FINISHED'))
     ) THEN
       INSERT INTO `exe` (`recId`, `status`, `createTime`) VALUES
         (`i_recId`, 'PLANNED', `i_createTime`);
@@ -214,6 +216,14 @@ BEGIN
     ON `e0`.`exeId` = `n0`.`exeId`
   ) AS `e1`
   ON `r0`.`recId` = `e1`.`recId`;
+END$
+
+/**
+ * Delete incomplete executions for easier server startup.
+ */
+CREATE PROCEDURE IF NOT EXISTS `deleteIncompleteExecutions` ()
+BEGIN
+  DELETE FROM `exe` WHERE (`status` != 'FAILURE' OR `status` != 'FINISHED');
 END$
 
 /**
@@ -296,7 +306,3 @@ BEGIN
 END$
 
 DELIMITER ;
-
--- Ensure consistent state -----------------------------------------------------
-
-DELETE FROM `exe` WHERE `status` != 'FINISHED';

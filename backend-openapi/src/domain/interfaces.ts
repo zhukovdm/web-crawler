@@ -26,6 +26,11 @@ export interface IExecutionModel {
   getAllExecutions(): Promise<ExecutionFullType[]>;
 
   /**
+   * Remove executions with statuses other than finished or failed.
+   */
+  deleteIncompleteExecutions(): Promise<void>;
+
+  /**
    * Create prioritized execution upon user command.
    */
   createExecution(recId: number): Promise<{ created: boolean, exeId: number | null }>;
@@ -46,4 +51,27 @@ export interface IExecutor {
    * Prioritize new execution.
    */
   prepend(exeId: number): void;
+
+  /**
+   * Report execution upon crawling.
+   */
+  reportCrawled(exeId: number): void;
+}
+
+export interface IWorkerPool {
+
+  /**
+   * Acquire available worker.
+   */
+  acquire(): number | undefined;
+
+  /**
+   * Release acquired worker.
+   */
+  release(wrkId: number): void;
+
+  /**
+   * Start crawling of a given execution on an acquired worker.
+   */
+  crawl(exeId: number, wrkId: number): void;
 }

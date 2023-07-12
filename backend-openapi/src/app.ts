@@ -4,15 +4,15 @@ import morgan from "morgan";
 import bodyParser from "body-parser";
 import express from "express";
 import * as validator from "express-openapi-validator";
-import { MySqlModel } from "./services/mysql-model";
-import { PromiseExecutor } from "./services/promise-executor";
+import { MySqlModel } from "./services/model";
+import { Executor } from "./services/executor";
 import { RecordController } from "./controllers/record-controller";
 import { ExecutionController } from "./controllers/execution-controller";
 
 (async function main() {
 
   const model = MySqlModel.getInstance();
-  const executor = await PromiseExecutor.getInstance(model, model);
+  const executor = await Executor.getInstance(model, model);
 
   const wapp = express();
   wapp.disable("x-powered-by");

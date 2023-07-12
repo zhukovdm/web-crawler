@@ -10,7 +10,7 @@ const {
 
 // MySQL
 
-export type MySqlConfig = {
+export type MySqlConfigType = {
   host: string;
   port: number;
   user: string;
@@ -18,7 +18,7 @@ export type MySqlConfig = {
   password: string;
 }
 
-export const MYSQL_CONFIG: MySqlConfig = {
+export const MYSQL_CONFIG: MySqlConfigType = {
   host: MYSQL_HOST!,
   port: parseInt(MYSQL_PORT!),
   user: MYSQL_USER!,

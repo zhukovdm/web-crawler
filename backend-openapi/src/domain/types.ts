@@ -1,5 +1,5 @@
 export type ExecutionStatus =
-  "WAITING" | "PLANNED" | "CRAWLING" | "FINISHED";
+  "WAITING" | "PLANNED" | "FAILURE" | "CRAWLING" | "FINISHED";
 
 export type RecordIdType = {
   recId: number;

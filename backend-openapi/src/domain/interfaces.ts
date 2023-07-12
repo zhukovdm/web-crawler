@@ -21,14 +21,16 @@ export interface IRecordModel {
 export interface IExecutionModel {
 
   /**
-   * Get a list of all executuions
+   * Get a list of all executuions.
    */
   getAllExecutions(): Promise<ExecutionFullType[]>;
 
   /**
-   * Execute prioritized execution.
+   * Create prioritized execution upon user command.
    */
-  createExecution(recId: number, status: ExecutionStatus): Promise<{ created: boolean, exeId: number | null }>;
+  createExecution(recId: number): Promise<{ created: boolean, exeId: number | null }>;
+
+  updateExecutionStatus(exeId: number, status: ExecutionStatus): Promise<{ updated: boolean }>;
 }
 
 export interface ICrawlerModel {

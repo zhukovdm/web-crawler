@@ -2,7 +2,10 @@ import {
   Pool,
   createPool
 } from "mysql";
-import { MYSQL_CONFIG } from "./config";
+import {
+  MYSQL_CONFIG,
+  MySqlConfigType
+} from "./config";
 import {
   ExecutionFullType,
   ExecutionStatus,
@@ -16,14 +19,6 @@ import {
   IExecutionModel,
   IRecordModel
 } from "../domain/interfaces";
-
-type MySqlPackType = {
-  host: string;
-  port: number;
-  user: string;
-  database: string;
-  password: string;
-};
 
 const GET_ALL_RECORDS_QUERY: string = `
 CALL getAllRecords ();`;
@@ -44,8 +39,12 @@ const GET_ALL_EXECUTIONS_QUERY: string = `
 CALL getAllExecutions ();`;
 
 const CREATE_EXECUTION_QUERY: string = `
-CALL createExecution (?, ?, ?, @exeId);
+CALL createExecution (?, ?, @exeId);
 SELECT @exeId AS exeId;`;
+
+const UPDATE_EXECUTION_STATUS: string = `
+CALL updateExecutionStatus (?, ?, @count);
+SELECT @count AS count;`;
 
 const CREATE_NODE_QUERY: string = `
 CALL createNode (?, ?, ?, ?, @nodId);
@@ -67,7 +66,7 @@ export class MySqlModel implements IRecordModel, IExecutionModel, ICrawlerModel 
    */
   private static readonly CONNECTION_LIMIT: number = 10;
 
-  private constructor(p: MySqlPackType) {
+  private constructor(p: MySqlConfigType) {
     this.pool = createPool({
       ...p,
       dateStrings: true,
@@ -154,14 +153,24 @@ export class MySqlModel implements IRecordModel, IExecutionModel, ICrawlerModel 
     });
   }
 
-  public async createExecution(recId: number, status: ExecutionStatus): Promise<{ created: boolean, exeId: number | null }> {
+  public async createExecution(recId: number): Promise<{ created: boolean, exeId: number | null }> {
     return new Promise((res, rej) => {
-      this.pool.query(CREATE_EXECUTION_QUERY, [recId, status, MySqlModel.getCurrentTime()], (err, results) => {
+      this.pool.query(CREATE_EXECUTION_QUERY, [recId, MySqlModel.getCurrentTime()], (err, results) => {
         if (err) { rej(err); }
         else {
           const { exeId } = MySqlModel.getUnsafeOutputParams(results);
           res({ created: exeId !== null, exeId: exeId });
         }
+      });
+    });
+  }
+
+  public async updateExecutionStatus(exeId: number, status: ExecutionStatus): Promise<{ updated: boolean; }> {
+    return new Promise((res, rej) => {
+      this.pool.query(UPDATE_EXECUTION_STATUS, [exeId, status], (err, results) => {
+        (err)
+          ? rej(err)
+          : res({ updated: MySqlModel.getUnsafeOutputParams(results).count > 0 });
       });
     });
   }

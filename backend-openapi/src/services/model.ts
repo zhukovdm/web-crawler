@@ -45,6 +45,10 @@ const CREATE_EXECUTION_QUERY: string = `
 CALL createExecution (?, ?, @exeId);
 SELECT @exeId AS exeId;`;
 
+const REPEAT_EXECUTION_QUERY: string = `
+CALL repeatExecution (?, ?, @exeId);
+SELECT @exeId AS exeId;`;
+
 const UPDATE_EXECUTION_STATUS: string = `
 CALL updateExecutionStatus (?, ?, @count);
 SELECT @count AS count;`;
@@ -173,6 +177,18 @@ export class MySqlModel implements IRecordModel, IExecutionModel, ICrawlerModel 
           res({ created: exeId !== null, exeId: exeId });
         }
       });
+    });
+  }
+
+  public async repeatExecution(exeId: number): Promise<{ repeated: boolean, exeId: number | null }> {
+    return new Promise((res, rej) => {
+      this.pool.query(REPEAT_EXECUTION_QUERY, [exeId, MySqlModel.getCurrentTime()], (err, results) => {
+        if (err) { rej(err); }
+        else {
+          const { exeId } = MySqlModel.getUnsafeOutputParams(results);
+          res({ repeated: exeId !== null, exeId: exeId });
+        }
+      })
     });
   }
 

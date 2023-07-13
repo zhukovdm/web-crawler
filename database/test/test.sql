@@ -33,7 +33,7 @@ CALL deleteRecord (
 );
 SELECT @count AS count;
 
-CALL createExecution(
+CALL createExecution (
   1,
   'WAITING',
   '2023-01-01 00:00:00',

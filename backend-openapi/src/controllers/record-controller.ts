@@ -17,7 +17,7 @@ export class RecordController {
     req: Request, res: Response, model: IRecordModel, executor: IExecutor): Promise<void> {
     try {
       const { recId, exeId } = await model.createRecord(req.body);
-      if (exeId !== null) { executor.prepend(exeId); } // active!
+      if (exeId !== null) { executor.prioritize(exeId); } // active!
       res.status(201).json({ recId: recId });
     }
     catch (ex) { handleInternalServerError(res, ex); }
@@ -28,7 +28,7 @@ export class RecordController {
     const recId = parseInt(req.params.recId);
     try {
       const { updated, exeId } = await model.updateRecord({ recId: recId, ...req.body });
-      if (exeId !== null) { executor.prepend(exeId); }
+      if (exeId !== null) { executor.prioritize(exeId); }
       res.status(updated ? 204 : 404).end();
     }
     catch (ex) { handleInternalServerError(res, ex); }

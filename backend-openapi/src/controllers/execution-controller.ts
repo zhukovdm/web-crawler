@@ -17,7 +17,7 @@ export class ExecutionController {
     req: Request, res: Response, model: IExecutionModel, executor: IExecutor): Promise<void> {
     try {
       const { created, exeId } = await model.createExecution(req.body.recId);
-      if (exeId !== null) { executor.prepend(exeId); }
+      if (exeId !== null) { executor.prioritize(exeId); }
       res.status(created ? 204 : 404).end();
     }
     catch (ex) { handleInternalServerError(res, ex); }

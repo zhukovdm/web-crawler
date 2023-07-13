@@ -160,12 +160,12 @@ BEGIN
         `tags`   = `i_tags`
       WHERE `recId` = `i_recId`;
 
-    -- statuses other than 'FINISHED' mean the record will be repeated
+    -- incomplete statuses mean the record will be repeated
     IF (
       `i_active` = 1 AND `o_count` > 0 AND
       NOT EXISTS (
         SELECT * FROM `exe`
-        WHERE `recId` = `i_recId` AND (`status` != 'FAILURE' OR `status` != 'FINISHED'))
+        WHERE `recId` = `i_recId` AND `status` NOT IN ('FAILURE', 'FINISHED'))
     ) THEN
       INSERT INTO `exe` (`recId`, `status`, `createTime`) VALUES
         (`i_recId`, 'PLANNED', `i_createTime`);
@@ -223,7 +223,7 @@ END$
  */
 CREATE PROCEDURE IF NOT EXISTS `deleteIncompleteExecutions` ()
 BEGIN
-  DELETE FROM `exe` WHERE (`status` != 'FAILURE' OR `status` != 'FINISHED');
+  DELETE FROM `exe` WHERE `status` NOT IN ('FAILURE', 'FINISHED');
 END$
 
 /**
@@ -252,6 +252,30 @@ BEGIN
 
     DELETE FROM `exe` WHERE `recId` = `i_recId` AND `status` = 'WAITING';
   COMMIT;
+END$
+
+/**
+ * Create waiting execution if the record is still active, and no other
+ * incomplete executions exist.
+ */
+CREATE PROCEDURE IF NOT EXISTS `repeatExecution` (
+  IN  `i_exeId`       BIGINT,
+  IN  `i_createTime`  DATETIME,
+  OUT `o_exeId`       BIGINT)
+BEGIN
+  INSERT INTO `exe` (`recId`, `status`, `createTime`)
+    SELECT `r1`.`recId`, 'WAITING', `i_createTime` FROM (
+      SELECT `recId` FROM `rec` AS `r0`
+      WHERE `r0`.`active` = 1
+	    AND EXISTS (
+        SELECT `recId` FROM `exe` WHERE `r0`.`recId` = `exe`.`recId` AND `exe`.`exeId` = `i_exeId`)
+      AND NOT EXISTS (
+        SELECT `recId` FROM `exe` WHERE `r0`.`recId` = `exe`.`recId` AND `exe`.`status` NOT IN ('FAILURE', 'FINISHED'))
+    ) AS `r1`;
+
+  IF (ROW_COUNT () > 0) THEN
+    SELECT LAST_INSERT_ID () INTO `o_exeId`;
+  END IF;
 END$
 
 /**

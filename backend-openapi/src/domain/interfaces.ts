@@ -35,6 +35,14 @@ export interface IExecutionModel {
    */
   createExecution(recId: number): Promise<{ created: boolean, exeId: number | null }>;
 
+  /**
+   * Repeat execution after the previous one has been completed.
+   */
+  repeatExecution(exeId: number): Promise<{ repeated: boolean, exeId: number | null }>;
+
+  /**
+   * Set new status for a selected execution.
+   */
   updateExecutionStatus(exeId: number, status: ExecutionStatus): Promise<{ updated: boolean }>;
 }
 
@@ -50,7 +58,7 @@ export interface IExecutor {
   /**
    * Prioritize new execution.
    */
-  prepend(exeId: number): void;
+  prioritize(exeId: number): void;
 
   /**
    * Report execution upon crawling.

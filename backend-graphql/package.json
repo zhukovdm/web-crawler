@@ -1,0 +1,21 @@
+{
+  "name": "backend-graphql",
+  "version": "1.0.0",
+  "main": "dist/app.js",
+  "scripts": {
+    "start": "npx tsc && node ./dist/app.js",
+    "style": "eslint . --ext .ts"
+  },
+  "license": "MIT",
+  "author": "Dmitry Zhukov",
+  "keywords": [
+    "backend",
+    "graphql",
+    "web spider",
+    "web crawler"
+  ],
+  "dependencies": {
+  },
+  "devDependencies": {
+  }
+}

@@ -21,7 +21,12 @@ export class Executor implements IExecutor {
   /**
    * Plan executions with exceeded waiting time.
    */
-  private async plan(): Promise<void> {
+  private async resume(): Promise<void> {
+    try {
+      const { exeId } = await this.model.resumeExecution();
+      if (exeId !== null) { this.planned.enqueue(exeId); }
+    }
+    catch (_) { }
   }
 
   /**
@@ -50,7 +55,10 @@ export class Executor implements IExecutor {
     }
   }
 
-  private async renew(): Promise<void> {
+  /**
+   * Generate waiting execution for a crawled one.
+   */
+  private async repeat(): Promise<void> {
     const exeId = this.crawled.dequeue();
 
     try {
@@ -74,12 +82,15 @@ export class Executor implements IExecutor {
    * Attach event generators to the instance.
    */
   private withEvents(): IExecutor {
-    setInterval(() => { this.plan();  }, Executor.TICK_INTERVAL);
-    setInterval(() => { this.crawl(); }, Executor.TICK_INTERVAL);
-    setInterval(() => { this.renew(); }, Executor.TICK_INTERVAL);
+    setInterval(() => { this.resume(); }, Executor.TICK_INTERVAL);
+    setInterval(() => { this.crawl();  }, Executor.TICK_INTERVAL);
+    setInterval(() => { this.repeat(); }, Executor.TICK_INTERVAL);
     return this;
   }
 
+  /**
+   * Factory method.
+   */
   public static async getInstance(
     recModel: IRecordModel, exeModel: IExecutionModel): Promise<IExecutor> {
 

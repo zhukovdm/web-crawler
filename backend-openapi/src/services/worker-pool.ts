@@ -18,7 +18,7 @@ export class ArrayWorkerPool implements IWorkerPool {
 
     this.workerObjects = Array(ArrayWorkerPool.MAX_THREADS)
       .fill(undefined)
-      .map(() => new Worker("./dist/worker.js"));
+      .map(() => new Worker("./dist/services/worker.js"));
 
     this.workerObjects.forEach((worker) => {
       const pool = this;

@@ -1,11 +1,11 @@
 import {
+  Connection,
+  ConnectionConfig,
   Pool,
+  createConnection,
   createPool
 } from "mysql";
-import {
-  MYSQL_CONFIG,
-  MySqlConfigType
-} from "./config";
+import { MYSQL_CONFIG, MySqlConfigType } from "./config";
 import {
   ExecutionFullType,
   ExecutionStatus,
@@ -61,23 +61,38 @@ const CREATE_LINK_QUERY: string = `
 CALL createLink (?, ?, @count);
 SELECT @count AS count;`;
 
-export class MySqlModel implements IRecordModel, IExecutionModel, ICrawlerModel {
+/**
+ * Construct standard connection config.
+ */
+function getConnectionConfig(config: MySqlConfigType): ConnectionConfig {
+  return { ...config, dateStrings: true, multipleStatements: true };
+}
+
+/**
+ * Current time in `YYYY-MM-DD HH:MM:SS` format.
+ */
+function getCurrentTime(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`;
+};
+
+function getUnsafeOutputParams(results: any) { return { ...results[1][0] } };
+
+export class MySqlModel implements IRecordModel, IExecutionModel {
 
   /**
    * Connection pool.
    */
-  private pool: Pool;
+  private readonly pool: Pool;
 
   /**
    * Number of shared connections.
    */
   private static readonly CONNECTION_LIMIT: number = 10;
 
-  private constructor(p: MySqlConfigType) {
+  private constructor(config: MySqlConfigType) {
     this.pool = createPool({
-      ...p,
-      dateStrings: true,
-      multipleStatements: true,
+      ...getConnectionConfig(config),
       connectionLimit: MySqlModel.CONNECTION_LIMIT,
     });
   }
@@ -88,21 +103,6 @@ export class MySqlModel implements IRecordModel, IExecutionModel, ICrawlerModel 
 
   private static unpackRecordBase(r: RecordBaseType): [string, string, number, string, number, string] {
     return [r.url, r.regexp, r.period, r.label, r.active ? 1 : 0, JSON.stringify(r.tags)];
-  }
-
-  /**
-   * Get indices right!
-   */
-  private static getUnsafeOutputParams(results: any): any {
-    return { ...results[1][0] };
-  }
-
-  /**
-   * Current time in `YYYY-MM-DD HH:MM:SS` format.
-   */
-  private static getCurrentTime(): string {
-    const d = new Date();
-    return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`;
   }
 
   public async getAllRecords(): Promise<RecordFullType[]> {
@@ -119,11 +119,11 @@ export class MySqlModel implements IRecordModel, IExecutionModel, ICrawlerModel 
   public async createRecord(r: RecordBaseType): Promise<{ recId: number, exeId: number | null }> {
     return new Promise((res, rej) => {
       this.pool.query(CREATE_RECORD_QUERY, [
-        ...MySqlModel.unpackRecordBase(r), MySqlModel.getCurrentTime()
+        ...MySqlModel.unpackRecordBase(r), getCurrentTime()
       ], (err, results) => {
         (err)
           ? rej(err)
-          : res(MySqlModel.getUnsafeOutputParams(results));
+          : res(getUnsafeOutputParams(results));
       });
     });
   }
@@ -133,7 +133,7 @@ export class MySqlModel implements IRecordModel, IExecutionModel, ICrawlerModel 
       this.pool.query(UPDATE_RECORD_QUERY, [r.recId, ...MySqlModel.unpackRecordBase(r)], (err, results) => {
         if (err) { rej(err); }
         else {
-          const params = MySqlModel.getUnsafeOutputParams(results);
+          const params = getUnsafeOutputParams(results);
           res({ ...params, updated: params.count > 0 });
         }
       });
@@ -145,7 +145,7 @@ export class MySqlModel implements IRecordModel, IExecutionModel, ICrawlerModel 
       this.pool.query(DELETE_RECORD_QUERY, [recId], (err, results) => {
         (err)
           ? rej(err)
-          : res({ deleted: MySqlModel.getUnsafeOutputParams(results).count > 0 });
+          : res({ deleted: getUnsafeOutputParams(results).count > 0 });
       });
     });
   }
@@ -170,10 +170,10 @@ export class MySqlModel implements IRecordModel, IExecutionModel, ICrawlerModel 
 
   public async createExecution(recId: number): Promise<{ created: boolean, exeId: number | null }> {
     return new Promise((res, rej) => {
-      this.pool.query(CREATE_EXECUTION_QUERY, [recId, MySqlModel.getCurrentTime()], (err, results) => {
+      this.pool.query(CREATE_EXECUTION_QUERY, [recId, getCurrentTime()], (err, results) => {
         if (err) { rej(err); }
         else {
-          const { exeId } = MySqlModel.getUnsafeOutputParams(results);
+          const { exeId } = getUnsafeOutputParams(results);
           res({ created: exeId !== null, exeId: exeId });
         }
       });
@@ -182,10 +182,10 @@ export class MySqlModel implements IRecordModel, IExecutionModel, ICrawlerModel 
 
   public async repeatExecution(exeId: number): Promise<{ repeated: boolean, exeId: number | null }> {
     return new Promise((res, rej) => {
-      this.pool.query(REPEAT_EXECUTION_QUERY, [exeId, MySqlModel.getCurrentTime()], (err, results) => {
+      this.pool.query(REPEAT_EXECUTION_QUERY, [exeId, getCurrentTime()], (err, results) => {
         if (err) { rej(err); }
         else {
-          const { exeId } = MySqlModel.getUnsafeOutputParams(results);
+          const { exeId } = getUnsafeOutputParams(results);
           res({ repeated: exeId !== null, exeId: exeId });
         }
       })
@@ -197,28 +197,41 @@ export class MySqlModel implements IRecordModel, IExecutionModel, ICrawlerModel 
       this.pool.query(UPDATE_EXECUTION_STATUS, [exeId, status], (err, results) => {
         (err)
           ? rej(err)
-          : res({ updated: MySqlModel.getUnsafeOutputParams(results).count > 0 });
+          : res({ updated: getUnsafeOutputParams(results).count > 0 });
       });
     });
   }
 
-  public async createNode(n: NodeBaseType): Promise<{ nodId: number | null }> {
+  public end(): void { this.pool.end(); }
+}
+
+export class CrawlerModel implements ICrawlerModel {
+
+  private readonly conn: Connection;
+
+  private constructor(config: MySqlConfigType) {
+    this.conn = createConnection(getConnectionConfig(config));
+  }
+
+  createNode(n: NodeBaseType): Promise<{ nodId: number | null; }> {
     return new Promise((res, rej) => {
-      this.pool.query(CREATE_NODE_QUERY, [n.exeId, n.url, n.title, n.crawlTime], (err, results) => {
+      this.conn.query(CREATE_NODE_QUERY, [n.exeId, n.url, n.title, n.crawlTime], (err, results) => {
         (err)
           ? rej(err)
-          : res(MySqlModel.getUnsafeOutputParams(results));
+          : res(getUnsafeOutputParams(results));
       });
     });
   }
 
-  public async createLink(nodFr: number, nodTo: number): Promise<{ created: boolean }> {
+  createLink(nodFr: number, nodTo: number): Promise<{ created: boolean; }> {
     return new Promise((res, rej) => {
-      this.pool.query(CREATE_LINK_QUERY, [nodFr, nodTo], (err, results) => {
+      this.conn.query(CREATE_LINK_QUERY, [nodFr, nodTo], (err, results) => {
         (err)
           ? rej(err)
-          : res({ created: MySqlModel.getUnsafeOutputParams(results).count > 0 });
+          : res({ created: getUnsafeOutputParams(results).count > 0 });
       });
     });
   }
+
+  public end(): void { this.conn.end(); }
 }

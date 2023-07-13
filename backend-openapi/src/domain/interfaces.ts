@@ -16,6 +16,11 @@ export interface IRecordModel {
   updateRecord(record: RecordIdType & RecordBaseType): Promise<{ updated: boolean, exeId: number | null }>;
 
   deleteRecord(record: RecordIdType): Promise<{ deleted: boolean }>;
+
+  /**
+   * Release resources gracefully.
+   */
+  end(): void;
 }
 
 export interface IExecutionModel {
@@ -44,6 +49,11 @@ export interface IExecutionModel {
    * Set new status for a selected execution.
    */
   updateExecutionStatus(exeId: number, status: ExecutionStatus): Promise<{ updated: boolean }>;
+
+  /**
+   * Release resources gracefully.
+   */
+  end(): void;
 }
 
 export interface ICrawlerModel {
@@ -51,6 +61,11 @@ export interface ICrawlerModel {
   createNode(node: NodeBaseType): Promise<{ nodId: number | null }>;
 
   createLink(nodFr: number, nodTo: number): Promise<{ created: boolean }>;
+
+  /**
+   * Release resources gracefully.
+   */
+  end(): void;
 }
 
 export interface IExecutor {

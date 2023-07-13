@@ -4,12 +4,14 @@
   "main": "dist/app.js",
   "scripts": {
     "start": "npx tsc && node ./dist/app.js",
-    "lint": "eslint . --ext .ts"
+    "style": "eslint . --ext .ts"
   },
   "license": "MIT",
   "author": "Dmitry Zhukov",
   "keywords": [
     "backend",
+    "frontend",
+    "graphql",
     "openapi",
     "web spider",
     "web crawler"

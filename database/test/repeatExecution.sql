@@ -14,7 +14,7 @@ CALL repeatExecution (
 );
 SELECT @exeId AS exeId;
 
--- nothing happens
+-- nothing happens, null is returned
 
 CALL repeatExecution (
   1,

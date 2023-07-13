@@ -36,19 +36,24 @@ export interface IExecutionModel {
   deleteIncompleteExecutions(): Promise<void>;
 
   /**
+   * Resume waiting execution by planning it.
+   */
+  resumeExecution(): Promise<{ resumed: boolean, exeId: number | null }>;
+
+  /**
    * Create prioritized execution upon user command.
    */
   createExecution(recId: number): Promise<{ created: boolean, exeId: number | null }>;
 
   /**
-   * Repeat execution after the previous one has been completed.
-   */
-  repeatExecution(exeId: number): Promise<{ repeated: boolean, exeId: number | null }>;
-
-  /**
    * Set new status for a selected execution.
    */
   updateExecutionStatus(exeId: number, status: ExecutionStatus): Promise<{ updated: boolean }>;
+
+  /**
+   * Repeat execution after the previous one has been completed.
+   */
+  repeatExecution(exeId: number): Promise<{ repeated: boolean, exeId: number | null }>;
 
   /**
    * Release resources gracefully.

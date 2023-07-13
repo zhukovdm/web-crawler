@@ -227,6 +227,33 @@ BEGIN
 END$
 
 /**
+ * Find an execution with the smallest identifier and expired timer. Covers
+ * transition from 'WAITING' to 'PLANNED'.
+ */
+CREATE PROCEDURE IF NOT EXISTS `resumeExecution` (
+  IN  `i_actualTime`  DATETIME,
+  OUT `o_exeId`       BIGINT)
+BEGIN
+  UPDATE `exe` AS `e0`
+  SET
+    `e0`.`exeId`  = LAST_INSERT_ID (`e0`.`exeId`), -- (!)
+    `e0`.`status` = 'PLANNED'
+  WHERE `e0`.`exeId` IN (
+    SELECT `exeId` FROM (
+      SELECT `exe`.`exeId`
+      FROM `rec` INNER JOIN `exe` ON `rec`.`recId` = `exe`.`recId`
+      WHERE `exe`.`status` = 'WAITING'
+        AND DATE_ADD(`exe`.`createTime`, INTERVAL `rec`.`period` MINUTE) <= `i_actualTime`
+      ORDER BY `exe`.`exeId` ASC LIMIT 1
+    ) AS `e1`
+  );
+
+  IF (ROW_COUNT () > 0) THEN
+    SELECT LAST_INSERT_ID () INTO `o_exeId`;
+  END IF;
+END$
+
+/**
  * Create prioritized execution upon user command, removes all waiting
  * executions corresponding to the provided `recId`.
  */
@@ -255,8 +282,22 @@ BEGIN
 END$
 
 /**
- * Create waiting execution if the record is still active, and no other
- * incomplete executions exist.
+ * Update execution status (e.g. 'PLANNED' to 'CRAWLING' before passing to
+ * a crawler).
+ */
+CREATE PROCEDURE IF NOT EXISTS `updateExecutionStatus` (
+  IN  `i_exeId`       BIGINT,
+  IN  `i_status`      ENUM('WAITING', 'PLANNED', 'FAILURE', 'CRAWLING', 'FINISHED'),
+  OUT `o_count`       INT)
+BEGIN
+  UPDATE `exe` SET `status` = `i_status` WHERE `exeId` = `i_exeId`;
+  SELECT ROW_COUNT () INTO `o_count`;
+END$
+
+/**
+ * Create waiting execution if the record is still active, and no other incom-
+ * plete executions exist. Covers transition from 'FINISHED' or 'FAILURE' to
+ * a new 'WAITING' execution.
  */
 CREATE PROCEDURE IF NOT EXISTS `repeatExecution` (
   IN  `i_exeId`       BIGINT,
@@ -279,19 +320,7 @@ BEGIN
 END$
 
 /**
- * Update execution status (e.g. set 'CRAWLING' before passing to a crawler).
- */
-CREATE PROCEDURE IF NOT EXISTS `updateExecutionStatus` (
-  IN  `i_exeId`       BIGINT,
-  IN  `i_status`      ENUM('WAITING', 'PLANNED', 'FAILURE', 'CRAWLING', 'FINISHED'),
-  OUT `o_count`       INT)
-BEGIN
-  UPDATE `exe` SET `status` = `i_status` WHERE `exeId` = `i_exeId`;
-  SELECT ROW_COUNT () INTO `o_count`;
-END$
-
-/**
- * Create new crawled node.
+ * Create newly crawled node.
  */
 CREATE PROCEDURE IF NOT EXISTS `createNode` (
   IN  `i_exeId`       BIGINT,

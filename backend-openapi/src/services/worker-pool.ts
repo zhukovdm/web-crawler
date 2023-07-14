@@ -1,6 +1,9 @@
 import os from "os";
 import { Worker } from "worker_threads";
-import { IExecutor, IWorkerPool } from "../domain/interfaces";
+import {
+  IExecutor,
+  IWorkerPool
+} from "../domain/common-interfaces";
 
 export class ArrayWorkerPool implements IWorkerPool {
 

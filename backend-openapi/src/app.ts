@@ -4,15 +4,21 @@ import morgan from "morgan";
 import bodyParser from "body-parser";
 import express from "express";
 import * as validator from "express-openapi-validator";
-import { MySqlModel } from "./services/model";
+import {
+  MySqlExecutionModel,
+  MySqlModelInitializer,
+  MySqlRecordModel
+} from "./models/mysql-model";
 import { Executor } from "./services/executor";
-import { RecordController } from "./controllers/record-controller";
-import { ExecutionController } from "./controllers/execution-controller";
+import { Controller } from "./services/controller";
 
 (async function main() {
 
-  const model = MySqlModel.getInstance();
-  const executor = await Executor.getInstance(model, model);
+  await MySqlModelInitializer.init();
+
+  const recModel = MySqlRecordModel.getInstance();
+  const exeModel = MySqlExecutionModel.getInstance();
+  const executor = await Executor.getInstance(recModel, exeModel);
 
   const wapp = express();
   wapp.disable("x-powered-by");
@@ -25,27 +31,27 @@ import { ExecutionController } from "./controllers/execution-controller";
     .use(validator.middleware({ apiSpec: OPENAPI_SPEC! }));
 
   wapp.get("/api/v1/records", async (req, res) => {
-    await RecordController.getAllRecords(req, res, model);
+    await Controller.getAllRecords(req, res, recModel);
   });
 
   wapp.post("/api/v1/records", async (req, res) => {
-    await RecordController.createRecord(req, res, model, executor);
+    await Controller.createRecord(req, res, recModel, executor);
   });
 
   wapp.put("/api/v1/records/:recId", async (req, res) => {
-    await RecordController.updateRecord(req, res, model, executor);
+    await Controller.updateRecord(req, res, recModel, executor);
   });
 
   wapp.delete("/api/v1/records/:recId", async (req, res) => {
-    await RecordController.deleteRecord(req, res, model);
+    await Controller.deleteRecord(req, res, recModel);
   });
 
   wapp.get("/api/v1/executions/", async (req, res) => {
-    await ExecutionController.getAllExecutions(req, res, model);
+    await Controller.getAllExecutions(req, res, exeModel);
   });
 
   wapp.post("/api/v1/executions/", async (req, res) => {
-    await ExecutionController.createExecution(req, res, model, executor);
+    await Controller.createExecution(req, res, exeModel, executor);
   });
 
   wapp.use((err: any, req: any, res: any, nxt: any) => {

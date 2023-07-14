@@ -1,19 +1,19 @@
+import { IQueue } from "../domain/common-interfaces";
+
 /**
  * Use for small collections.
  */
-export class ArrayQueue<T> {
+export class ArrayQueue<T> implements IQueue<T> {
 
   private readonly arr: T[] = [];
 
-  constructor() { }
+  public empty(): boolean { return this.arr.length === 0; }
 
   public prepend(item: T): void { this.arr.unshift(item); }
 
   public enqueue(item: T): void { this.arr.push(item); }
 
   public dequeue(): T | undefined { return this.arr.shift(); }
-
-  public empty(): boolean { return this.arr.length === 0; }
 }
 
 type LinkedListItem<T> = {
@@ -24,11 +24,13 @@ type LinkedListItem<T> = {
 /**
  * Use for potentially large collections.
  */
-export class LinkedListQueue<T> {
+export class LinkedListQueue<T> implements IQueue<T> {
 
+  private count: number = 0;
   private head: LinkedListItem<T> | undefined = undefined;
   private tail: LinkedListItem<T> | undefined = undefined;
-  private count: number = 0;
+
+  public empty(): boolean { return this.count === 0; }
 
   public prepend(item: T): void {
     const llitem = { item: item, next: this.head };
@@ -59,6 +61,4 @@ export class LinkedListQueue<T> {
     this.count = this.count - (llitem ? 1 : 0);
     return llitem?.item;
   }
-
-  public empty(): boolean { return this.count === 0; }
 }

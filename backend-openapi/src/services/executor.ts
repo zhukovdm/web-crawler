@@ -1,9 +1,9 @@
+import { IExecutor } from "../domain/common-interfaces";
 import {
   IExecutionModel,
-  IExecutor,
   IRecordModel
-} from "../domain/interfaces";
-import { ArrayQueue } from "./queue";
+} from "../domain/model-interfaces";
+import { ArrayQueue } from "../primitives/queue";
 import { ArrayWorkerPool } from "./worker-pool";
 
 export class Executor implements IExecutor {
@@ -93,11 +93,6 @@ export class Executor implements IExecutor {
    */
   public static async getInstance(
     recModel: IRecordModel, exeModel: IExecutionModel): Promise<IExecutor> {
-
-    /* Ensure consistent state so that all executions are complete ('FINISHED'
-     * or 'FAILURE' statuses are acceptable). */
-
-    await exeModel.deleteIncompleteExecutions();
 
     // for each record, create waiting execution.
 

@@ -5,7 +5,7 @@ CALL createRecord (
   'Example web',
   1, -- active
   JSON_ARRAY('a', 'b'),
-  '2023-01-01 00:00:00',
+  '2023-01-01 00:00:00.000',
   @recId,
   @exeId
 );

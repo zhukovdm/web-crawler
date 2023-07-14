@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS `nod` (
   `nodId`       BIGINT NOT NULL AUTO_INCREMENT,
   `exeId`       BIGINT NOT NULL,
   `url`         VARCHAR(2048) NOT NULL,
-  `title`       VARCHAR(1024) NOT NULL,
+  `title`       VARCHAR(1024),
   `crawlTime`   DATETIME,
   PRIMARY KEY (`nodId`),
   FOREIGN KEY (`exeId`) REFERENCES `exe`(`exeId`)

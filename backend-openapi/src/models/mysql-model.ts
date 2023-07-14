@@ -70,8 +70,7 @@ export class MySqlModelInitializer {
 
     const conn = createConnection(getConnectionConfig(MYSQL_CONFIG));
 
-    const queryString: string = `
-      CALL deleteIncompleteExecutions ();`;
+    const queryString: string = `CALL deleteIncompleteExecutions ();`;
 
     return new Promise((res, rej) => {
       conn.query(queryString, [], (err) => {
@@ -115,8 +114,7 @@ export class MySqlRecordModel extends MySqlPoolModel implements IRecordModel {
   }
 
   public async getAllRecords(): Promise<RecordFullType[]> {
-    const queryString: string = `
-      CALL getAllRecords ();`;
+    const queryString: string = `CALL getAllRecords ();`;
 
     return new Promise((res, rej) => {
       this.pool.query(queryString, [], (err, results) => {
@@ -129,8 +127,7 @@ export class MySqlRecordModel extends MySqlPoolModel implements IRecordModel {
   }
 
   public async createRecord(record: RecordBaseType): Promise<{ recId: number, exeId: number | null }> {
-    const queryString: string = `
-      CALL createRecord (?, ?, ?, ?, ?, ?, ?, @recId, @exeId);
+    const queryString: string = `CALL createRecord (?, ?, ?, ?, ?, ?, ?, @recId, @exeId);
       SELECT @recId AS recId, @exeId AS exeId;`;
 
     return new Promise((res, rej) => {
@@ -145,8 +142,7 @@ export class MySqlRecordModel extends MySqlPoolModel implements IRecordModel {
   }
 
   public async updateRecord(recId: number, record: RecordBaseType): Promise<{ updated: boolean, exeId: number | null }> {
-    const queryString: string = `
-      CALL updateRecord (?, ?, ?, ?, ?, ?, ?, ?, @count, @exeId);
+    const queryString: string = `CALL updateRecord (?, ?, ?, ?, ?, ?, ?, ?, @count, @exeId);
       SELECT @count AS count, @exeId AS exeId;`;
 
     return new Promise((res, rej) => {
@@ -161,8 +157,7 @@ export class MySqlRecordModel extends MySqlPoolModel implements IRecordModel {
   }
 
   public async deleteRecord(recId: number): Promise<{ deleted: boolean }> {
-    const queryString: string = `
-      CALL deleteRecord (?, @count);
+    const queryString: string = `CALL deleteRecord (?, @count);
       SELECT @count AS count;`;
 
     return new Promise((res, rej) => {
@@ -194,8 +189,7 @@ export class MySqlExecutionModel extends MySqlPoolModel implements IExecutionMod
   }
 
   public async getAllExecutions(): Promise<ExecutionFullType[]> {
-    const queryString: string = `
-      CALL getAllExecutions ();`;
+    const queryString: string = `CALL getAllExecutions ();`;
 
     return new Promise((res, rej) => {
       this.pool.query(queryString, [], (err, results) => {
@@ -207,8 +201,7 @@ export class MySqlExecutionModel extends MySqlPoolModel implements IExecutionMod
   }
 
   public async resumeExecution(): Promise<{ resumed: boolean; exeId: number | null; }> {
-    const queryString: string = `
-      CALL resumeExecution (?, @exeId);
+    const queryString: string = `CALL resumeExecution (?, @exeId);
       SELECT @exeId AS exeId;`;
 
     return new Promise((res, rej) => {
@@ -223,8 +216,7 @@ export class MySqlExecutionModel extends MySqlPoolModel implements IExecutionMod
   }
 
   public async createExecution(recId: number): Promise<{ created: boolean, exeId: number | null }> {
-    const queryString: string = `
-      CALL createExecution (?, ?, @exeId);
+    const queryString: string = `CALL createExecution (?, ?, @exeId);
       SELECT @exeId AS exeId;`;
 
     return new Promise((res, rej) => {
@@ -239,8 +231,7 @@ export class MySqlExecutionModel extends MySqlPoolModel implements IExecutionMod
   }
 
   public async updateExecutionStatus(exeId: number, status: ExecutionStatus): Promise<{ updated: boolean; }> {
-    const queryString: string = `
-      CALL updateExecutionStatus (?, ?, @count);
+    const queryString: string = `CALL updateExecutionStatus (?, ?, @count);
       SELECT @count AS count;`;
 
     return new Promise((res, rej) => {
@@ -253,8 +244,7 @@ export class MySqlExecutionModel extends MySqlPoolModel implements IExecutionMod
   }
 
   public async repeatExecution(exeId: number): Promise<{ repeated: boolean, exeId: number | null }> {
-    const queryString: string = `
-      CALL repeatExecution (?, ?, @exeId);
+    const queryString: string = `CALL repeatExecution (?, ?, @exeId);
       SELECT @exeId AS exeId;`;
 
     return new Promise((res, rej) => {
@@ -285,8 +275,7 @@ export class MySqlCrawlerModel implements ICrawlerModel {
   }
 
   public getExecutionBoundary(exeId: number): Promise<{ url: string; regexp: string; } | undefined> {
-    const queryString: string = `
-      CALL getExecutionBoundary (?);`;
+    const queryString: string = `CALL getExecutionBoundary (?);`;
 
     return new Promise((res, rej) => {
       this.conn.query(queryString, [exeId], (err, results) => {
@@ -296,8 +285,7 @@ export class MySqlCrawlerModel implements ICrawlerModel {
   }
 
   public createNode(node: NodeBaseType): Promise<{ nodId: number | null; }> {
-    const queryString: string = `
-      CALL createNode (?, ?, ?, ?, @nodId);
+    const queryString: string = `CALL createNode (?, ?, ?, ?, @nodId);
       SELECT @nodId AS nodId;`;
 
     return new Promise((res, rej) => {
@@ -310,8 +298,7 @@ export class MySqlCrawlerModel implements ICrawlerModel {
   }
 
   public createLink(nodFr: number, nodTo: number): Promise<{ created: boolean; }> {
-    const queryString: string = `
-      CALL createLink (?, ?, @count);
+    const queryString: string = `CALL createLink (?, ?, @count);
       SELECT @count AS count;`;
 
     return new Promise((res, rej) => {

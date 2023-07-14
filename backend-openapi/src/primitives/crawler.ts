@@ -1,4 +1,3 @@
-import { JSDOM } from "jsdom";
 import {
   IQueue,
   IUrlFetcher,
@@ -7,15 +6,7 @@ import {
   ICrawlerModel,
 } from "../domain/model-interfaces";
 import { LinkedListQueue } from "./queue";
-
-class Boundary {
-
-  constructor(baseUrl: string, regexp: string) {
-
-  }
-
-  public isValid(url: string) {  }
-}
+import { BoundaryUrlMatcher } from "./matcher";
 
 export class Crawler {
 
@@ -25,20 +16,6 @@ export class Crawler {
 
   private readonly links = new Map<string, Set<string>>();
 
-  private extractUrls(baseUrl: string, txt: string): string[] {
-    return [...new JSDOM(txt).window.document.getElementsByTagName("a")]
-      .map((e) => {
-        try {
-          return new URL(e.href, baseUrl).href;
-        } catch (_) { return undefined; }
-      })
-      .filter((u) => u !== undefined) as string[];
-  }
-
-  private matchLinks(urls: string[], regexp: string): string[] {
-    return urls.filter((url) => new RegExp(regexp, "i").test(url));
-  }
-
   constructor(model: ICrawlerModel, fetcher: IUrlFetcher) {
     this.queue = new LinkedListQueue();
     this.model = model;
@@ -46,10 +23,24 @@ export class Crawler {
   }
 
   public async crawl(exeId: number): Promise<void> {
+    const boundary = await this.model.getExecutionBoundary(exeId);
+    if (!boundary) { return; } // the execution has been removed
 
-    try {
+    const { url: baseUrl, regexp } = boundary;
+    this.queue.enqueue(baseUrl);
+    const matcher = new BoundaryUrlMatcher(baseUrl, regexp);
 
+    while (!this.queue.empty()) {
+      const url = this.queue.dequeue()!;
+
+      if (!this.links.has(url)) {
+
+        const { title, links } = matcher.match(url)
+          ? (await this.fetcher.fetch(url))
+          : { title: null, links: [] };
+
+        links.forEach((link) => this.queue.enqueue(link));
+      }
     }
-    catch (ex) {  }
   }
 }

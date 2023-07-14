@@ -30,7 +30,7 @@ export class Controller {
   public static async updateRecord(
     req: Request, res: Response, model: IRecordModel, executor: IExecutor): Promise<void> {
     try {
-      const { updated, exeId } = await model.updateRecord(parseInt(req.params.recId), req.body);
+      const { updated, exeId } = await model.updateRecord(parseInt(req.params.recId!), req.body);
       if (exeId !== null) { executor.prioritize(exeId); }
       res.status(updated ? 204 : 404).end();
     }
@@ -40,7 +40,7 @@ export class Controller {
   public static async deleteRecord(
     req: Request, res: Response, model: IRecordModel): Promise<void> {
     try {
-      const { deleted } = await model.deleteRecord(parseInt(req.params.recId));
+      const { deleted } = await model.deleteRecord(parseInt(req.params.recId!));
       res.status(deleted ? 204 : 404).end();
     }
     catch (ex) { this.handleInternalServerError(res, ex); }

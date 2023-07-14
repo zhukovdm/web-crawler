@@ -1,8 +1,8 @@
 import { parentPort } from "worker_threads";
 import { Crawler } from "../primitives/crawler";
-import { MySqlCrawlerModel } from "../models/mysql-model";
 import { ICrawlerModel } from "../domain/model-interfaces";
-import { MockUrlFetcher } from "../primitives/fetcher";
+import { getUrlFetcher } from "../primitives/fetcher";
+import { MySqlCrawlerModel } from "../models/mysql-model";
 
 function reportCrawling(exeId: number, wrkId: number): void {
   console.log(` > [Worker ${wrkId}] Crawling ${exeId}.`);
@@ -17,10 +17,10 @@ parentPort?.on("message", async (msg) => {
   reportCrawling(exeId, wrkId);
 
   let model: ICrawlerModel | undefined = undefined;
-  
+
   try {
     model = MySqlCrawlerModel.getInstance();
-    const fetcher = new MockUrlFetcher();
+    const fetcher = getUrlFetcher();
 
     await new Crawler(model, fetcher).crawl(exeId);
   }

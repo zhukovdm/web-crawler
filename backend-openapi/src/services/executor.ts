@@ -79,7 +79,7 @@ export class Executor implements IExecutor {
   }
 
   /**
-   * Attach event generators to the instance.
+   * Attach event generators.
    */
   private withEvents(): IExecutor {
     setInterval(() => { this.resume(); }, Executor.TICK_INTERVAL);

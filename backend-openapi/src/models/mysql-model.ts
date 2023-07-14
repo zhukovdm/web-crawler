@@ -19,6 +19,7 @@ import {
   IExecutionModel,
   IRecordModel
 } from "../domain/model-interfaces";
+import { getCurrentTime } from "../primitives/functions";
 
 const {
   MYSQL_HOST,
@@ -52,14 +53,6 @@ const MYSQL_CONFIG: MySqlConfigType = {
 function getConnectionConfig(config: MySqlConfigType): ConnectionConfig {
   return { ...config, dateStrings: true, multipleStatements: true };
 }
-
-/**
- * Current time in `YYYY-MM-DD HH:MM:SS` format.
- */
-function getCurrentTime(): string {
-  const d = new Date();
-  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`;
-};
 
 /**
  * Get output parameters from mysql result object (get indices right).
@@ -332,6 +325,9 @@ export class MySqlCrawlerModel implements ICrawlerModel {
 
   public dispose(): void { this.conn.end(); }
 
+  /**
+   * Factory method.
+   */
   public static getInstance(): ICrawlerModel {
     return new MySqlCrawlerModel(MYSQL_CONFIG);
   }

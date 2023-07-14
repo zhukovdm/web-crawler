@@ -17,8 +17,6 @@ export class ArrayWorkerPool implements IWorkerPool {
 
   private constructor(executor: IExecutor) {
 
-    console.log(` > CPU count ${os.cpus().length}`);
-
     this.workerObjects = Array(ArrayWorkerPool.MAX_THREADS)
       .fill(undefined)
       .map(() => new Worker("./dist/services/worker.js"));
@@ -44,7 +42,7 @@ export class ArrayWorkerPool implements IWorkerPool {
   }
 
   public crawl(exeId: number, wrkId: number): void {
-    this.workerObjects[wrkId].postMessage({ exeId: exeId, wrkId: wrkId });
+    this.workerObjects[wrkId]?.postMessage({ exeId: exeId, wrkId: wrkId });
   }
 
   public static getInstance(executor: IExecutor): ArrayWorkerPool {

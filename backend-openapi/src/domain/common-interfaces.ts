@@ -42,12 +42,27 @@ export interface IExecutor {
   reportCrawled(exeId: number): void;
 }
 
+export type FetchPackType = {
+
+  /**
+   * Links found in the page.
+   */
+  links: string[];
+
+  /**
+   * The title of a page.
+   */
+  title: string | null;
+};
+
 export interface IUrlFetcher {
 
   /**
-   * Obtain a list of reachable 
+   * Obtain a content on the base url, and extract a title and a list
+   * of urls with http protocol.
+   * @param baseUrl Valid absolute url with http(s) protocol.
    */
-  fetch(url: string): Promise<string[]>;
+  fetch(baseUrl: string): Promise<FetchPackType>;
 }
 
 export interface IWorkerPool {

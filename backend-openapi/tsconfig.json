@@ -6,6 +6,7 @@
     "esModuleInterop": true,
     "moduleResolution": "Node",
     "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
     "outDir": "./dist"
   },
   "include": [

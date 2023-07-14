@@ -3,7 +3,7 @@ CREATE DATABASE IF NOT EXISTS `db`
 
 USE `db`;
 
--- Create relations ------------------------------------------------------------
+-- Relations -------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS `rec` (
   `recId`       BIGINT NOT NULL AUTO_INCREMENT,
@@ -317,6 +317,18 @@ BEGIN
   IF (ROW_COUNT () > 0) THEN
     SELECT LAST_INSERT_ID () INTO `o_exeId`;
   END IF;
+END$
+
+/**
+ * Get `url` and `regexp` associated with an execution.
+ */
+CREATE PROCEDURE IF NOT EXISTS `getExecutionBoundary` (
+  IN  `i_exeId`       BIGINT)
+BEGIN
+  SELECT `rec`.`url`, `rec`.`regexp` 
+  FROM `rec` INNER JOIN `exe`
+    ON `rec`.`recId` = `exe`.`recId`
+  WHERE `exe`.`exeId` = `i_exeId`;
 END$
 
 /**

@@ -3,6 +3,7 @@
     "strict": true,
     "module": "NodeNext",
     "target": "ES2017",
+    "skipLibCheck": true,
     "esModuleInterop": true,
     "moduleResolution": "Node",
     "noFallthroughCasesInSwitch": true,

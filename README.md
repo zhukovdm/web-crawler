@@ -6,7 +6,7 @@ Tech stack: `TypeScript`, `Node.js`, `MySQL`, `OpenAPI`, `GraphQL`.
 
 # deployment
 
-
+- http://localhost:4000/graphql
 
 # references
 

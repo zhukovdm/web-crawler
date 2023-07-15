@@ -48,7 +48,7 @@ const MYSQL_CONFIG: MySqlConfigType = {
 };
 
 /**
- * Construct standard connection config.
+ * Construct standard MySQL connection config.
  */
 function getConnectionConfig(config: MySqlConfigType): ConnectionConfig {
   return { ...config, dateStrings: true, multipleStatements: true };

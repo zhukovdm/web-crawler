@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS `lnk` (
     ON UPDATE CASCADE
 ) ENGINE = InnoDB;
 
--- Stored procedures -----------------------------------------------------------
+-- OpenAPI stored procedures ---------------------------------------------------
 
 DELIMITER $
 
@@ -381,6 +381,17 @@ CREATE PROCEDURE IF NOT EXISTS `finishExecution` (
 BEGIN
   UPDATE `exe` SET `status` = `i_status`, `finishTime` = `i_finishTime` WHERE `exeId` = `i_exeId`;
   SELECT ROW_COUNT () INTO `o_count`;
+END$
+
+DELIMITER ;
+
+-- GraphQL stored procedures ---------------------------------------------------
+
+DELIMITER $
+
+CREATE PROCEDURE IF NOT EXISTS `getAllWebPages` ()
+BEGIN
+  SELECT `recId` AS `identifier`, `label`, `url`, `regexp`, `tags`, `active` FROM `rec`;
 END$
 
 DELIMITER ;

@@ -7,6 +7,10 @@ import {
   GraphQLSchema,
   GraphQLString
 } from "graphql";
+import {
+  resolveNodes,
+  resolveWebsites
+} from "./graphql-resolver";
 
 const WebPageType = new GraphQLObjectType({
   name: "WebPage",
@@ -30,7 +34,7 @@ const WebPageType = new GraphQLObjectType({
       type: new GraphQLNonNull(GraphQLBoolean)
     }
   }
-}) as GraphQLObjectType<any, any>;
+}) as GraphQLObjectType;
 
 const NodeType = new GraphQLObjectType({
   name: "Node",
@@ -52,17 +56,24 @@ const NodeType = new GraphQLObjectType({
         type: new GraphQLNonNull(WebPageType)
       }
     })
-}) as GraphQLObjectType<any, any>;
+}) as GraphQLObjectType;
 
 export const schema = new GraphQLSchema({
   query: new GraphQLObjectType({
     name: "Query",
     fields: {
       websites: {
-        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(WebPageType)))
+        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(WebPageType))),
+        resolve: async () => (await resolveWebsites())
       },
       nodes: {
-        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(NodeType)))
+        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(NodeType))),
+        args: {
+          webPages: {
+            type: new GraphQLList(new GraphQLNonNull(GraphQLID))
+          }
+        },
+        resolve: async ({ _, webPages }) => (await resolveNodes(webPages))
       }
     }
   })

@@ -9,8 +9,9 @@ import {
 } from "graphql";
 import {
   resolveNodes,
-  resolveWebsites
+  resolveWebPages
 } from "./graphql-resolver";
+import { IModel } from "./domain/interfaces";
 
 const WebPageType = new GraphQLObjectType({
   name: "WebPage",
@@ -55,26 +56,35 @@ const NodeType = new GraphQLObjectType({
       owner: {
         type: new GraphQLNonNull(WebPageType)
       }
-    })
+    }),
+  //resolve: () => 
 }) as GraphQLObjectType;
 
-export const schema = new GraphQLSchema({
-  query: new GraphQLObjectType({
-    name: "Query",
-    fields: {
-      websites: {
-        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(WebPageType))),
-        resolve: async () => (await resolveWebsites())
-      },
-      nodes: {
-        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(NodeType))),
-        args: {
-          webPages: {
-            type: new GraphQLList(new GraphQLNonNull(GraphQLID))
-          }
+/**
+ * Get a schema with binded model.
+ */
+export function getSchema(model: IModel): GraphQLSchema {
+
+  return new GraphQLSchema({
+    query: new GraphQLObjectType({
+      name: "Query",
+      fields: {
+        websites: {
+          type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(WebPageType))),
+          resolve: async () => (await resolveWebPages(model))
         },
-        resolve: async ({ _, webPages }) => (await resolveNodes(webPages))
+        nodes: {
+          type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(NodeType))),
+          args: {
+            webPages: {
+              type: new GraphQLList(new GraphQLNonNull(GraphQLID))
+            }
+          },
+          resolve: async (_, { webPages }) => (
+            await resolveNodes(
+              (webPages ?? []).filter((p: any) => !isNaN(p)).map((p: any) => parseInt(p))))
+        }
       }
-    }
-  })
-});
+    })
+  });
+}

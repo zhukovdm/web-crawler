@@ -10,8 +10,8 @@ import {
 import {
   resolveNodes,
   resolveWebPages
-} from "./graphql-resolver";
-import { IModel } from "./domain/interfaces";
+} from "./resolver";
+import { IModel } from "../domain/interfaces";
 
 const WebPageType = new GraphQLObjectType({
   name: "WebPage",

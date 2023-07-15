@@ -1,5 +1,5 @@
-import { IModel } from "./domain/interfaces";
-import { WebPageType } from "./domain/types";
+import { IModel } from "../domain/interfaces";
+import { WebPageType } from "../domain/types";
 
 export async function resolveWebPages(model: IModel): Promise<WebPageType[]> {
   return await model.getAllWebPages();

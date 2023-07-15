@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "module": "NodeNext",
+    "target": "ES2017",
+    "esModuleInterop": true,
+    "moduleResolution": "Node",
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "outDir": "./dist"
+  },
+  "include": [
+    "./src/**/*"
+  ]
+}

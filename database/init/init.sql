@@ -22,13 +22,13 @@ CREATE TABLE IF NOT EXISTS `exe` (
   `recId`       BIGINT NOT NULL,
   `status`      ENUM('WAITING', 'PLANNED', 'CRAWLING', 'FAILURE', 'SUCCESS')
                 NOT NULL,
-  `createTime`  DATETIME NOT NULL,
-  `finishTime`  DATETIME,
+  `createTime`  DATETIME(3) NOT NULL,
+  `finishTime`  DATETIME(3),
   PRIMARY KEY (`exeId`),
   FOREIGN KEY (`recId`) REFERENCES `rec`(`recId`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
-  CHECK (ISNULL(`finishTime`) OR `createTime` < `finishTime`)
+  CHECK (ISNULL(`finishTime`) OR `createTime` <= `finishTime`)
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS `nod` (
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS `nod` (
   `exeId`       BIGINT NOT NULL,
   `url`         VARCHAR(2048) NOT NULL,
   `title`       VARCHAR(1024),
-  `crawlTime`   DATETIME,
+  `crawlTime`   DATETIME(3),
   PRIMARY KEY (`nodId`),
   FOREIGN KEY (`exeId`) REFERENCES `exe`(`exeId`)
     ON DELETE CASCADE
@@ -102,7 +102,7 @@ CREATE PROCEDURE IF NOT EXISTS `createRecord` (
   IN  `i_label`       VARCHAR(1024),
   IN  `i_active`      INT,
   IN  `i_tags`        JSON,
-  IN  `i_createTime`  DATETIME,
+  IN  `i_createTime`  DATETIME(3),
   OUT `o_recId`       BIGINT,
   OUT `o_exeId`       BIGINT)
 BEGIN
@@ -138,7 +138,7 @@ CREATE PROCEDURE IF NOT EXISTS `updateRecord` (
   IN  `i_label`       VARCHAR(1024),
   IN  `i_active`      INT,
   IN  `i_tags`        JSON,
-  IN  `i_createTime`  DATETIME,
+  IN  `i_createTime`  DATETIME(3),
   OUT `o_count`       INT,
   OUT `o_exeId`       BIGINT)
 BEGIN
@@ -231,7 +231,7 @@ END$
  * transition from 'WAITING' to 'PLANNED'.
  */
 CREATE PROCEDURE IF NOT EXISTS `resumeExecution` (
-  IN  `i_actualTime`  DATETIME,
+  IN  `i_actualTime`  DATETIME(3),
   OUT `o_exeId`       BIGINT)
 BEGIN
   UPDATE `exe` AS `e0`
@@ -259,7 +259,7 @@ END$
  */
 CREATE PROCEDURE IF NOT EXISTS `createExecution` (
   IN  `i_recId`       BIGINT,
-  IN  `i_createTime`  DATETIME,
+  IN  `i_createTime`  DATETIME(3),
   OUT `o_exeId`       BIGINT)
 BEGIN
   DECLARE EXIT HANDLER FOR SQLEXCEPTION
@@ -301,7 +301,7 @@ END$
  */
 CREATE PROCEDURE IF NOT EXISTS `repeatExecution` (
   IN  `i_exeId`       BIGINT,
-  IN  `i_createTime`  DATETIME,
+  IN  `i_createTime`  DATETIME(3),
   OUT `o_exeId`       BIGINT)
 BEGIN
   INSERT INTO `exe` (`recId`, `status`, `createTime`)
@@ -338,7 +338,7 @@ CREATE PROCEDURE IF NOT EXISTS `createNode` (
   IN  `i_exeId`       BIGINT,
   IN  `i_url`         VARCHAR(2048),
   IN  `i_title`       VARCHAR(1024),
-  IN  `i_crawlTime`   DATETIME,
+  IN  `i_crawlTime`   DATETIME(3),
   OUT `o_nodId`       BIGINT)
 BEGIN
   INSERT INTO `nod` (`exeId`, `url`, `title`, `crawlTime`)
@@ -376,7 +376,7 @@ END$
 CREATE PROCEDURE IF NOT EXISTS `finishExecution` (
   IN  `i_exeId`       BIGINT,
   IN  `i_status`      ENUM('WAITING', 'PLANNED', 'CRAWLING', 'FAILURE', 'SUCCESS'),
-  IN  `i_finishTime`  DATETIME
+  IN  `i_finishTime`  DATETIME(3),
   OUT `o_count`       INT)
 BEGIN
   UPDATE `exe` SET `status` = `i_status`, `finishTime` = `i_finishTime` WHERE `exeId` = `i_exeId`;

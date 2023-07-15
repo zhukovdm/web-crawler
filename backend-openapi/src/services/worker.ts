@@ -11,7 +11,8 @@ function reportCrawling(exeId: number, wrkId: number): void {
 
 function reportUnexpectedError(exeId: number, wrkId: number, err: any): void {
   console.log(
-    ` > [Worker ${wrkId}] Unexpected error ${err?.message}. Execution ${exeId} is in inconsistent state.`);
+    ` > [Worker ${wrkId}] Unexpected error, execution ${exeId} is in inconsistent state.`);
+  if (err?.message) { console.log(`   ${err?.message}`); }
 }
 
 parentPort?.on("message", async (msg) => {
@@ -25,7 +26,7 @@ parentPort?.on("message", async (msg) => {
     model = ModelFactory.getCrawlerModel();
 
     await new Crawler(model, fetcher).crawl(exeId);
-    await model.finishExecution(exeId, "SUCCESS", getCurrentTime())
+    await model.finishExecution(exeId, "SUCCESS", getCurrentTime());
   }
   catch (_) {
     try {

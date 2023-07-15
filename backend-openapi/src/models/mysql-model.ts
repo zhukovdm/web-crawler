@@ -279,7 +279,11 @@ export class MySqlCrawlerModel implements ICrawlerModel {
 
     return new Promise((res, rej) => {
       this.conn.query(queryString, [exeId], (err, results) => {
-        (err) ? rej(err) : res(results[0][0]);
+        if (err) { rej(err); }
+        else {
+          const obj = results[0][0];
+          res(obj ? { ...obj } : undefined);
+        }
       });
     });
   }

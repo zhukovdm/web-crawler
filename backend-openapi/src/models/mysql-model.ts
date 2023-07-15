@@ -57,7 +57,7 @@ function getConnectionConfig(config: MySqlConfigType): ConnectionConfig {
 /**
  * Get output parameters from mysql result object (get indices right).
  */
-function getUnsafeOutputParams(results: any) {
+function getOutputParamsUnsafe(results: any) {
   return { ...results[1][0] };
 };
 
@@ -136,7 +136,7 @@ export class MySqlRecordModel extends MySqlPoolModel implements IRecordModel {
       ], (err, results) => {
         (err)
           ? rej(err)
-          : res(getUnsafeOutputParams(results));
+          : res(getOutputParamsUnsafe(results));
       });
     });
   }
@@ -149,7 +149,7 @@ export class MySqlRecordModel extends MySqlPoolModel implements IRecordModel {
       this.pool.query(queryString, [recId, ...MySqlRecordModel.unpackRecordBase(record)], (err, results) => {
         if (err) { rej(err); }
         else {
-          const params = getUnsafeOutputParams(results);
+          const params = getOutputParamsUnsafe(results);
           res({ ...params, updated: params.count > 0 });
         }
       });
@@ -164,7 +164,7 @@ export class MySqlRecordModel extends MySqlPoolModel implements IRecordModel {
       this.pool.query(queryString, [recId], (err, results) => {
         (err)
           ? rej(err)
-          : res({ deleted: getUnsafeOutputParams(results).count > 0 });
+          : res({ deleted: getOutputParamsUnsafe(results).count > 0 });
       });
     });
   }
@@ -208,7 +208,7 @@ export class MySqlExecutionModel extends MySqlPoolModel implements IExecutionMod
       this.pool.query(queryString, [getCurrentTime()], (err, results) => {
         if (err) { rej(err); }
         else {
-          const { exe: exeId } = getUnsafeOutputParams(results);
+          const { exe: exeId } = getOutputParamsUnsafe(results);
           res({ resumed: exeId !== null, exeId: exeId });
         }
       })
@@ -223,7 +223,7 @@ export class MySqlExecutionModel extends MySqlPoolModel implements IExecutionMod
       this.pool.query(queryString, [recId, getCurrentTime()], (err, results) => {
         if (err) { rej(err); }
         else {
-          const { exeId } = getUnsafeOutputParams(results);
+          const { exeId } = getOutputParamsUnsafe(results);
           res({ created: exeId !== null, exeId: exeId });
         }
       });
@@ -238,7 +238,7 @@ export class MySqlExecutionModel extends MySqlPoolModel implements IExecutionMod
       this.pool.query(queryString, [exeId, status], (err, results) => {
         (err)
           ? rej(err)
-          : res({ updated: getUnsafeOutputParams(results).count > 0 });
+          : res({ updated: getOutputParamsUnsafe(results).count > 0 });
       });
     });
   }
@@ -251,7 +251,7 @@ export class MySqlExecutionModel extends MySqlPoolModel implements IExecutionMod
       this.pool.query(queryString, [exeId, getCurrentTime()], (err, results) => {
         if (err) { rej(err); }
         else {
-          const { exeId } = getUnsafeOutputParams(results);
+          const { exeId } = getOutputParamsUnsafe(results);
           res({ repeated: exeId !== null, exeId: exeId });
         }
       })
@@ -292,7 +292,7 @@ export class MySqlCrawlerModel implements ICrawlerModel {
       this.conn.query(queryString, [node.exeId, node.url, node.title, node.crawlTime], (err, results) => {
         (err)
           ? rej(err)
-          : res(getUnsafeOutputParams(results));
+          : res(getOutputParamsUnsafe(results));
       });
     });
   }
@@ -305,7 +305,21 @@ export class MySqlCrawlerModel implements ICrawlerModel {
       this.conn.query(queryString, [nodFr, nodTo], (err, results) => {
         (err)
           ? rej(err)
-          : res({ created: getUnsafeOutputParams(results).count > 0 });
+          : res({ created: getOutputParamsUnsafe(results).count > 0 });
+      });
+    });
+  }
+
+  public finishExecution(
+    exeId: number, status: ExecutionStatus, finishTime: string): Promise<{ finished: boolean; }> {
+    const queryString: string = `CALL finishExecution (?, ?, ?, @count);
+      SELECT @count AS count;`;
+
+    return new Promise((res, rej) => {
+      this.conn.query(queryString, [exeId, status, finishTime], (err, results) => {
+        (err)
+          ? rej(err)
+          : res({ finished: getOutputParamsUnsafe(results).count > 0 });
       });
     });
   }

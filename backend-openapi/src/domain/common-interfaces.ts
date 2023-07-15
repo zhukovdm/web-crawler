@@ -45,14 +45,19 @@ export interface IExecutor {
 export type FetchPackType = {
 
   /**
+   * The title of a page.
+   */
+  title: string | null;
+
+  /**
    * Links found in the page.
    */
   links: string[];
 
   /**
-   * The title of a page.
+   * Time of fetch.
    */
-  title: string | null;
+  crawlTime: string | null;
 };
 
 export interface IUrlFetcher {

@@ -26,7 +26,8 @@ export interface IRecordModel extends IDisposable {
    * Accommodate user-defined updates into a record. Possible create a new
    * execution if the record is active after update.
    */
-  updateRecord(recId: number, record: RecordBaseType): Promise<{ updated: boolean, exeId: number | null }>;
+  updateRecord(
+    recId: number, record: RecordBaseType): Promise<{ updated: boolean, exeId: number | null }>;
 
   /**
    * Delete record with the given identifier.
@@ -79,4 +80,10 @@ export interface ICrawlerModel extends IDisposable {
    * Create directed edge between two nodes.
    */
   createLink(nodFr: number, nodTo: number): Promise<{ created: boolean }>;
+
+  /**
+   * Finish execution with a given status and time.
+   */
+  finishExecution(
+    exeId: number, status: ExecutionStatus, finishTime: string): Promise<{ finished: boolean }>;
 }

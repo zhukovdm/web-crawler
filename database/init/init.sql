@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `rec` (
 CREATE TABLE IF NOT EXISTS `exe` (
   `exeId`       BIGINT NOT NULL AUTO_INCREMENT,
   `recId`       BIGINT NOT NULL,
-  `status`      ENUM('WAITING', 'PLANNED', 'FAILURE', 'CRAWLING', 'FINISHED')
+  `status`      ENUM('WAITING', 'PLANNED', 'CRAWLING', 'FAILURE', 'SUCCESS')
                 NOT NULL,
   `createTime`  DATETIME NOT NULL,
   `finishTime`  DATETIME,
@@ -165,7 +165,7 @@ BEGIN
       `i_active` = 1 AND `o_count` > 0 AND
       NOT EXISTS (
         SELECT * FROM `exe`
-        WHERE `recId` = `i_recId` AND `status` NOT IN ('FAILURE', 'FINISHED'))
+        WHERE `recId` = `i_recId` AND `status` NOT IN ('FAILURE', 'SUCCESS'))
     ) THEN
       INSERT INTO `exe` (`recId`, `status`, `createTime`) VALUES
         (`i_recId`, 'PLANNED', `i_createTime`);
@@ -223,7 +223,7 @@ END$
  */
 CREATE PROCEDURE IF NOT EXISTS `deleteIncompleteExecutions` ()
 BEGIN
-  DELETE FROM `exe` WHERE `status` NOT IN ('FAILURE', 'FINISHED');
+  DELETE FROM `exe` WHERE `status` NOT IN ('FAILURE', 'SUCCESS');
 END$
 
 /**
@@ -287,7 +287,7 @@ END$
  */
 CREATE PROCEDURE IF NOT EXISTS `updateExecutionStatus` (
   IN  `i_exeId`       BIGINT,
-  IN  `i_status`      ENUM('WAITING', 'PLANNED', 'FAILURE', 'CRAWLING', 'FINISHED'),
+  IN  `i_status`      ENUM('WAITING', 'PLANNED', 'CRAWLING', 'FAILURE', 'SUCCESS'),
   OUT `o_count`       INT)
 BEGIN
   UPDATE `exe` SET `status` = `i_status` WHERE `exeId` = `i_exeId`;
@@ -296,7 +296,7 @@ END$
 
 /**
  * Create waiting execution if the record is still active, and no other incom-
- * plete executions exist. Covers transition from 'FINISHED' or 'FAILURE' to
+ * plete executions exist. Covers transition from 'FAILURE' or 'SUCCESS' to
  * a new 'WAITING' execution.
  */
 CREATE PROCEDURE IF NOT EXISTS `repeatExecution` (
@@ -311,7 +311,7 @@ BEGIN
 	    AND EXISTS (
         SELECT `recId` FROM `exe` WHERE `r0`.`recId` = `exe`.`recId` AND `exe`.`exeId` = `i_exeId`)
       AND NOT EXISTS (
-        SELECT `recId` FROM `exe` WHERE `r0`.`recId` = `exe`.`recId` AND `exe`.`status` NOT IN ('FAILURE', 'FINISHED'))
+        SELECT `recId` FROM `exe` WHERE `r0`.`recId` = `exe`.`recId` AND `exe`.`status` NOT IN ('FAILURE', 'SUCCESS'))
     ) AS `r1`;
 
   IF (ROW_COUNT () > 0) THEN
@@ -367,6 +367,19 @@ BEGIN
     CROSS JOIN
       (SELECT `nodId` FROM `nod` WHERE `nodId` = `i_nodTo`) AS `n1`;
 
+  SELECT ROW_COUNT () INTO `o_count`;
+END$
+
+/**
+ * Finish a possibly existing execution with provided time and status.
+ */
+CREATE PROCEDURE IF NOT EXISTS `finishExecution` (
+  IN  `i_exeId`       BIGINT,
+  IN  `i_status`      ENUM('WAITING', 'PLANNED', 'CRAWLING', 'FAILURE', 'SUCCESS'),
+  IN  `i_finishTime`  DATETIME
+  OUT `o_count`       INT)
+BEGIN
+  UPDATE `exe` SET `status` = `i_status`, `finishTime` = `i_finishTime` WHERE `exeId` = `i_exeId`;
   SELECT ROW_COUNT () INTO `o_count`;
 END$
 

@@ -4,20 +4,16 @@ import morgan from "morgan";
 import bodyParser from "body-parser";
 import express from "express";
 import * as validator from "express-openapi-validator";
-import {
-  MySqlExecutionModel,
-  MySqlModelInitializer,
-  MySqlRecordModel
-} from "./models/mysql-model";
 import { Executor } from "./services/executor";
 import { Controller } from "./services/controller";
+import { ModelFactory } from "./models";
 
 (async function main() {
 
-  await MySqlModelInitializer.init();
+  await ModelFactory.init();
 
-  const recModel = MySqlRecordModel.getInstance();
-  const exeModel = MySqlExecutionModel.getInstance();
+  const recModel = ModelFactory.getRecordModel();
+  const exeModel = ModelFactory.getExecutionModel();
   const executor = await Executor.getInstance(recModel, exeModel);
 
   const wapp = express();

@@ -3,11 +3,9 @@
  */
 export class HttpUrlMatcher {
 
-  private readonly regexp: RegExp;
+  private static readonly regexp: RegExp = new RegExp(/^https?:\/\//i);
 
-  constructor() { this.regexp = new RegExp(/^https?:\/\//i); }
-
-  public match(url: string): boolean { return this.regexp.test(url); }
+  public match(url: string): boolean { return HttpUrlMatcher.regexp.test(url); }
 }
 
 /**

@@ -1,5 +1,5 @@
 export type ExecutionStatus =
-  "WAITING" | "PLANNED" | "FAILURE" | "CRAWLING" | "FINISHED";
+  "WAITING" | "PLANNED" | "CRAWLING" | "FAILURE" | "SUCCESS";
 
 export type RecordIdType = {
   recId: number;
@@ -35,6 +35,6 @@ export type ExecutionFullType = RecordIdType & {
 export type NodeBaseType = {
   exeId: number;
   url: string;
-  title: string;
+  title: string | null;
   crawlTime: string | null;
 };

@@ -27,8 +27,7 @@ CREATE TABLE IF NOT EXISTS `exe` (
   PRIMARY KEY (`exeId`),
   FOREIGN KEY (`recId`) REFERENCES `rec`(`recId`)
     ON DELETE CASCADE
-    ON UPDATE CASCADE,
-  CHECK (ISNULL(`finishTime`) OR `createTime` <= `finishTime`)
+    ON UPDATE CASCADE
 ) ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS `nod` (
@@ -389,9 +388,60 @@ DELIMITER ;
 
 DELIMITER $
 
+/**
+ * Get all webpage records available in the database.
+ */
 CREATE PROCEDURE IF NOT EXISTS `getAllWebPages` ()
 BEGIN
   SELECT `recId` AS `identifier`, `label`, `url`, `regexp`, `tags`, `active` FROM `rec`;
+END$
+
+/**
+ * Get a web page by identifier.
+ */
+CREATE PROCEDURE IF NOT EXISTS `getWebPage` (
+  `i_recId`           BIGINT)
+BEGIN
+  SELECT `recId` AS `identifier`, `label`, `url`, `regexp`, `tags`, `active`
+  FROM `rec` WHERE `recId` = `i_recId`;
+END$
+
+/**
+ * Get nodes of the latest execution corresponding to a provided record.
+ */
+CREATE PROCEDURE IF NOT EXISTS `getLatestNodes` (
+  IN  `i_recId`       BIGINT)
+BEGIN
+  SELECT
+    `n1`.`nodId`,
+    `n1`.`title`,
+    `n1`.`url`,
+    `n1`.`crawlTime`
+  FROM `nod` AS `n1` INNER JOIN (
+    SELECT `e0`.`exeId`
+      FROM `rec` AS `r0` INNER JOIN `exe` AS `e0` ON `r0`.`recId` = `e0`.`recId`
+      WHERE `r0`.`recId` = `i_recId`
+      ORDER BY `e0`.`exeId` DESC LIMIT 1
+  ) AS `e1`
+  ON `n1`.`exeId` = `e1`.`exeId`;
+END$
+
+/**
+ * Get node by identifier.
+ */
+CREATE PROCEDURE IF NOT EXISTS `getNode` (
+  IN `i_nodId`        BIGINT)
+BEGIN
+  SELECT `nodId`, `title`, `url`, `crawlTime` FROM `nod` WHERE `nodId` = `i_nodId`;
+END$
+
+/**
+ * Get out edges for a given node.
+ */
+CREATE PROCEDURE IF NOT EXISTS `getNodeLinks` (
+  IN `i_nodFr`        BIGINT)
+BEGIN
+  SELECT `nodTo` FROM `lnk` WHERE `nodFr` = `i_nodFr`;
 END$
 
 DELIMITER ;

@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 import { Pool, createPool } from "mysql";
-import { WebPageType } from "../domain/types";
+import { NodeBaseType, WebPageType } from "../domain/types";
 import { IModel } from "../domain/interfaces";
 
 const {
@@ -42,14 +42,60 @@ export class MySqlModel implements IModel {
     });
   }
 
+  private unpackPage(page: any): WebPageType {
+    return { ...page, active: page.active === 1, tags: JSON.parse(page.tags) };
+  }
+
   public getAllWebPages(): Promise<WebPageType[]> {
     const queryString: string = `CALL getAllWebPages ();`;
 
     return new Promise((res, rej) => {
       this.pool.query(queryString, [], (err, results) => {
-        (err) ? rej(err) : res(results[0].map((page: any) => ({
-          ...page, active: page.active === 1, tags: JSON.parse(page.tags)
-        })));
+        (err) ? rej(err) : res(results[0].map((page: any) => (this.unpackPage(page))));
+      });
+    });
+  }
+
+  public getWebPage(recId: number): Promise<WebPageType | undefined> {
+    const queryString: string = `CALL getWebPage (?);`;
+
+    return new Promise((res, rej) => {
+      this.pool.query(queryString, [recId], (err, results) => {
+        if (err) { rej(err); }
+        else {
+          const page = results[0][0];
+          res(page ? this.unpackPage(page) : undefined);
+        }
+      });
+    });
+  }
+
+  public getLatestNodes(recId: number): Promise<NodeBaseType[]> {
+    const queryString: string = `CALL getLatestNodes (?);`;
+
+    return new Promise((res, rej) => {
+      this.pool.query(queryString, [recId], (err, results) => {
+        (err) ? rej(err) : res(results[0])
+      });
+    })
+  }
+
+  public getNode(nodId: number): Promise<NodeBaseType | undefined> {
+    const queryString: string = `CALL getNode (?)`;
+
+    return new Promise((res, rej) => {
+      this.pool.query(queryString, [nodId], (err, results) => {
+        (err) ? rej(err) : res(results[0][0]);
+      });
+    });
+  }
+
+  public getNodeLinks(nodFr: number): Promise<number[]> {
+    const queryString: string = `CALL getNodeLinks (?)`;
+
+    return new Promise((res, rej) => {
+      this.pool.query(queryString, [nodFr], (err, results) => {
+        (err) ? rej(err) : res(results[0].map((row: any) => row.nodTo));
       });
     });
   }

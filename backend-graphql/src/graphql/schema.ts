@@ -8,10 +8,11 @@ import {
   GraphQLString
 } from "graphql";
 import {
+  resolveLinks,
   resolveNodes,
+  resolveWebPage,
   resolveWebPages
 } from "./resolver";
-import { IModel } from "../domain/interfaces";
 
 const WebPageType = new GraphQLObjectType({
   name: "WebPage",
@@ -39,52 +40,46 @@ const WebPageType = new GraphQLObjectType({
 
 const NodeType = new GraphQLObjectType({
   name: "Node",
-  fields: () => (
-    {
-      title: {
-        type: GraphQLString
-      },
-      url: {
-        type: new GraphQLNonNull(GraphQLString)
-      },
-      crawlTime: {
-        type: GraphQLString
-      },
-      links: {
-        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(NodeType)))
-      },
-      owner: {
-        type: new GraphQLNonNull(WebPageType)
-      }
-    }),
-  //resolve: () => 
+  fields: () => ({
+    title: {
+      type: GraphQLString
+    },
+    url: {
+      type: new GraphQLNonNull(GraphQLString)
+    },
+    crawlTime: {
+      type: GraphQLString
+    },
+    links: {
+      type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(NodeType))),
+      resolve: async ({ links, owner }, _a, { model }) => (await resolveLinks(model, owner, links))
+    },
+    owner: {
+      type: new GraphQLNonNull(WebPageType),
+      resolve: async ({ owner }, _a, { model }) => (await resolveWebPage(model, owner))
+    }
+  })
 }) as GraphQLObjectType;
 
-/**
- * Get a schema with binded model.
- */
-export function getSchema(model: IModel): GraphQLSchema {
-
-  return new GraphQLSchema({
-    query: new GraphQLObjectType({
-      name: "Query",
-      fields: {
-        websites: {
-          type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(WebPageType))),
-          resolve: async () => (await resolveWebPages(model))
+export const schema = new GraphQLSchema({
+  query: new GraphQLObjectType({
+    name: "Query",
+    fields: {
+      websites: {
+        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(WebPageType))),
+        resolve: async (_s, _a, { model }) => (await resolveWebPages(model))
+      },
+      nodes: {
+        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(NodeType))),
+        args: {
+          webPages: {
+            type: new GraphQLList(new GraphQLNonNull(GraphQLID))
+          }
         },
-        nodes: {
-          type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(NodeType))),
-          args: {
-            webPages: {
-              type: new GraphQLList(new GraphQLNonNull(GraphQLID))
-            }
-          },
-          resolve: async (_, { webPages }) => (
-            await resolveNodes(
-              (webPages ?? []).filter((p: any) => !isNaN(p)).map((p: any) => parseInt(p))))
-        }
+        resolve: async (_s, { webPages }, { model }) => (
+          await resolveNodes(model,
+            (webPages ?? []).filter((p: any) => !isNaN(p)).map((p: any) => parseInt(p))))
       }
-    })
-  });
-}
+    }
+  })
+});

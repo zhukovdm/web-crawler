@@ -7,6 +7,14 @@ export type WebPageType = {
   active: boolean;
 };
 
-export type NodeType = {
-  
+export type NodeBaseType = {
+  nodId: number;
+  url: string;
+  title: string | null;
+  crawlTime: string;
 };
+
+export type NodeFullType = NodeBaseType & {
+  links: number[];
+  owner: number;
+}

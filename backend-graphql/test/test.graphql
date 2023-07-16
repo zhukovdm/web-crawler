@@ -1,0 +1,39 @@
+{
+  websites {
+    identifier
+    label
+    url
+    regexp
+    tags
+    active
+  }
+}
+
+{
+  nodes (webPages: [1]) {
+    title
+    url
+    crawlTime
+    links {
+      title
+      url
+      crawlTime
+      owner {
+        identifier
+        label
+        url
+        regexp
+        tags
+        active
+      }
+    }
+    owner {
+      identifier
+      label
+      url
+      regexp
+      tags
+      active
+    }
+  }
+}

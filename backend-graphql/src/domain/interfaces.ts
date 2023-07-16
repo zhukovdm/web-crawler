@@ -1,11 +1,16 @@
-import { WebPageType } from "./types";
+import { NodeBaseType, WebPageType } from "./types";
 
 export interface IModel {
 
-  /**
-   * Get a list of all web pages available in the database.
-   */
   getAllWebPages(): Promise<WebPageType[]>;
+
+  getWebPage(recId: number): Promise<WebPageType | undefined>;
+
+  getLatestNodes(recId: number): Promise<NodeBaseType[]>;
+
+  getNode(nodId: number): Promise<NodeBaseType | undefined>;
+
+  getNodeLinks(nodFr: number): Promise<number[]>;
 
   /**
    * Release allocated resources gracefully.

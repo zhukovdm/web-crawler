@@ -26,7 +26,7 @@ type LinkedListItem<T> = {
  */
 export class LinkedListQueue<T> implements IQueue<T> {
 
-  private count: number = 0;
+  private count = 0;
   private head: LinkedListItem<T> | undefined = undefined;
   private tail: LinkedListItem<T> | undefined = undefined;
 

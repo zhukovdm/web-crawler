@@ -47,7 +47,7 @@ export class MySqlModel implements IModel {
   }
 
   public getAllWebPages(): Promise<WebPageType[]> {
-    const queryString: string = `CALL getAllWebPages ();`;
+    const queryString = `CALL getAllWebPages ();`;
 
     return new Promise((res, rej) => {
       this.pool.query(queryString, [], (err, results) => {
@@ -57,7 +57,7 @@ export class MySqlModel implements IModel {
   }
 
   public getWebPage(recId: number): Promise<WebPageType | undefined> {
-    const queryString: string = `CALL getWebPage (?);`;
+    const queryString = `CALL getWebPage (?);`;
 
     return new Promise((res, rej) => {
       this.pool.query(queryString, [recId], (err, results) => {
@@ -71,7 +71,7 @@ export class MySqlModel implements IModel {
   }
 
   public getLatestNodes(recId: number): Promise<NodeBaseType[]> {
-    const queryString: string = `CALL getLatestNodes (?);`;
+    const queryString = `CALL getLatestNodes (?);`;
 
     return new Promise((res, rej) => {
       this.pool.query(queryString, [recId], (err, results) => {
@@ -81,7 +81,7 @@ export class MySqlModel implements IModel {
   }
 
   public getNode(nodId: number): Promise<NodeBaseType | undefined> {
-    const queryString: string = `CALL getNode (?)`;
+    const queryString = `CALL getNode (?)`;
 
     return new Promise((res, rej) => {
       this.pool.query(queryString, [nodId], (err, results) => {
@@ -91,7 +91,7 @@ export class MySqlModel implements IModel {
   }
 
   public getNodeLinks(nodFr: number): Promise<number[]> {
-    const queryString: string = `CALL getNodeLinks (?)`;
+    const queryString = `CALL getNodeLinks (?)`;
 
     return new Promise((res, rej) => {
       this.pool.query(queryString, [nodFr], (err, results) => {

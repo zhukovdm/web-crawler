@@ -22,10 +22,9 @@ export class ArrayWorkerPool implements IWorkerPool {
       .map(() => new Worker("./dist/services/worker.js"));
 
     this.workerObjects.forEach((worker) => {
-      const pool = this;
 
-      worker.on("message", function ({ exeId, wrkId: wrkId }) {
-        pool.release(wrkId);
+      worker.on("message", ({ exeId, wrkId: wrkId }) => {
+        this.release(wrkId);
         executor.reportCrawled(exeId);
       });
     });

@@ -26,7 +26,7 @@ export class Executor implements IExecutor {
       const { exeId } = await this.model.resumeExecution();
       if (exeId !== null) { this.planned.enqueue(exeId); }
     }
-    catch (_) { }
+    catch (_) { /* do nothing */ }
   }
 
   /**
@@ -34,7 +34,7 @@ export class Executor implements IExecutor {
    */
   private async crawl(): Promise<void> {
     let exeId = this.planned.dequeue();
-    let wrkId = this.wrkPool.acquire();
+    const wrkId = this.wrkPool.acquire();
 
     try {
       if (exeId === undefined || wrkId === undefined) {
@@ -96,7 +96,7 @@ export class Executor implements IExecutor {
 
     // for each record, create waiting execution.
 
-    let records = (await recModel.getAllRecords())
+    const records = (await recModel.getAllRecords())
       .filter((rec) => rec.active).map((rec) => rec.recId);
 
     const exes: number[] = [];

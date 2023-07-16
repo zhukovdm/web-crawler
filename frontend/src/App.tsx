@@ -7,10 +7,11 @@ import {
 } from "react-router-dom";
 import { Divider } from "@mui/material";
 import { store } from "./store";
-import NavigationBar from "./components/shared/NavigationBar";
+import NavigationBar from "./components/_shared/NavigationBar";
 import RecPage from "./components/RecPage";
 import ExePage from "./components/ExePage";
 import VisPage from "./components/VisPage";
+import HomPage from "./components/HomPage";
 
 export default function App() {
   return (
@@ -19,10 +20,11 @@ export default function App() {
         <NavigationBar />
         <Divider light />
         <Routes>
+          <Route path={"/"} element={<HomPage />} />
           <Route path={"/rec"} element={<RecPage />} />
           <Route path={"/exe"} element={<ExePage />} />
           <Route path={"/vis"} element={<VisPage />} />
-          <Route path={"*"} element={<Navigate to={"/rec"} />} />
+          <Route path={"*"} element={<Navigate to={"/hom"} />} />
         </Routes>
       </BrowserRouter>
     </Provider>

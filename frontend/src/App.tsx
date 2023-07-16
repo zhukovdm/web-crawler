@@ -1,21 +1,28 @@
-function App() {
+import { Provider } from "react-redux";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes
+} from "react-router-dom";
+import { store } from "./store";
+import NavigationBar from "./components/NavigationBar";
+import RecPage from "./components/RecPage";
+import ExePage from "./components/ExePage";
+import VisPage from "./components/VisPage";
+
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Provider store={store}>
+      <BrowserRouter>
+        <NavigationBar />
+        <Routes>
+          <Route path={"/rec"} element={<RecPage />} />
+          <Route path={"/exe"} element={<ExePage />} />
+          <Route path={"/vis"} element={<VisPage />} />
+          <Route path={"*"} element={<Navigate to={"/rec"} />} />
+        </Routes>
+      </BrowserRouter>
+    </Provider>
   );
 }
-
-export default App;

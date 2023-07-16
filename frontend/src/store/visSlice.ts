@@ -1,13 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-export const vizSlice = createSlice({
-  name: "viz",
+export const visSlice = createSlice({
+  name: "vis",
   initialState: ({}),
   reducers: {
   }
 });
 
 export const {
-} = vizSlice.actions;
+} = visSlice.actions;
 
-export default vizSlice.reducer;
+export default visSlice.reducer;

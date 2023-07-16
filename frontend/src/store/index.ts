@@ -6,13 +6,13 @@ import {
 import { configureStore } from "@reduxjs/toolkit";
 import recReducer from "./recSlice";
 import exeReducer from "./exeSlice";
-import vizReducer from "./vizSlice";
+import visReducer from "./visSlice";
 
 export const store = configureStore({
   reducer: {
     rec: recReducer,
     exe: exeReducer,
-    viz: vizReducer,
+    vis: visReducer
   }
 });
 

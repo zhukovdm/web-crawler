@@ -9,35 +9,41 @@ import {
 } from "../domain/types";
 
 type RecInitialStateType = {
-  loading: boolean;
   filters: RecordFilters;
   sorters: RecordSorters;
   records: RecordFullType[];
+  createAction: boolean;
+  updateAction: boolean;
 };
 
 const initialState = (): RecInitialStateType => ({
-  loading: false,
   filters: { tags: [] },
   sorters: { url: false, lastCrawlTime: false },
-  records: []
+  records: [],
+  createAction: false,
+  updateAction: false
 });
 
 export const recSlice = createSlice({
   name: "rec",
   initialState: (initialState()),
   reducers: {
-    setLoading: (state, action: PayloadAction<boolean>) => {
-      state.loading = action.payload;
-    },
     appendRecord: (state, action: PayloadAction<RecordFullType>) => {
       state.records.push(action.payload);
+    },
+    setCreateAction: (state, action: PayloadAction<boolean>) => {
+      state.createAction = action.payload;
+    },
+    setUpdateAction: (state, action: PayloadAction<boolean>) => {
+      state.updateAction = action.payload;
     }
   }
 });
 
 export const {
-  setLoading,
-  appendRecord
+  appendRecord,
+  setCreateAction,
+  setUpdateAction
 } = recSlice.actions;
 
 export default recSlice.reducer;

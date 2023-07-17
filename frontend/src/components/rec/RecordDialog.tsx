@@ -56,7 +56,7 @@ export default function RecordDialog(
     ? minutesToDdhhmm(record.period)
     : { dd: 0, hh: 0, mm: 0 };
 
-  const { loading } = useAppSelector((state) => state.rec);
+  const { createAction } = useAppSelector((state) => state.rec);
 
   const [lab, setLab] = useState(record?.label ?? "");
   const [labError, setLabError] = useState(false);
@@ -119,7 +119,11 @@ export default function RecordDialog(
         justifyContent={"space-between"}
       >
         {action.slice(0, 1).toUpperCase() + action.slice(1)} record
-        <IconButton title="Clean dialog" onClick={clean}>
+        <IconButton
+          title="Clean dialog"
+          disabled={createAction}
+          onClick={clean}
+        >
           <Delete />
         </IconButton>
       </DialogTitle>
@@ -203,13 +207,13 @@ export default function RecordDialog(
       <DialogActions>
         <Button
           color={"error"}
-          disabled={loading}
+          disabled={createAction}
           onClick={hide}
         >
           <span>Cancel</span>
         </Button>
         <LoadingButton
-          loading={loading}
+          loading={createAction}
           loadingPosition={"start"}
           startIcon={<Send />}
           onClick={confirm}

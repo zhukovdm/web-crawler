@@ -2,7 +2,7 @@ import { Box, Button } from "@mui/material";
 import { RecordBaseType } from "../../domain/types";
 import { OpenApiService } from "../../services/openapi";
 import { useAppDispatch } from "../../store";
-import { appendRecord, setLoading } from "../../store/recSlice";
+import { appendRecord, setCreateAction } from "../../store/recSlice";
 import RecordDialog from "./RecordDialog";
 import { useState } from "react";
 
@@ -13,7 +13,7 @@ export default function CreateDialog(): JSX.Element {
   const [show, setShow] = useState(false);
 
   const callback = async (record: RecordBaseType) => {
-    dispatch(setLoading(true));
+    dispatch(setCreateAction(true));
     try {
       const res = await OpenApiService.createRecord(record);
       dispatch(appendRecord({
@@ -27,7 +27,7 @@ export default function CreateDialog(): JSX.Element {
     }
     catch (ex: any) { alert(ex.message); }
     finally {
-      dispatch(setLoading(false));
+      dispatch(setCreateAction(false));
     }
   };
 

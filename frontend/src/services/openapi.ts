@@ -1,5 +1,6 @@
 import {
   RecordBaseType,
+  RecordFullType,
   RecordIdType
 } from "../domain/types";
 import { OPENAPI_REC_ADDR } from "./endpoint";
@@ -23,6 +24,14 @@ export class OpenApiService {
       },
       body: (body) ? JSON.stringify(body) : undefined
     };
+  }
+
+  public static async getAllRecords(): Promise<RecordFullType[]> {
+    const res = await fetch(OPENAPI_REC_ADDR, this.getOptions("GET", undefined));
+    if (res.status !== 200) {
+      throw new Error(OpenApiService.getErrorMessage(res));
+    }
+    return await res.json();
   }
 
   public static async createRecord(record: RecordBaseType): Promise<RecordIdType> {

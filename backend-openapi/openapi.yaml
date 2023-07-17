@@ -164,7 +164,7 @@ components:
     ExecutionStatus:
       type: string
       enum:
-        - 'CREATED'
+        - 'WAITING'
         - 'PLANNED'
         - 'CRAWLING'
         - 'FAILURE'

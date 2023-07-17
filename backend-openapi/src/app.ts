@@ -2,6 +2,7 @@ require("dotenv").config();
 
 import morgan from "morgan";
 import bodyParser from "body-parser";
+import cors from "cors";
 import express from "express";
 import * as validator from "express-openapi-validator";
 import { Executor } from "./services/executor";
@@ -22,6 +23,7 @@ import { ModelFactory } from "./models";
   const { OPENAPI_PORT, OPENAPI_SPEC } = process.env;
 
   wapp
+    .use(cors())
     .use(morgan("dev"))
     .use(bodyParser.json())
     .use(validator.middleware({ apiSpec: OPENAPI_SPEC! }));

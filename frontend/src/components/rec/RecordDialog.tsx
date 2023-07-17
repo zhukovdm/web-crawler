@@ -6,13 +6,14 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
   Stack,
   Switch,
   TextField,
   Typography
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
-import { Send } from "@mui/icons-material";
+import { Delete, Send } from "@mui/icons-material";
 import { useAppSelector } from "../../store";
 import { RecordBaseType } from "../../domain/types";
 import { ddhhmmToMinutes, minutesToDdhhmm } from "../../domain/functions";
@@ -66,13 +67,25 @@ export default function RecordDialog(
   const [rgx, setRgx] = useState(record?.regexp ?? "");
   const [rgxError, setRgxError] = useState(false);
 
+  const [act, setAct] = useState(record?.active ?? true);
+  const [tag, setTag] = useState(record?.tags ? record.tags.join(", ") : "");
+
   const [periodDD, setPeriodDD] = useState(dd);
   const [periodHH, setPeriodHH] = useState(hh);
   const [periodMM, setPeriodMM] = useState(mm);
   const [dhmError, setDhmError] = useState(false);
 
-  const [act, setAct] = useState(record?.active ?? true);
-  const [tag, setTag] = useState(record?.tags ? record.tags.join(", ") : "");
+  const clean = () => {
+
+    setLab("");
+    setUrl("");
+    setRgx("");
+    setTag("");
+    setAct(true);
+    setPeriodDD(0);
+    setPeriodHH(0);
+    setPeriodMM(0);
+  };
 
   const confirm = () => {
 
@@ -100,8 +113,15 @@ export default function RecordDialog(
 
   return (
     <Dialog open={show}>
-      <DialogTitle>
+      <DialogTitle
+        display={"flex"}
+        alignItems={"center"}
+        justifyContent={"space-between"}
+      >
         {action.slice(0, 1).toUpperCase() + action.slice(1)} record
+        <IconButton title="Clean dialog" onClick={clean}>
+          <Delete />
+        </IconButton>
       </DialogTitle>
       <DialogContent>
         <Stack sx={{ my: 1 }} direction={"column"} gap={3}>

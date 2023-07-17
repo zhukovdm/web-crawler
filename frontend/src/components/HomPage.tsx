@@ -33,7 +33,7 @@ export default function HomPage(): JSX.Element {
           <Typography>.</Typography>
         </Box>
         <Box display={"flex"}>
-          <Typography>Visualize ongoing executions at&nbsp;</Typography>
+          <Typography>See the graph of ongoing executions at&nbsp;</Typography>
           <Link
             to={"/vis"}
             display={"inline"}

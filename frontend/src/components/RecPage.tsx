@@ -1,10 +1,11 @@
 import { Box } from "@mui/material";
-import CreateRecord from "./rec/CreateRecord";
+import CreateDialog from "./rec/CreateDialog";
 
 export default function RecPage(): JSX.Element {
+
   return (
     <Box sx={{ m: 4 }}>
-      <CreateRecord />
+      <CreateDialog />
     </Box>
   );
 }

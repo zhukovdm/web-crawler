@@ -6,42 +6,37 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  IconButton,
-  Typography
+  IconButton
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
-import { Delete, Send } from "@mui/icons-material";
+import { Send, Settings } from "@mui/icons-material";
+import { OpenApiService } from "../../services/openapi";
 import {
   useAppDispatch,
   useAppSelector
 } from "../../store";
-import {
-  deleteRecord,
-  setDeleteAction
-} from "../../store/recSlice";
-import { OpenApiService } from "../../services/openapi";
+import { setExecutAction } from "../../store/recSlice";
 
-type DeleteDialogType = {
+type ExecutDialogType = {
   index: number;
-};
+}
 
-export default function DeleteDialog({ index }: DeleteDialogType): JSX.Element {
+export default function ExecutDialog({ index }: ExecutDialogType): JSX.Element {
 
   const dispatch = useAppDispatch();
-  const { records, deleteAction } = useAppSelector((state) => state.rec);
+  const { records, executAction } = useAppSelector((state) => state.rec);
 
-  const record = records[index];
+  const record = records[index]!;
   const [show, setShow] = useState(false);
 
   const confirm = async () => {
-    dispatch(setDeleteAction(true));
+    dispatch(setExecutAction(true));
     try {
-      await OpenApiService.deleteRecord(record!.recId);
-      dispatch(deleteRecord(index));
+      await OpenApiService.createExecution(record.recId);
     }
     catch (ex: any) { alert(ex?.message); }
     finally {
-      dispatch(setDeleteAction(false));
+      dispatch(setExecutAction(false));
     }
   };
 
@@ -49,29 +44,27 @@ export default function DeleteDialog({ index }: DeleteDialogType): JSX.Element {
     <Box>
       <IconButton
         size={"small"}
-        title={"Delete record"}
+        title={"Execute record"}
         onClick={() => setShow(true)}
       >
-        <Delete fontSize={"small"} />
+        <Settings fontSize={"small"} />
       </IconButton>
       <Dialog open={show}>
-        <DialogTitle>Delete record</DialogTitle>
+        <DialogTitle>Execute record</DialogTitle>
         <DialogContent>
-          <Typography>
-            You are about to delete record with ID: {`${record?.recId}`}.
-            Confirm the action.
-          </Typography>
+          You are about to create execution for the record with ID: {`${record?.recId}`}.
+          Confirm the action.
         </DialogContent>
         <DialogActions>
           <Button
             color={"error"}
-            disabled={deleteAction}
+            disabled={executAction}
             onClick={() => setShow(false)}
           >
             <span>Cancel</span>
           </Button>
           <LoadingButton
-            loading={deleteAction}
+            loading={executAction}
             loadingPosition={"start"}
             startIcon={<Send />}
             onClick={confirm}

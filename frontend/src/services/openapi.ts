@@ -3,7 +3,10 @@ import {
   RecordFullType,
   RecordIdType
 } from "../domain/types";
-import { OPENAPI_REC_ADDR } from "./endpoint";
+import {
+  OPENAPI_EXE_ADDR,
+  OPENAPI_REC_ADDR
+} from "./endpoint";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 
@@ -51,6 +54,13 @@ export class OpenApiService {
 
   public static async deleteRecord(recId: number): Promise<void> {
     const res = await fetch(`${OPENAPI_REC_ADDR}/${recId}`, this.getOptions("DELETE", undefined));
+    if (res.status !== 204) {
+      throw new Error(OpenApiService.getErrorMessage(res));
+    }
+  }
+
+  public static async createExecution(recId: number): Promise<void> {
+    const res = await fetch(OPENAPI_EXE_ADDR, this.getOptions("POST", { recId: recId }))
     if (res.status !== 204) {
       throw new Error(OpenApiService.getErrorMessage(res));
     }

@@ -14,6 +14,7 @@ type RecInitialStateType = {
   records: RecordFullType[];
   getAllAction: boolean;
   createAction: boolean;
+  executAction: boolean;
   updateAction: boolean;
   deleteAction: boolean;
 };
@@ -24,6 +25,7 @@ const initialState = (): RecInitialStateType => ({
   records: [],
   getAllAction: true,
   createAction: false,
+  executAction: false,
   updateAction: false,
   deleteAction: false
 });
@@ -52,6 +54,9 @@ export const recSlice = createSlice({
     setCreateAction: (state, action: PayloadAction<boolean>) => {
       state.createAction = action.payload;
     },
+    setExecutAction: (state, action: PayloadAction<boolean>) => {
+      state.executAction = action.payload;
+    },
     setUpdateAction: (state, action: PayloadAction<boolean>) => {
       state.updateAction = action.payload;
     },
@@ -68,6 +73,7 @@ export const {
   deleteRecord,
   setGetAllAction,
   setCreateAction,
+  setExecutAction,
   setUpdateAction,
   setDeleteAction
 } = recSlice.actions;

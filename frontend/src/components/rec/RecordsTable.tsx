@@ -1,7 +1,6 @@
 import {
   Box,
   Chip,
-  IconButton,
   Pagination,
   Paper,
   Stack,
@@ -12,12 +11,12 @@ import {
   TableHead,
   TableRow
 } from "@mui/material";
-import { Settings } from "@mui/icons-material";
 import { minutesToDdhhmm } from "../../domain/functions";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "../../store";
 import UpdateDialog from "./UpdateDialog";
 import DeleteDialog from "./DeleteDialog";
+import ExecutDialog from "./ExecutDialog";
 
 const PAGE_SIZE = 5;
 
@@ -113,9 +112,7 @@ export default function RecordsTable(): JSX.Element {
                 </TableCell>
                 <TableCell>
                   <Stack direction={"row"}>
-                    <IconButton title={"Execute record"} size={"small"}>
-                      <Settings fontSize={"small"} />
-                    </IconButton>
+                    <ExecutDialog index={i} />
                     <UpdateDialog index={i} />
                     <DeleteDialog index={i} />
                   </Stack>

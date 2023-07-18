@@ -14,9 +14,12 @@ import {
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { Delete, Send } from "@mui/icons-material";
-import { useAppSelector } from "../../store";
 import { RecordBaseType } from "../../domain/types";
-import { ddhhmmToMinutes, minutesToDdhhmm } from "../../domain/functions";
+import {
+  ddhhmmToMinutes,
+  minutesToDdhhmm
+} from "../../domain/functions";
+import { useAppSelector } from "../../store";
 
 type RecordDialogType = {
   show: boolean
@@ -52,9 +55,8 @@ function isValidDhm(dd: number, hh: number, mm: number): boolean {
 export default function RecordDialog(
   { show, hide, action, record, callback }: RecordDialogType): JSX.Element {
 
-  const { dd, hh, mm } = (record)
-    ? minutesToDdhhmm(record.period)
-    : { dd: 0, hh: 0, mm: 0 };
+  const [dd, hh, mm] = (record)
+    ? minutesToDdhhmm(record.period) : [0, 0, 0];
 
   const { createAction } = useAppSelector((state) => state.rec);
 
@@ -103,7 +105,7 @@ export default function RecordDialog(
       callback({
         url: url.trim(),
         regexp: rgx.trim(),
-        period: ddhhmmToMinutes({ dd: periodDD, hh: periodHH, mm: periodMM }),
+        period: ddhhmmToMinutes([periodDD, periodHH, periodMM]),
         label: lab.trim(),
         active: act,
         tags: tag.split(",").map((tag) => tag.trim()).filter((tag) => tag.length > 0)

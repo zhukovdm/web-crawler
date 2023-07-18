@@ -17,9 +17,9 @@ import {
   Settings,
   Update
 } from "@mui/icons-material";
-import { RecordFullType } from "../../domain/types";
 import { minutesToDdhhmm } from "../../domain/functions";
 import { useEffect, useState } from "react";
+import { useAppSelector } from "../../store";
 
 const PAGE_SIZE = 5;
 
@@ -29,15 +29,19 @@ function totalPages(length: number): number {
 }
 
 function showPeriod(period: number): string {
-  const { dd, hh, mm } = minutesToDdhhmm(period);
-  return `${dd}-${hh}-${mm}`;
+  const dhm = minutesToDdhhmm(period);
+
+  return ["days", "hours", "minutes"]
+    .map((sfx, idx) => (
+      (dhm[idx] === 0) ? undefined : `${dhm[idx]} ${sfx}`
+    ))
+    .filter((itm) => itm !== undefined)
+    .join(", ");
 }
 
-type RecordsTableType = {
-  records: RecordFullType[];
-};
+export default function RecordsTable(): JSX.Element {
 
-export default function RecordsTable({ records }: RecordsTableType): JSX.Element {
+  const { records } = useAppSelector((state) => state.rec);
 
   const [curPage, setCurPage] = useState(1);
   const [curRecs, setCurRecs] = useState(records.slice(0, PAGE_SIZE));
@@ -49,10 +53,20 @@ export default function RecordsTable({ records }: RecordsTableType): JSX.Element
 
   const handlePage = (_: React.ChangeEvent<unknown>, value: number) => {
     setCurPage(value);
-  }
+  };
 
   return (
     <Stack direction={"column"} gap={4}>
+      <Box display={"flex"} justifyContent={"center"}>
+        <Pagination
+          count={totalPages(records.length)}
+          size={"large"}
+          shape={"rounded"}
+          variant={"outlined"}
+          page={curPage}
+          onChange={handlePage}
+        />
+      </Box>
       <TableContainer component={Paper}>
         <Table sx={{ width: "100%" }} aria-label={"Record table"}>
           {/* <colgroup>
@@ -68,7 +82,7 @@ export default function RecordsTable({ records }: RecordsTableType): JSX.Element
               <TableCell>Label</TableCell>
               <TableCell>URL</TableCell>
               <TableCell>Tags</TableCell>
-              <TableCell>Period (dd-hh-mm)</TableCell>
+              <TableCell>Periodicity</TableCell>
               <TableCell>Last exec. stat</TableCell>
               <TableCell>Last exec. time</TableCell>
               <TableCell>Actions</TableCell>
@@ -101,14 +115,14 @@ export default function RecordsTable({ records }: RecordsTableType): JSX.Element
                 </TableCell>
                 <TableCell>
                   <Stack direction={"row"}>
-                    <IconButton title={"Delete record"} size={"small"}>
-                      <Delete fontSize={"small"} />
-                    </IconButton>
                     <IconButton title={"Update record"} size={"small"}>
                       <Update fontSize={"small"} />
                     </IconButton>
                     <IconButton title={"Execute record"} size={"small"}>
                       <Settings fontSize={"small"} />
+                    </IconButton>
+                    <IconButton title={"Delete record"} size={"small"}>
+                      <Delete fontSize={"small"} />
                     </IconButton>
                   </Stack>
                 </TableCell>
@@ -117,16 +131,6 @@ export default function RecordsTable({ records }: RecordsTableType): JSX.Element
           </TableBody>
         </Table>
       </TableContainer>
-      <Box display={"flex"} justifyContent={"center"}>
-        <Pagination
-          count={totalPages(records.length)}
-          size={"large"}
-          shape={"rounded"}
-          variant={"outlined"}
-          page={curPage}
-          onChange={handlePage}
-        />
-      </Box>
     </Stack>
   );
 }

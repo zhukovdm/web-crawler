@@ -2,7 +2,10 @@ import { Box, Button } from "@mui/material";
 import { RecordBaseType } from "../../domain/types";
 import { OpenApiService } from "../../services/openapi";
 import { useAppDispatch } from "../../store";
-import { appendRecord, setCreateAction } from "../../store/recSlice";
+import {
+  appendRecord,
+  setCreateAction
+} from "../../store/recSlice";
 import RecordDialog from "./RecordDialog";
 import { useState } from "react";
 
@@ -36,7 +39,11 @@ export default function CreateDialog(): JSX.Element {
       <Button variant={"outlined"} onClick={() => setShow(true)}>
         Create record
       </Button>
-      <RecordDialog show={show} hide={() => setShow(false)} action={"create"} callback={callback} />
+      <RecordDialog
+        show={show}
+        action={"create"}
+        hide={() => setShow(false)}
+        callback={callback} />
     </Box>
   );
 }

@@ -14,17 +14,17 @@ import {
 } from "@mui/material";
 import {
   Delete,
-  Settings,
-  Update
+  Settings
 } from "@mui/icons-material";
 import { minutesToDdhhmm } from "../../domain/functions";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "../../store";
+import UpdateDialog from "./UpdateDialog";
 
 const PAGE_SIZE = 5;
 
 function totalPages(length: number): number {
-  const whole = Math.floor(length / PAGE_SIZE); console.log(whole);
+  const whole = Math.floor(length / PAGE_SIZE);
   return Math.max(1, whole + ((whole * PAGE_SIZE < length) ? 1 : 0));
 }
 
@@ -89,7 +89,7 @@ export default function RecordsTable(): JSX.Element {
             </TableRow>
           </TableHead>
           <TableBody>
-            {curRecs.map((rec) => (
+            {curRecs.map((rec, i) => (
               <TableRow key={rec.recId}>
                 <TableCell>
                   {rec.label}
@@ -115,9 +115,7 @@ export default function RecordsTable(): JSX.Element {
                 </TableCell>
                 <TableCell>
                   <Stack direction={"row"}>
-                    <IconButton title={"Update record"} size={"small"}>
-                      <Update fontSize={"small"} />
-                    </IconButton>
+                    <UpdateDialog index={i} />
                     <IconButton title={"Execute record"} size={"small"}>
                       <Settings fontSize={"small"} />
                     </IconButton>

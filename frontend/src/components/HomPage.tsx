@@ -39,7 +39,7 @@ export default function HomPage(): JSX.Element {
             display={"inline"}
             component={RouterLink}
           >
-            <Typography>Visualization</Typography>
+            <Typography>Visualisation</Typography>
           </Link>
           <Typography>.</Typography>
         </Box>

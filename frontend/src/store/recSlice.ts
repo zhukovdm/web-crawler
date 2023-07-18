@@ -12,9 +12,9 @@ type RecInitialStateType = {
   filters: RecordFilters;
   sorters: RecordSorters;
   records: RecordFullType[];
+  getAllAction: boolean;
   createAction: boolean;
   updateAction: boolean;
-  getAllAction: boolean;
 };
 
 const initialState = (): RecInitialStateType => ({
@@ -23,7 +23,7 @@ const initialState = (): RecInitialStateType => ({
   records: [],
   getAllAction: true,
   createAction: false,
-  updateAction: false,
+  updateAction: false
 });
 
 export const recSlice = createSlice({
@@ -36,6 +36,10 @@ export const recSlice = createSlice({
     appendRecord: (state, action: PayloadAction<RecordFullType>) => {
       state.records.push(action.payload);
     },
+    updateRecord: (state, action: PayloadAction<{ index: number, record: RecordFullType }>) => {
+      const { index, record } = action.payload;
+      state.records = [...state.records.slice(0, index), record, ...state.records.slice(index + 1)];
+    },
     setGetAllAction: (state, action: PayloadAction<boolean>) => {
       state.getAllAction = action.payload;
     },
@@ -44,16 +48,17 @@ export const recSlice = createSlice({
     },
     setUpdateAction: (state, action: PayloadAction<boolean>) => {
       state.updateAction = action.payload;
-    },
+    }
   }
 });
 
 export const {
   setRecords,
   appendRecord,
+  updateRecord,
   setGetAllAction,
   setCreateAction,
-  setUpdateAction,
+  setUpdateAction
 } = recSlice.actions;
 
 export default recSlice.reducer;

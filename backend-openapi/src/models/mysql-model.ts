@@ -145,7 +145,9 @@ export class MySqlRecordModel extends MySqlPoolModel implements IRecordModel {
       SELECT @count AS count, @exeId AS exeId;`;
 
     return new Promise((res, rej) => {
-      this.pool.query(queryString, [recId, ...MySqlRecordModel.unpackRecordBase(record)], (err, results) => {
+      this.pool.query(queryString, [
+        recId, ...MySqlRecordModel.unpackRecordBase(record), getCurrentTime()
+      ], (err, results) => {
         if (err) { rej(err); }
         else {
           const params = getOutputParamsUnsafe(results);

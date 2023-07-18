@@ -1,7 +1,7 @@
 import { Box, Button } from "@mui/material";
 import { RecordBaseType } from "../../domain/types";
 import { OpenApiService } from "../../services/openapi";
-import { useAppDispatch } from "../../store";
+import { useAppDispatch, useAppSelector } from "../../store";
 import {
   appendRecord,
   setCreateAction
@@ -12,23 +12,24 @@ import { useState } from "react";
 export default function CreateDialog(): JSX.Element {
 
   const dispatch = useAppDispatch();
+  const { createAction } = useAppSelector((state) => state.rec);
 
   const [show, setShow] = useState(false);
 
-  const callback = async (record: RecordBaseType) => {
+  const callback = async (createdRecord: RecordBaseType) => {
     dispatch(setCreateAction(true));
     try {
-      const res = await OpenApiService.createRecord(record);
+      const res = await OpenApiService.createRecord(createdRecord);
       dispatch(appendRecord({
         ...res,
-        ...record,
+        ...createdRecord,
         lastExecStatus: null,
         lastExecCreateTime: null,
-        lastExecFinishTime: null,
+        lastExecFinishTime: null
       }));
       setShow(false);
     }
-    catch (ex: any) { alert(ex.message); }
+    catch (ex: any) { alert(ex?.message); }
     finally {
       dispatch(setCreateAction(false));
     }
@@ -42,6 +43,7 @@ export default function CreateDialog(): JSX.Element {
       <RecordDialog
         show={show}
         action={"create"}
+        remoteAction={createAction}
         hide={() => setShow(false)}
         callback={callback} />
     </Box>

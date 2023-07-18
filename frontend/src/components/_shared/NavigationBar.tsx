@@ -40,7 +40,7 @@ export default function NavigationBar(): JSX.Element {
         <Typography>Executions</Typography>
       } />
       <NavigationLink address={"/vis"} element={
-        <Typography>Visualization</Typography>
+        <Typography>Visualisation</Typography>
       } />
     </Stack>
   );

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  Box,
   Button,
   Dialog,
   DialogActions,
@@ -19,13 +18,13 @@ import {
   ddhhmmToMinutes,
   minutesToDdhhmm
 } from "../../domain/functions";
-import { useAppSelector } from "../../store";
 
 type RecordDialogType = {
   show: boolean
   hide: () => void;
   record?: RecordBaseType;
   action: "create" | "update";
+  remoteAction: boolean;
   callback: (record: RecordBaseType) => void;
 };
 
@@ -53,12 +52,10 @@ function isValidDhm(dd: number, hh: number, mm: number): boolean {
 }
 
 export default function RecordDialog(
-  { show, hide, action, record, callback }: RecordDialogType): JSX.Element {
+  { show, hide, record, action, remoteAction, callback }: RecordDialogType): JSX.Element {
 
   const [dd, hh, mm] = (record)
     ? minutesToDdhhmm(record.period) : [0, 0, 0];
-
-  const { createAction } = useAppSelector((state) => state.rec);
 
   const [lab, setLab] = useState(record?.label ?? "");
   const [labError, setLabError] = useState(false);
@@ -123,7 +120,7 @@ export default function RecordDialog(
         {action.slice(0, 1).toUpperCase() + action.slice(1)} record
         <IconButton
           title="Clean dialog"
-          disabled={createAction}
+          disabled={remoteAction}
           onClick={clean}
         >
           <Delete />
@@ -133,6 +130,7 @@ export default function RecordDialog(
         <Stack sx={{ my: 1 }} direction={"column"} gap={3}>
           <TextField
             required
+            disabled={remoteAction}
             value={lab}
             label={"Label"}
             error={labError}
@@ -141,6 +139,7 @@ export default function RecordDialog(
           />
           <TextField
             required
+            disabled={remoteAction}
             value={url}
             label={"URL"}
             error={urlError}
@@ -149,6 +148,7 @@ export default function RecordDialog(
           />
           <TextField
             required
+            disabled={remoteAction}
             value={rgx}
             label={"RegExp"}
             error={rgxError}
@@ -160,6 +160,7 @@ export default function RecordDialog(
             <TextField
               sx={{ width: "6rem" }}
               required
+              disabled={remoteAction}
               type={"number"}
               value={periodDD}
               label={"Days"}
@@ -170,6 +171,7 @@ export default function RecordDialog(
             <TextField
               sx={{ width: "6rem" }}
               required
+              disabled={remoteAction}
               type={"number"}
               value={periodHH}
               label={"Hours"}
@@ -180,6 +182,7 @@ export default function RecordDialog(
             <TextField
               sx={{ width: "6rem" }}
               required
+              disabled={remoteAction}
               type={"number"}
               value={periodMM}
               label={"Minutes"}
@@ -189,6 +192,7 @@ export default function RecordDialog(
             />
           </Stack>
           <TextField
+            disabled={remoteAction}
             value={tag}
             label={"Tags"}
             onChange={(e) => setTag(e.target.value)}
@@ -209,13 +213,13 @@ export default function RecordDialog(
       <DialogActions>
         <Button
           color={"error"}
-          disabled={createAction}
+          disabled={remoteAction}
           onClick={hide}
         >
           <span>Cancel</span>
         </Button>
         <LoadingButton
-          loading={createAction}
+          loading={remoteAction}
           loadingPosition={"start"}
           startIcon={<Send />}
           onClick={confirm}

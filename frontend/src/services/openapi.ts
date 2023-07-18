@@ -41,4 +41,11 @@ export class OpenApiService {
     }
     return await res.json();
   }
+
+  public static async updateRecord(recId: number, record: RecordBaseType): Promise<void> {
+    const res = await fetch(`${OPENAPI_REC_ADDR}/${recId}`, this.getOptions("PUT", record));
+    if (res.status !== 204) {
+      throw new Error(OpenApiService.getErrorMessage(res));
+    }
+  }
 }

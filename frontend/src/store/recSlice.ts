@@ -17,6 +17,12 @@ type RecInitialStateType = {
   executAction: boolean;
   updateAction: boolean;
   deleteAction: boolean;
+  urlFilterCon: string;
+  urlFilterAct: boolean;
+  labFilterCon: string;
+  labFilterAct: boolean;
+  tagFilterCon: string;
+  tagFilterAct: boolean;
 };
 
 const initialState = (): RecInitialStateType => ({
@@ -27,7 +33,13 @@ const initialState = (): RecInitialStateType => ({
   createAction: false,
   executAction: false,
   updateAction: false,
-  deleteAction: false
+  deleteAction: false,
+  urlFilterCon: "",
+  urlFilterAct: false,
+  labFilterCon: "",
+  labFilterAct: false,
+  tagFilterCon: "",
+  tagFilterAct: false
 });
 
 export const recSlice = createSlice({
@@ -62,6 +74,24 @@ export const recSlice = createSlice({
     },
     setDeleteAction: (state, action: PayloadAction<boolean>) => {
       state.deleteAction = action.payload;
+    },
+    setUrlFilterCon: (state, action: PayloadAction<string>) => {
+      state.urlFilterCon = action.payload;
+    },
+    setUrlFilterAct: (state, action: PayloadAction<boolean>) => {
+      state.urlFilterAct = action.payload;
+    },
+    setLabFilterCon: (state, action: PayloadAction<string>) => {
+      state.labFilterCon = action.payload;
+    },
+    setLabFilterAct: (state, action: PayloadAction<boolean>) => {
+      state.labFilterAct = action.payload;
+    },
+    setTagFilterCon: (state, action: PayloadAction<string>) => {
+      state.tagFilterCon = action.payload;
+    },
+    setTagFilterAct: (state, action: PayloadAction<boolean>) => {
+      state.tagFilterAct = action.payload;
     }
   }
 });
@@ -75,7 +105,13 @@ export const {
   setCreateAction,
   setExecutAction,
   setUpdateAction,
-  setDeleteAction
+  setDeleteAction,
+  setUrlFilterCon,
+  setUrlFilterAct,
+  setLabFilterCon,
+  setLabFilterAct,
+  setTagFilterCon,
+  setTagFilterAct
 } = recSlice.actions;
 
 export default recSlice.reducer;

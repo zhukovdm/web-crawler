@@ -22,12 +22,12 @@ export default function FilterConfig(): JSX.Element {
 
   const dispatch = useAppDispatch();
   const {
-    urlFilterAct,
     urlFilterCon,
-    labFilterAct,
+    urlFilterAct,
     labFilterCon,
-    tagFilterAct,
-    tagFilterCon
+    labFilterAct,
+    tagFilterCon,
+    tagFilterAct
   } = useAppSelector((state) => state.rec);
 
   return (

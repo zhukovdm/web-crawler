@@ -6,6 +6,7 @@ import { OpenApiService } from "../services/openapi";
 import CreateDialog from "./rec/CreateDialog";
 import RecordsTable from "./rec/RecordsTable";
 import FilterConfig from "./rec/FilterConfig";
+import SorterConfig from "./rec/SorterConfig";
 
 export default function RecPage(): JSX.Element {
 
@@ -29,6 +30,8 @@ export default function RecPage(): JSX.Element {
       <CreateDialog />
       <Divider light />
       <FilterConfig />
+      <Divider light />
+      <SorterConfig />
       <Divider light />
       {getAllAction
         ? <Box display={"flex"} justifyContent={"center"}>

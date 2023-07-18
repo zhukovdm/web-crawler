@@ -4,14 +4,14 @@ import {
   IconButton
 } from "@mui/material";
 import { Update } from "@mui/icons-material";
-import { useAppDispatch, useAppSelector } from "../../store";
 import { RecordBaseType } from "../../domain/types";
-import RecordDialog from "./RecordDialog";
+import { useAppDispatch, useAppSelector } from "../../store";
 import {
   setUpdateAction,
   updateRecord
 } from "../../store/recSlice";
 import { OpenApiService } from "../../services/openapi";
+import RecordDialog from "./RecordDialog";
 
 type UpdateDialogType = {
   index: number;

@@ -15,6 +15,7 @@ type RecInitialStateType = {
   getAllAction: boolean;
   createAction: boolean;
   updateAction: boolean;
+  deleteAction: boolean;
 };
 
 const initialState = (): RecInitialStateType => ({
@@ -23,7 +24,8 @@ const initialState = (): RecInitialStateType => ({
   records: [],
   getAllAction: true,
   createAction: false,
-  updateAction: false
+  updateAction: false,
+  deleteAction: false
 });
 
 export const recSlice = createSlice({
@@ -40,6 +42,10 @@ export const recSlice = createSlice({
       const { index, record } = action.payload;
       state.records = [...state.records.slice(0, index), record, ...state.records.slice(index + 1)];
     },
+    deleteRecord: (state, action: PayloadAction<number>) => {
+      const index = action.payload;
+      state.records = [...state.records.slice(0, index), ...state.records.slice(index + 1)];
+    },
     setGetAllAction: (state, action: PayloadAction<boolean>) => {
       state.getAllAction = action.payload;
     },
@@ -48,6 +54,9 @@ export const recSlice = createSlice({
     },
     setUpdateAction: (state, action: PayloadAction<boolean>) => {
       state.updateAction = action.payload;
+    },
+    setDeleteAction: (state, action: PayloadAction<boolean>) => {
+      state.deleteAction = action.payload;
     }
   }
 });
@@ -56,9 +65,11 @@ export const {
   setRecords,
   appendRecord,
   updateRecord,
+  deleteRecord,
   setGetAllAction,
   setCreateAction,
-  setUpdateAction
+  setUpdateAction,
+  setDeleteAction
 } = recSlice.actions;
 
 export default recSlice.reducer;

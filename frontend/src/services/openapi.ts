@@ -48,4 +48,11 @@ export class OpenApiService {
       throw new Error(OpenApiService.getErrorMessage(res));
     }
   }
+
+  public static async deleteRecord(recId: number): Promise<void> {
+    const res = await fetch(`${OPENAPI_REC_ADDR}/${recId}`, this.getOptions("DELETE", undefined));
+    if (res.status !== 204) {
+      throw new Error(OpenApiService.getErrorMessage(res));
+    }
+  }
 }

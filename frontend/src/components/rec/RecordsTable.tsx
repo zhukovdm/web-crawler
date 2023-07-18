@@ -12,14 +12,12 @@ import {
   TableHead,
   TableRow
 } from "@mui/material";
-import {
-  Delete,
-  Settings
-} from "@mui/icons-material";
+import { Settings } from "@mui/icons-material";
 import { minutesToDdhhmm } from "../../domain/functions";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "../../store";
 import UpdateDialog from "./UpdateDialog";
+import DeleteDialog from "./DeleteDialog";
 
 const PAGE_SIZE = 5;
 
@@ -115,13 +113,11 @@ export default function RecordsTable(): JSX.Element {
                 </TableCell>
                 <TableCell>
                   <Stack direction={"row"}>
-                    <UpdateDialog index={i} />
                     <IconButton title={"Execute record"} size={"small"}>
                       <Settings fontSize={"small"} />
                     </IconButton>
-                    <IconButton title={"Delete record"} size={"small"}>
-                      <Delete fontSize={"small"} />
-                    </IconButton>
+                    <UpdateDialog index={i} />
+                    <DeleteDialog index={i} />
                   </Stack>
                 </TableCell>
               </TableRow>

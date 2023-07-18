@@ -6,7 +6,8 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  IconButton
+  IconButton,
+  Typography
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { Send, Settings } from "@mui/icons-material";
@@ -33,6 +34,7 @@ export default function ExecutDialog({ index }: ExecutDialogType): JSX.Element {
     dispatch(setExecutAction(true));
     try {
       await OpenApiService.createExecution(record.recId);
+      setShow(false);
     }
     catch (ex: any) { alert(ex?.message); }
     finally {
@@ -52,8 +54,10 @@ export default function ExecutDialog({ index }: ExecutDialogType): JSX.Element {
       <Dialog open={show}>
         <DialogTitle>Execute record</DialogTitle>
         <DialogContent>
-          You are about to create execution for the record with ID: {`${record?.recId}`}.
-          Confirm the action.
+          <Typography>
+            You are about to create execution for<br />
+            the record with ID: <strong>{`${record?.recId}`}</strong>. Confirm the action.
+          </Typography>
         </DialogContent>
         <DialogActions>
           <Button

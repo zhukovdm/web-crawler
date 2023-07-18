@@ -24,7 +24,7 @@ export default function App() {
           <Route path={"/rec"} element={<RecPage />} />
           <Route path={"/exe"} element={<ExePage />} />
           <Route path={"/vis"} element={<VisPage />} />
-          <Route path={"*"} element={<Navigate to={"/hom"} />} />
+          <Route path={"*"} element={<Navigate to={"/"} />} />
         </Routes>
       </BrowserRouter>
     </Provider>

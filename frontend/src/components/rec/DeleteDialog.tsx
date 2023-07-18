@@ -37,6 +37,7 @@ export default function DeleteDialog({ index }: DeleteDialogType): JSX.Element {
     dispatch(setDeleteAction(true));
     try {
       await OpenApiService.deleteRecord(record!.recId);
+      setShow(false);
       dispatch(deleteRecord(index));
     }
     catch (ex: any) { alert(ex?.message); }
@@ -58,8 +59,8 @@ export default function DeleteDialog({ index }: DeleteDialogType): JSX.Element {
         <DialogTitle>Delete record</DialogTitle>
         <DialogContent>
           <Typography>
-            You are about to delete record with ID: {`${record?.recId}`}.
-            Confirm the action.
+            You are about to delete<br />
+            the record with ID: {`${record?.recId}`}. Confirm the action.
           </Typography>
         </DialogContent>
         <DialogActions>

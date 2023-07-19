@@ -1,4 +1,9 @@
 import {
+  useEffect,
+  useMemo,
+  useState
+} from "react";
+import {
   Box,
   Chip,
   Pagination,
@@ -11,8 +16,11 @@ import {
   TableHead,
   TableRow
 } from "@mui/material";
-import { minutesToDdhhmm } from "../../domain/functions";
-import { useEffect, useState } from "react";
+import { RecordFullType } from "../../domain/types";
+import {
+  minutesToDdhhmm,
+  stringToTags
+} from "../../domain/functions";
 import { useAppSelector } from "../../store";
 import UpdateDialog from "./UpdateDialog";
 import DeleteDialog from "./DeleteDialog";
@@ -38,15 +46,43 @@ function showPeriod(period: number): string {
 
 export default function RecordsTable(): JSX.Element {
 
-  const { records } = useAppSelector((state) => state.rec);
+  const {
+    records,
+    labFilterAct,
+    labFilterCon,
+    urlFilterAct,
+    urlFilterCon,
+    tagFilterAct,
+    tagFilterCon
+  } = useAppSelector((state) => state.rec);
+
+  const fsRecords = useMemo(() => {
+
+    return records
+      .map((r, i) => [r, i] as [RecordFullType, number])
+      .filter(([r, _]) => !labFilterAct || r.label.toLowerCase().includes(labFilterCon))
+      .filter(([r, _]) => !urlFilterAct || r.label.toLowerCase().includes(urlFilterCon))
+      .filter(([r, _]) => {
+        const rt = new Set(stringToTags(tagFilterCon))
+        return !tagFilterAct || r.tags.reduce((acc, t) => acc || rt.has(t), false);
+      });
+  }, [
+    records,
+    labFilterAct,
+    labFilterCon,
+    urlFilterAct,
+    urlFilterCon,
+    tagFilterAct,
+    tagFilterCon
+  ]);
 
   const [curPage, setCurPage] = useState(1);
-  const [curRecs, setCurRecs] = useState(records.slice(0, PAGE_SIZE));
+  const [curRecs, setCurRecs] = useState(fsRecords.slice(0, PAGE_SIZE));
 
   useEffect(() => {
     const base = (curPage - 1) * PAGE_SIZE
-    setCurRecs(records.slice(base, base + PAGE_SIZE))
-  }, [curPage, records]);
+    setCurRecs(fsRecords.slice(base, base + PAGE_SIZE))
+  }, [curPage, fsRecords]);
 
   const handlePage = (_: React.ChangeEvent<unknown>, value: number) => {
     setCurPage(value);
@@ -57,7 +93,7 @@ export default function RecordsTable(): JSX.Element {
       <Box display={"flex"} justifyContent={"center"}>
         <Pagination
           size={"large"}
-          count={totalPages(records.length)}
+          count={totalPages(fsRecords.length)}
           shape={"rounded"}
           variant={"outlined"}
           page={curPage}
@@ -67,12 +103,7 @@ export default function RecordsTable(): JSX.Element {
       <TableContainer component={Paper}>
         <Table sx={{ width: "100%" }} aria-label={"table of records"}>
           {/* <colgroup>
-            <col width={"17%"} />
-            <col width={"23%"} />
-            <col width={"15%"} />
-            <col width={"15%"} />
-            <col width={"15%"} />
-            <col width={"15%"} />
+            <col width={"100%"} />
           </colgroup> */}
           <TableHead>
             <TableRow>
@@ -86,29 +117,29 @@ export default function RecordsTable(): JSX.Element {
             </TableRow>
           </TableHead>
           <TableBody>
-            {curRecs.map((rec, i) => (
-              <TableRow key={rec.recId}>
+            {curRecs.map(([r, i]) => (
+              <TableRow key={r.recId}>
                 <TableCell>
-                  {rec.label}
+                  {r.label}
                 </TableCell>
                 <TableCell>
-                  {rec.url}
+                  {r.url}
                 </TableCell>
                 <TableCell>
                   <Stack direction={"row"} gap={0.5} flexWrap={"wrap"}>
-                    {rec.tags.map((tag, i) => (
-                      <Chip key={i} label={tag} size={"small"} />
+                    {r.tags.map((t, i) => (
+                      <Chip key={i} label={t} size={"small"} />
                     ))}
                   </Stack>
                 </TableCell>
                 <TableCell>
-                  {showPeriod(rec.period)}
+                  {showPeriod(r.period)}
                 </TableCell>
                 <TableCell>
-                  {rec.lastExecFinishTime ?? rec.lastExecCreateTime ?? "N/A"}
+                  {r.lastExecFinishTime ?? r.lastExecCreateTime ?? "N/A"}
                 </TableCell>
                 <TableCell>
-                  {rec.lastExecStatus ?? "N/A"}
+                  {r.lastExecStatus ?? "N/A"}
                 </TableCell>
                 <TableCell>
                   <Stack direction={"row"}>

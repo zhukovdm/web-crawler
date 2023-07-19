@@ -43,7 +43,6 @@ export default function FilterConfig(): JSX.Element {
             size={"small"}
             label={"Label (substr)"}
             value={labFilterCon}
-            disabled={!labFilterAct}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               dispatch(setLabFilterCon(e.target.value));
             }}
@@ -56,9 +55,8 @@ export default function FilterConfig(): JSX.Element {
           />
           <TextField
             size={"small"}
-            label={"URL (exact)"}
+            label={"URL (substr)"}
             value={urlFilterCon}
-            disabled={!urlFilterAct}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               dispatch(setUrlFilterCon(e.target.value));
             }}
@@ -73,7 +71,6 @@ export default function FilterConfig(): JSX.Element {
             size={"small"}
             label={"Tags (any of)"}
             value={tagFilterCon}
-            disabled={!tagFilterAct}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               dispatch(setTagFilterCon(e.target.value));
             }}

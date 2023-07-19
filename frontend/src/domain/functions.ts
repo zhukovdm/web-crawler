@@ -14,3 +14,13 @@ export function ddhhmmToMinutes(ddhhmm: [number, number, number]): number {
   const [dd, hh, mm] = ddhhmm;
   return dd * minutesInDD + hh * minutesInHH + mm;
 }
+
+export function stringToTags(str: string): string[] {
+  return str.split(",")
+    .map((tag) => tag.trim())
+    .filter((tag) => tag.length > 0);
+}
+
+export function tagsToString(tags: string[]): string {
+  return tags.join(", ");
+}

@@ -16,7 +16,9 @@ import { Delete, Send } from "@mui/icons-material";
 import { RecordBaseType } from "../../domain/types";
 import {
   ddhhmmToMinutes,
-  minutesToDdhhmm
+  minutesToDdhhmm,
+  stringToTags,
+  tagsToString
 } from "../../domain/functions";
 
 type RecordDialogType = {
@@ -67,7 +69,7 @@ export default function RecordDialog(
   const [rgxError, setRgxError] = useState(false);
 
   const [act, setAct] = useState(record?.active ?? true);
-  const [tag, setTag] = useState(record?.tags ? record.tags.join(", ") : "");
+  const [tag, setTag] = useState(record?.tags ? tagsToString(record.tags) : "");
 
   const [periodDD, setPeriodDD] = useState(dd);
   const [periodHH, setPeriodHH] = useState(hh);
@@ -105,7 +107,7 @@ export default function RecordDialog(
         period: ddhhmmToMinutes([periodDD, periodHH, periodMM]),
         label: lab.trim(),
         active: act,
-        tags: tag.split(",").map((tag) => tag.trim()).filter((tag) => tag.length > 0)
+        tags: stringToTags(tag)
       });
     }
   };

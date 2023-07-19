@@ -14,7 +14,7 @@ type ExeInitialStateType = {
 
 const initialState = (): ExeInitialStateType => ({
   exeFilterAct: false,
-  exeFilterCon: 0
+  exeFilterCon: undefined
 });
 
 export const exeSlice = createSlice({
@@ -24,7 +24,7 @@ export const exeSlice = createSlice({
     setExeFilterAct: (state, action: PayloadAction<boolean>) => {
       state.exeFilterAct = action.payload;
     },
-    setExeFilterCon: (state, action: PayloadAction<number>) => {
+    setExeFilterCon: (state, action: PayloadAction<number | undefined>) => {
       state.exeFilterCon = action.payload;
     }
   }

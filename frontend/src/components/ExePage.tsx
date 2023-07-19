@@ -31,7 +31,7 @@ export default function ExePage(): JSX.Element {
 
   return (
     <Stack sx={{ m: 4 }} gap={4}>
-      <FilterConfig />
+      <FilterConfig load={load} exes={exes} />
       <Divider light />
       {load
         ? <Box display={"flex"} justifyContent={"center"}>

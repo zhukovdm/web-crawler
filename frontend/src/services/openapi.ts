@@ -1,4 +1,5 @@
 import {
+  ExecutionFullType,
   RecordBaseType,
   RecordFullType,
   RecordIdType
@@ -57,6 +58,14 @@ export class OpenApiService {
     if (res.status !== 204) {
       throw new Error(OpenApiService.getErrorMessage(res));
     }
+  }
+
+  public static async getAllExecutions(): Promise<ExecutionFullType[]> {
+    const res = await fetch(OPENAPI_EXE_ADDR, this.getOptions("GET", undefined));
+    if (res.status !== 200) {
+      throw new Error(OpenApiService.getErrorMessage(res));
+    }
+    return await res.json();
   }
 
   public static async createExecution(recId: number): Promise<void> {

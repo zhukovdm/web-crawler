@@ -1,18 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   CircularProgress,
   Divider,
   Stack
 } from "@mui/material";
-import {
-  useAppDispatch,
-  useAppSelector
-} from "../store";
-import {
-  setExecutions,
-  setGetAllAction
-} from "../store/exeSlice";
+import { ExecutionFullType } from "../domain/types";
+import { useAppDispatch } from "../store";
 import { OpenApiService } from "../services/openapi";
 import FilterConfig from "./exe/FilterConfig";
 import ExecutionsTable from "./exe/ExecutionsTable";
@@ -20,29 +14,30 @@ import ExecutionsTable from "./exe/ExecutionsTable";
 export default function ExePage(): JSX.Element {
 
   const dispatch = useAppDispatch();
-  const { getAllAction } = useAppSelector((state) => state.exe);
+  const [load, setLoad] = useState(true);
+  const [exes, setExes] = useState<ExecutionFullType[]>([]);
 
   useEffect(() => {
     const f = async () => {
       try {
-        dispatch(setExecutions(await OpenApiService.getAllExecutions()));
-        dispatch(setGetAllAction(false));
+        setExes(await OpenApiService.getAllExecutions());
+        setLoad(false);
       }
       catch (ex: any) { alert(ex?.message); }
     };
 
-    if (getAllAction) { f(); }
-  }, [dispatch, getAllAction]);
+    f();
+  }, [dispatch]);
 
   return (
     <Stack sx={{ m: 4 }} gap={4}>
       <FilterConfig />
       <Divider light />
-      {getAllAction
+      {load
         ? <Box display={"flex"} justifyContent={"center"}>
             <CircularProgress />
           </Box>
-        : <ExecutionsTable />
+        : <ExecutionsTable exes={exes} />
       }
     </Stack>
   );

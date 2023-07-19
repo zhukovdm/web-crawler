@@ -2,11 +2,8 @@ import {
   PayloadAction,
   createSlice
 } from "@reduxjs/toolkit";
-import { ExecutionFullType } from "../domain/types";
 
 type ExeInitialStateType = {
-  executions: ExecutionFullType[];
-  getAllAction: boolean;
   exeFilterAct: boolean;
 
   /**
@@ -16,8 +13,6 @@ type ExeInitialStateType = {
 };
 
 const initialState = (): ExeInitialStateType => ({
-  executions: [],
-  getAllAction: true,
   exeFilterAct: false,
   exeFilterCon: 0
 });
@@ -26,12 +21,6 @@ export const exeSlice = createSlice({
   name: "exe",
   initialState: (initialState()),
   reducers: {
-    setExecutions: (state, action: PayloadAction<ExecutionFullType[]>) => {
-      state.executions = action.payload;
-    },
-    setGetAllAction: (state, action: PayloadAction<boolean>) => {
-      state.getAllAction = action.payload;
-    },
     setExeFilterAct: (state, action: PayloadAction<boolean>) => {
       state.exeFilterAct = action.payload;
     },
@@ -42,8 +31,6 @@ export const exeSlice = createSlice({
 });
 
 export const {
-  setExecutions,
-  setGetAllAction,
   setExeFilterAct,
   setExeFilterCon
 } = exeSlice.actions;

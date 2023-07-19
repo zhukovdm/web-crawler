@@ -19,20 +19,22 @@ import {
   updatePage
 } from "../_shared/paginate";
 
-export default function ExecutionsTable(): JSX.Element {
+type ExecutionsTableType = {
+  exes: ExecutionFullType[];
+};
+
+export default function ExecutionsTable({ exes }: ExecutionsTableType): JSX.Element {
 
   const {
-    executions,
     exeFilterAct,
     exeFilterCon
   } = useAppSelector((state) => state.exe);
 
   const fsExecutions = useMemo(() => {
-
-    return executions
+    return exes
       .map((e, i) => [e, i] as [ExecutionFullType, number])
       .filter(([e, _]) => !exeFilterAct || e.recId === exeFilterCon);
-  }, [executions, exeFilterAct, exeFilterCon]);
+  }, [exes, exeFilterAct, exeFilterCon]);
 
   const [curPage, setCurPage] = useState(1);
   const [curExes, setCurExes] = useState(getFirstPage(fsExecutions));

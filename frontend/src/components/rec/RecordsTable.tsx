@@ -22,16 +22,14 @@ import {
   stringToTags
 } from "../../domain/functions";
 import { useAppSelector } from "../../store";
+import {
+  getFirstPage,
+  getPageCount,
+  updatePage
+} from "../_shared/paginate";
 import UpdateDialog from "./UpdateDialog";
 import DeleteDialog from "./DeleteDialog";
 import ExecutDialog from "./ExecutDialog";
-
-const PAGE_SIZE = 5;
-
-function totalPages(length: number): number {
-  const whole = Math.floor(length / PAGE_SIZE);
-  return Math.max(1, whole + ((whole * PAGE_SIZE < length) ? 1 : 0));
-}
 
 function showPeriod(period: number): string {
   const dhm = minutesToDdhhmm(period);
@@ -113,11 +111,12 @@ export default function RecordsTable(): JSX.Element {
   ]);
 
   const [curPage, setCurPage] = useState(1);
-  const [curRecs, setCurRecs] = useState(fsRecords.slice(0, PAGE_SIZE));
+  const [curRecs, setCurRecs] = useState(getFirstPage(fsRecords));
 
   useEffect(() => {
-    const base = (curPage - 1) * PAGE_SIZE
-    setCurRecs(fsRecords.slice(base, base + PAGE_SIZE))
+    const [nxtPage, nxtRecs] = updatePage(curPage, fsRecords);
+    setCurPage(nxtPage);
+    setCurRecs(nxtRecs);
   }, [curPage, fsRecords]);
 
   const handlePage = (_: React.ChangeEvent<unknown>, value: number) => {
@@ -128,12 +127,12 @@ export default function RecordsTable(): JSX.Element {
     <Stack direction={"column"} gap={4}>
       <Box display={"flex"} justifyContent={"center"}>
         <Pagination
+          page={curPage}
+          count={getPageCount(fsRecords.length)}
+          onChange={handlePage}
           size={"large"}
-          count={totalPages(fsRecords.length)}
           shape={"rounded"}
           variant={"outlined"}
-          page={curPage}
-          onChange={handlePage}
         />
       </Box>
       <TableContainer component={Paper}>

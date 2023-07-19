@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Box,
   Checkbox,
@@ -20,7 +21,6 @@ import {
   setUrlSorterAsc,
   setTimSorterAsc
 } from "../../store/recSlice";
-import React from "react";
 
 function getOrder(ad: boolean): string {
   return `${ad ? "a" : "de"}scending order`;
@@ -57,7 +57,7 @@ export default function SorterConfig(): JSX.Element {
               title={getOrder(urlSorterAsc)}
               onClick={() => dispatch(setUrlSorterAsc(!urlSorterAsc))}
             >
-              {urlSorterAsc ? <ArrowCircleUp /> : <ArrowCircleDown />}
+              {urlSorterAsc ? <ArrowCircleDown /> : <ArrowCircleUp />}
             </IconButton>
             <Radio
               value={0}
@@ -72,7 +72,7 @@ export default function SorterConfig(): JSX.Element {
               title={getOrder(timSorterAsc)}
               onClick={() => dispatch(setTimSorterAsc(!timSorterAsc))}
             >
-              {timSorterAsc ? <ArrowCircleUp /> : <ArrowCircleDown />}
+              {timSorterAsc ? <ArrowCircleDown /> : <ArrowCircleUp />}
             </IconButton>
             <Radio
               value={1}

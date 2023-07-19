@@ -53,12 +53,16 @@ export default function RecordsTable(): JSX.Element {
     urlFilterAct,
     urlFilterCon,
     tagFilterAct,
-    tagFilterCon
+    tagFilterCon,
+    sorterAct,
+    sorterCon,
+    urlSorterAsc,
+    timSorterAsc
   } = useAppSelector((state) => state.rec);
 
   const fsRecords = useMemo(() => {
 
-    return records
+    let rs = records
       .map((r, i) => [r, i] as [RecordFullType, number])
       .filter(([r, _]) => !labFilterAct || r.label.toLowerCase().includes(labFilterCon))
       .filter(([r, _]) => !urlFilterAct || r.label.toLowerCase().includes(urlFilterCon))
@@ -66,6 +70,34 @@ export default function RecordsTable(): JSX.Element {
         const rt = new Set(stringToTags(tagFilterCon))
         return !tagFilterAct || r.tags.reduce((acc, t) => acc || rt.has(t), false);
       });
+
+    if (sorterAct && sorterCon === 0 /* url */) {
+      const factor = urlSorterAsc ? +1 : -1;
+      rs = rs.sort(([{ url: l }], [{ url: r }]) => {
+        if (l < r) { return -1 * factor; }
+        if (l > r) { return +1 * factor; }
+        return 0;
+      });
+    }
+
+    if (sorterAct && sorterCon === 1 /* tim */) {
+      const factor = timSorterAsc ? +1 : -1;
+      rs = rs.sort(([{ lastExecFinishTime: l }], [{ lastExecFinishTime: r }]) => {
+
+        if (l !== null && r === null) { return -1 * factor; }
+        if (l === null && r !== null) { return +1 * factor; }
+        if (l !== null && r !== null) {
+          const ld = new Date(l);
+          const rd = new Date(r);
+          if (ld < rd) { return -1 * factor; }
+          if (ld > rd) { return +1 * factor; }
+        }
+
+        return 0;
+      })
+    }
+
+    return rs;
   }, [
     records,
     labFilterAct,
@@ -73,7 +105,11 @@ export default function RecordsTable(): JSX.Element {
     urlFilterAct,
     urlFilterCon,
     tagFilterAct,
-    tagFilterCon
+    tagFilterCon,
+    sorterAct,
+    sorterCon,
+    urlSorterAsc,
+    timSorterAsc
   ]);
 
   const [curPage, setCurPage] = useState(1);

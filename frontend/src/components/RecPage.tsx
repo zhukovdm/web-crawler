@@ -1,7 +1,18 @@
 import { useEffect } from "react";
-import { Box, CircularProgress, Divider, Stack } from "@mui/material";
-import { useAppDispatch, useAppSelector } from "../store";
-import { setGetAllAction, setRecords } from "../store/recSlice";
+import {
+  Box,
+  CircularProgress,
+  Divider,
+  Stack
+} from "@mui/material";
+import {
+  useAppDispatch,
+  useAppSelector
+} from "../store";
+import {
+  setGetAllAction,
+  setRecords
+} from "../store/recSlice";
 import { OpenApiService } from "../services/openapi";
 import CreateDialog from "./rec/CreateDialog";
 import RecordsTable from "./rec/RecordsTable";
@@ -27,11 +38,15 @@ export default function RecPage(): JSX.Element {
 
   return (
     <Stack sx={{ m: 4 }} gap={4}>
-      <CreateDialog />
-      <Divider light />
-      <FilterConfig />
-      <Divider light />
-      <SorterConfig />
+      <Stack direction={"row"} gap={4}>
+        <Stack direction={"column"} gap={4}>
+          <CreateDialog />
+          <Divider light />
+          <SorterConfig />
+        </Stack>
+        <Divider orientation={"vertical"} flexItem />
+        <FilterConfig />
+      </Stack>
       <Divider light />
       {getAllAction
         ? <Box display={"flex"} justifyContent={"center"}>

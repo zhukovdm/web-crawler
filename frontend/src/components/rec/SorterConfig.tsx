@@ -1,4 +1,5 @@
 import {
+  Box,
   Checkbox,
   FormControlLabel,
   Radio,
@@ -19,20 +20,22 @@ export default function SorterConfig(): JSX.Element {
 
   const dispatch = useAppDispatch();
   const {
-    sorterCon,
-    sorterAct
+    sorterAct,
+    sorterCon
   } = useAppSelector((state) => state.rec);
 
   return (
     <Stack direction={"column"} gap={2}>
       <Typography fontSize={"large"}>Sorters</Typography>
-      <Stack direction={"row"} gap={2}>
-        <Checkbox
-          value={sorterAct}
-          onChange={(_, v) => dispatch(setSorterAct(v))}
-        />
+      <Stack direction={"row"} gap={2} alignItems={"center"}>
+        <Box>
+          <Checkbox
+            value={sorterAct}
+            onChange={(_, v) => dispatch(setSorterAct(v))}
+          />
+        </Box>
         <RadioGroup
-          row
+          row={false}
           value={sorterCon}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             dispatch(setSorterCon(parseInt(e.target.value)))

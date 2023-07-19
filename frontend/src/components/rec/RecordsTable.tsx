@@ -56,8 +56,8 @@ export default function RecordsTable(): JSX.Element {
     <Stack direction={"column"} gap={4}>
       <Box display={"flex"} justifyContent={"center"}>
         <Pagination
-          count={totalPages(records.length)}
           size={"large"}
+          count={totalPages(records.length)}
           shape={"rounded"}
           variant={"outlined"}
           page={curPage}
@@ -65,7 +65,7 @@ export default function RecordsTable(): JSX.Element {
         />
       </Box>
       <TableContainer component={Paper}>
-        <Table sx={{ width: "100%" }} aria-label={"Record table"}>
+        <Table sx={{ width: "100%" }} aria-label={"table of records"}>
           {/* <colgroup>
             <col width={"17%"} />
             <col width={"23%"} />

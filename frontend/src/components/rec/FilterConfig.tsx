@@ -33,25 +33,10 @@ export default function FilterConfig(): JSX.Element {
   return (
     <Stack direction={"column"} gap={2}>
       <Typography fontSize={"large"}>Filters</Typography>
-      <Stack direction={"row"} gap={4}>
+      <Stack direction={"column"} gap={4}>
         <Stack direction={"row"} gap={1}>
           <Checkbox
-            value={urlFilterAct}
-            onChange={(_, v) => dispatch(setUrlFilterAct(v))}
-          />
-          <TextField
-            size={"small"}
-            label={"URL (exact)"}
-            value={urlFilterCon}
-            disabled={!urlFilterAct}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              dispatch(setUrlFilterCon(e.target.value));
-            }}
-          />
-        </Stack>
-        <Stack direction={"row"} gap={1}>
-          <Checkbox
-            value={labFilterAct}
+            checked={labFilterAct}
             onChange={(_, v) => dispatch(setLabFilterAct(v))}
           />
           <TextField
@@ -66,7 +51,22 @@ export default function FilterConfig(): JSX.Element {
         </Stack>
         <Stack direction={"row"} gap={1}>
           <Checkbox
-            value={tagFilterAct}
+            checked={urlFilterAct}
+            onChange={(_, v) => dispatch(setUrlFilterAct(v))}
+          />
+          <TextField
+            size={"small"}
+            label={"URL (exact)"}
+            value={urlFilterCon}
+            disabled={!urlFilterAct}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              dispatch(setUrlFilterCon(e.target.value));
+            }}
+          />
+        </Stack>
+        <Stack direction={"row"} gap={1}>
+          <Checkbox
+            checked={tagFilterAct}
             onChange={(_, v) => dispatch(setTagFilterAct(v))}
           />
           <TextField

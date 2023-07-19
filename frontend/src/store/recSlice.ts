@@ -2,48 +2,40 @@ import {
   PayloadAction,
   createSlice
 } from "@reduxjs/toolkit";
-import {
-  RecordFilters,
-  RecordFullType,
-  RecordSorters
-} from "../domain/types";
+import { RecordFullType } from "../domain/types";
 
 type RecInitialStateType = {
-  filters: RecordFilters;
-  sorters: RecordSorters;
   records: RecordFullType[];
   getAllAction: boolean;
   createAction: boolean;
   executAction: boolean;
   updateAction: boolean;
   deleteAction: boolean;
-  urlFilterCon: string;
   urlFilterAct: boolean;
-  labFilterCon: string;
+  urlFilterCon: string;
   labFilterAct: boolean;
-  tagFilterCon: string;
+  labFilterCon: string;
   tagFilterAct: boolean;
-  sorterCon: number;
+  tagFilterCon: string;
   sorterAct: boolean;
+  sorterCon: number;
 };
 
 const initialState = (): RecInitialStateType => ({
-  filters: { tags: [] },
-  sorters: { url: false, lastCrawlTime: false },
   records: [],
   getAllAction: true,
   createAction: false,
   executAction: false,
   updateAction: false,
   deleteAction: false,
-  urlFilterCon: "",
   urlFilterAct: false,
-  labFilterCon: "",
+  urlFilterCon: "",
   labFilterAct: false,
-  tagFilterCon: "",
+  labFilterCon: "",
   tagFilterAct: false,
-  sorterCon: 0,
-  sorterAct: false
+  tagFilterCon: "",
+  sorterAct: false,
+  sorterCon: 0
 });
 
 export const recSlice = createSlice({
@@ -79,29 +71,29 @@ export const recSlice = createSlice({
     setDeleteAction: (state, action: PayloadAction<boolean>) => {
       state.deleteAction = action.payload;
     },
-    setUrlFilterCon: (state, action: PayloadAction<string>) => {
-      state.urlFilterCon = action.payload;
-    },
     setUrlFilterAct: (state, action: PayloadAction<boolean>) => {
       state.urlFilterAct = action.payload;
     },
-    setLabFilterCon: (state, action: PayloadAction<string>) => {
-      state.labFilterCon = action.payload;
+    setUrlFilterCon: (state, action: PayloadAction<string>) => {
+      state.urlFilterCon = action.payload;
     },
     setLabFilterAct: (state, action: PayloadAction<boolean>) => {
       state.labFilterAct = action.payload;
     },
-    setTagFilterCon: (state, action: PayloadAction<string>) => {
-      state.tagFilterCon = action.payload;
+    setLabFilterCon: (state, action: PayloadAction<string>) => {
+      state.labFilterCon = action.payload;
     },
     setTagFilterAct: (state, action: PayloadAction<boolean>) => {
       state.tagFilterAct = action.payload;
     },
-    setSorterCon: (state, action: PayloadAction<number>) => {
-      state.sorterCon = action.payload;
+    setTagFilterCon: (state, action: PayloadAction<string>) => {
+      state.tagFilterCon = action.payload;
     },
     setSorterAct: (state, action: PayloadAction<boolean>) => {
       state.sorterAct = action.payload;
+    },
+    setSorterCon: (state, action: PayloadAction<number>) => {
+      state.sorterCon = action.payload;
     }
   }
 });
@@ -116,14 +108,14 @@ export const {
   setExecutAction,
   setUpdateAction,
   setDeleteAction,
-  setUrlFilterCon,
   setUrlFilterAct,
-  setLabFilterCon,
+  setUrlFilterCon,
   setLabFilterAct,
-  setTagFilterCon,
+  setLabFilterCon,
   setTagFilterAct,
-  setSorterCon,
-  setSorterAct
+  setTagFilterCon,
+  setSorterAct,
+  setSorterCon
 } = recSlice.actions;
 
 export default recSlice.reducer;

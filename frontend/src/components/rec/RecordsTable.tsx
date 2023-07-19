@@ -154,12 +154,8 @@ export default function RecordsTable(): JSX.Element {
           <TableBody>
             {curRecs.map(([r, i]) => (
               <TableRow key={r.recId}>
-                <TableCell>
-                  {r.label}
-                </TableCell>
-                <TableCell>
-                  {r.url}
-                </TableCell>
+                <TableCell>{r.label}</TableCell>
+                <TableCell>{r.url}</TableCell>
                 <TableCell>
                   <Stack direction={"row"} gap={0.5} flexWrap={"wrap"}>
                     {r.tags.map((t, i) => (
@@ -167,15 +163,9 @@ export default function RecordsTable(): JSX.Element {
                     ))}
                   </Stack>
                 </TableCell>
-                <TableCell>
-                  {showPeriod(r.period)}
-                </TableCell>
-                <TableCell>
-                  {r.lastExecFinishTime ?? "N/A"}
-                </TableCell>
-                <TableCell>
-                  {r.lastExecStatus ?? "N/A"}
-                </TableCell>
+                <TableCell>{showPeriod(r.period)}</TableCell>
+                <TableCell>{r.lastExecFinishTime ?? "N/A"}</TableCell>
+                <TableCell>{r.lastExecStatus ?? "N/A"}</TableCell>
                 <TableCell>
                   <Stack direction={"row"}>
                     <ExecutDialog index={i} />

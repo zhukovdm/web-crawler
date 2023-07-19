@@ -59,8 +59,8 @@ export default function DeleteDialog({ index }: DeleteDialogType): JSX.Element {
         <DialogTitle>Delete record</DialogTitle>
         <DialogContent>
           <Typography>
-            You are about to delete<br />
-            the record with ID: {`${record?.recId}`}. Confirm the action.
+            You are about to delete the record<br />
+            with ID: <strong>{`${record?.recId}`}</strong>. Confirm the action.
           </Typography>
         </DialogContent>
         <DialogActions>

@@ -172,7 +172,7 @@ export default function RecordsTable(): JSX.Element {
                   {showPeriod(r.period)}
                 </TableCell>
                 <TableCell>
-                  {r.lastExecFinishTime ?? r.lastExecCreateTime ?? "N/A"}
+                  {r.lastExecFinishTime ?? "N/A"}
                 </TableCell>
                 <TableCell>
                   {r.lastExecStatus ?? "N/A"}

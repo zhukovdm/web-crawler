@@ -1,59 +1,87 @@
 import {
   Box,
   Checkbox,
-  FormControlLabel,
+  IconButton,
   Radio,
-  RadioGroup,
   Stack,
   Typography
 } from "@mui/material";
+import {
+  ArrowCircleDown,
+  ArrowCircleUp
+} from "@mui/icons-material";
 import {
   useAppDispatch,
   useAppSelector
 } from "../../store";
 import {
   setSorterAct,
-  setSorterCon
+  setSorterCon,
+  setUrlSorterAsc,
+  setTimSorterAsc
 } from "../../store/recSlice";
+import React from "react";
+
+function getOrder(ad: boolean): string {
+  return `${ad ? "a" : "de"}scending order`;
+}
 
 export default function SorterConfig(): JSX.Element {
 
   const dispatch = useAppDispatch();
   const {
     sorterAct,
-    sorterCon
+    sorterCon,
+    urlSorterAsc,
+    timSorterAsc
   } = useAppSelector((state) => state.rec);
+
+  const handleRadio = (event: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(setSorterCon(parseInt(event.target.value)));
+  };
 
   return (
     <Stack direction={"column"} gap={2}>
       <Typography fontSize={"large"}>Sorters</Typography>
-      <Stack direction={"row"} gap={2} alignItems={"center"}>
+      <Stack direction={"row"} gap={1} alignItems={"center"}>
         <Box>
           <Checkbox
             value={sorterAct}
             onChange={(_, v) => dispatch(setSorterAct(v))}
           />
         </Box>
-        <RadioGroup
-          row={false}
-          value={sorterCon}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            dispatch(setSorterCon(parseInt(e.target.value)))
-          }}
-        >
-          <FormControlLabel
-            value={0}
-            label={"by URL"}
-            disabled={!sorterAct}
-            control={<Radio />}
-          />
-          <FormControlLabel
-            value={1}
-            label={"by crawl time"}
-            disabled={!sorterAct}
-            control={<Radio />}
-          />
-        </RadioGroup>
+        <Stack gap={1}>
+          <Stack direction={"row"} gap={1} alignItems={"center"}>
+            <IconButton
+              size={"small"}
+              title={getOrder(urlSorterAsc)}
+              onClick={() => dispatch(setUrlSorterAsc(!urlSorterAsc))}
+            >
+              {urlSorterAsc ? <ArrowCircleUp /> : <ArrowCircleDown />}
+            </IconButton>
+            <Radio
+              value={0}
+              checked={sorterCon === 0}
+              onChange={handleRadio}
+            />
+            <Typography>by URL</Typography>
+          </Stack>
+          <Stack direction={"row"} gap={1} alignItems={"center"}>
+            <IconButton
+              size={"small"}
+              title={getOrder(timSorterAsc)}
+              onClick={() => dispatch(setTimSorterAsc(!timSorterAsc))}
+            >
+              {timSorterAsc ? <ArrowCircleUp /> : <ArrowCircleDown />}
+            </IconButton>
+            <Radio
+              value={1}
+              checked={sorterCon === 1}
+              onChange={handleRadio}
+            />
+            <Typography>by crawl time</Typography>
+          </Stack>
+        </Stack>
       </Stack>
     </Stack>
   );

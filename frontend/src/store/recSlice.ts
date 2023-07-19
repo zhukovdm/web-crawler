@@ -19,6 +19,8 @@ type RecInitialStateType = {
   tagFilterCon: string;
   sorterAct: boolean;
   sorterCon: number;
+  urlSorterAsc: boolean;
+  timSorterAsc: boolean;
 };
 
 const initialState = (): RecInitialStateType => ({
@@ -35,7 +37,9 @@ const initialState = (): RecInitialStateType => ({
   tagFilterAct: false,
   tagFilterCon: "",
   sorterAct: false,
-  sorterCon: 0
+  sorterCon: 0,
+  urlSorterAsc: true,
+  timSorterAsc: true
 });
 
 export const recSlice = createSlice({
@@ -94,6 +98,12 @@ export const recSlice = createSlice({
     },
     setSorterCon: (state, action: PayloadAction<number>) => {
       state.sorterCon = action.payload;
+    },
+    setUrlSorterAsc: (state, action: PayloadAction<boolean>) => {
+      state.urlSorterAsc = action.payload;
+    },
+    setTimSorterAsc: (state, action: PayloadAction<boolean>) => {
+      state.timSorterAsc = action.payload;
     }
   }
 });
@@ -115,7 +125,9 @@ export const {
   setTagFilterAct,
   setTagFilterCon,
   setSorterAct,
-  setSorterCon
+  setSorterCon,
+  setUrlSorterAsc,
+  setTimSorterAsc
 } = recSlice.actions;
 
 export default recSlice.reducer;

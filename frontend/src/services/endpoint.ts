@@ -11,3 +11,7 @@ export const OPENAPI_EXE_ADDR = OPENAPI_ADDR + "/executions";
 
 export const GRAPHQL_ADDR =
   `http://${BACKEND_ADDR}:${env.REACT_APP_GRAPHQL_PORT!}/graphql`;
+
+export function getErrorMessage(res: Response): string {
+  return `${res.statusText} (status code ${res.status})`;
+}

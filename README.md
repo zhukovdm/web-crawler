@@ -13,3 +13,4 @@ Tech stack: `TypeScript`, `Node.js`, `MySQL`, `OpenAPI`, `GraphQL`.
 - https://www.typescriptlang.org/docs/handbook/intro.html
 - https://redux-toolkit.js.org/
 - https://mui.com/material-ui/getting-started/
+- https://github.com/visjs/vis-network

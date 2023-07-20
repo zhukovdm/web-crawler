@@ -1,6 +1,6 @@
 #!/bin/bash
 
-createRecords() {
+createRecs() {
 
   curl \
     -v \
@@ -42,4 +42,4 @@ createRecords() {
     http://127.0.0.1:3001/api/v1/records
 }
 
-createRecords
+createRecs

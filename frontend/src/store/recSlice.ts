@@ -6,7 +6,6 @@ import { RecordFullType } from "../domain/types";
 
 type RecInitialStateType = {
   records: RecordFullType[];
-  getAllAction: boolean;
   createAction: boolean;
   executAction: boolean;
   updateAction: boolean;
@@ -25,7 +24,6 @@ type RecInitialStateType = {
 
 const initialState = (): RecInitialStateType => ({
   records: [],
-  getAllAction: true,
   createAction: false,
   executAction: false,
   updateAction: false,
@@ -59,9 +57,6 @@ export const recSlice = createSlice({
     deleteRecord: (state, action: PayloadAction<number>) => {
       const index = action.payload;
       state.records = [...state.records.slice(0, index), ...state.records.slice(index + 1)];
-    },
-    setGetAllAction: (state, action: PayloadAction<boolean>) => {
-      state.getAllAction = action.payload;
     },
     setCreateAction: (state, action: PayloadAction<boolean>) => {
       state.createAction = action.payload;
@@ -113,7 +108,6 @@ export const {
   appendRecord,
   updateRecord,
   deleteRecord,
-  setGetAllAction,
   setCreateAction,
   setExecutAction,
   setUpdateAction,

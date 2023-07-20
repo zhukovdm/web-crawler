@@ -1,22 +1,43 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
-  Typography
+  CircularProgress,
+  Stack
 } from "@mui/material";
+import { useAppDispatch } from "../store";
+import { setWebsites } from "../store/visSlice";
 import { GraphQlService } from "../services/graphql";
+import WebsitesTable from "./vis/WebsitesTable";
+import Visualisation from "./vis/Visualisation";
 
 export default function VisPage(): JSX.Element {
 
+  const dispatch = useAppDispatch();
+  const [load, setLoad] = useState(true);
+
   useEffect(() => {
     const f = async () => {
-      console.log(await GraphQlService.getWebsites());
+      try {
+        dispatch(setWebsites(await GraphQlService.getWebsites()));
+        setLoad(false);
+      }
+      catch (ex: any) { alert(ex?.message); }
     }
-    f();
-  }, []);
+
+    if (load) { f(); }
+  }, [dispatch, load]);
 
   return (
     <Box sx={{ m: 4 }}>
-      <Typography>C</Typography>
+      {load
+        ? <Box display={"flex"} justifyContent={"center"}>
+            <CircularProgress />
+          </Box>
+        : <Stack gap={4}>
+            <WebsitesTable />
+            <Visualisation />
+          </Stack>
+      }
     </Box>
   );
 }

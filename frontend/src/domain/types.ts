@@ -32,3 +32,13 @@ export type ExecutionFullType = RecordIdType & {
   finishTime: string | null;
   nodCount: number;
 };
+
+export type WebsiteType = RecordIdType & RecordBaseType;
+
+export type NodeType = {
+  url: string;
+  title: string | null;
+  crawlTime: string | null;
+  links: { url: string }[];
+  owner: { recId: string };
+};

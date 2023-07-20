@@ -1,6 +1,6 @@
 import {
-  RecordBaseType,
-  RecordIdType
+  NodeType,
+  WebsiteType
 } from "../domain/types";
 import {
   GRAPHQL_ADDR,
@@ -24,28 +24,45 @@ export class GraphQlService {
 
   private static readonly webQuery = `{
     websites {
-      identifier
-      label
+      recId: identifier
       url
       regexp
-      tags
-      active
+      label
     }
   }`;
 
-  public static async getWebsites(): Promise<(RecordIdType & RecordBaseType)[]> {
+  public static async getWebsites(): Promise<WebsiteType[]> {
     const res = await fetch(GRAPHQL_ADDR, this.getOptions({ query: this.webQuery }));
     if (res.status !== 200) {
       throw new Error(getErrorMessage(res));
     }
     return (await res.json()).data.websites.map((page: any) => ({
-      recId: page.identifier,
-      url: page.url,
-      regexp: page.regexp,
-      period: Number.MAX_SAFE_INTEGER,
-      label: page.label,
-      active: page.active,
-      tags: page.tags
+      ...page,
+      tags: [],
+      active: true,
+      period: Number.MAX_SAFE_INTEGER
     }));
+  }
+
+  private static readonly nodQueryBuilder = (websites: number[]): string => `{
+    nodes (webPages: [${websites.join(", ")}]) {
+      url
+      title
+      crawlTime
+      links {
+        url
+      }
+      owner {
+        recId: identifier
+      }
+    }
+  }`;
+
+  public static async getNodes(websites: number[]): Promise<NodeType[]> {
+    const res = await fetch(GRAPHQL_ADDR, this.getOptions({ query: this.nodQueryBuilder(websites) }));
+    if (res.status !== 200) {
+      throw new Error(getErrorMessage(res));
+    }
+    return (await res.json()).data.nodes;
   }
 }

@@ -72,8 +72,8 @@ export class MySqlModelInitializer {
 
     return new Promise((res, rej) => {
       conn.query(queryString, [], (err) => {
-        (err) ? rej(err) : res();
         conn.end();
+        (err) ? rej(err) : res();
       });
     });
   }
@@ -208,7 +208,7 @@ export class MySqlExecutionModel extends MySqlPoolModel implements IExecutionMod
       this.pool.query(queryString, [getCurrentTime()], (err, results) => {
         if (err) { rej(err); }
         else {
-          const { exe: exeId } = getOutputParamsUnsafe(results);
+          const { exeId } = getOutputParamsUnsafe(results);
           res({ resumed: exeId !== null, exeId: exeId });
         }
       })

@@ -4,7 +4,6 @@ import {
 import {
   ExecutionFullType,
   ExecutionStatus,
-  NodeBaseType,
   RecordBaseType,
   RecordFullType
 } from "./types";
@@ -72,18 +71,32 @@ export interface ICrawlerModel extends IDisposable {
   getExecutionBoundary(exeId: number): Promise<{ url: string, regexp: string } | undefined>;
 
   /**
+   * Update counter for a particular execution.
+   */
+  updateExecutionSitesCrawl(exeId: number, sitesCrawl: number): Promise<void>;
+
+  /**
    * Create a node with provided information.
    */
-  createNode(node: NodeBaseType): Promise<{ nodId: number | null }>;
+  createNode(exeId: number, url: string): Promise<{ nodId: number }>;
+
+  /**
+   * Update a node with provided information.
+   */
+  updateNode(nodId: number, title: string | null, crawlTime: string | null): Promise<void>;
+
+  /**
+   * Delete nodes of all preceeding executions upon execution success.
+   */
+  deleteNodes(exeId: number): Promise<void>;
 
   /**
    * Create directed edge between two nodes.
    */
-  createLink(nodFr: number, nodTo: number): Promise<{ created: boolean }>;
+  createLink(nodFr: number, nodTo: number): Promise<void>;
 
   /**
    * Finish execution with a given status and time.
    */
-  finishExecution(
-    exeId: number, status: ExecutionStatus, finishTime: string): Promise<{ finished: boolean }>;
+  finishExecution(exeId: number, status: ExecutionStatus, finishTime: string): Promise<void>;
 }

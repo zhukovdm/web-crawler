@@ -40,7 +40,7 @@ class MockUrlFetcher implements IUrlFetcher {
   }
 }
 
-class StandardUrlFetcher implements IUrlFetcher {
+class UrlFetcher implements IUrlFetcher {
 
   /**
    * Cap URL length with respect to the database.
@@ -70,7 +70,7 @@ class StandardUrlFetcher implements IUrlFetcher {
       o.hash = "";
 
       const u = o.href;
-      const p = StandardUrlFetcher.matcher.match(u) && u.length <= StandardUrlFetcher.URL_MAX_LENGTH;
+      const p = UrlFetcher.matcher.match(u) && u.length <= UrlFetcher.URL_MAX_LENGTH;
 
       return (p) ? u : undefined;
     }
@@ -78,10 +78,12 @@ class StandardUrlFetcher implements IUrlFetcher {
   }
 
   public async fetch(baseUrl: string): Promise<FetchPackType> {
+
+    await new Promise((res) => setTimeout(res, 1000)); // gentle fetching
     const crawlTime = getCurrentTime();
 
     try {
-      const res = await fetch(baseUrl, StandardUrlFetcher.fetchOptions);
+      const res = await fetch(baseUrl, UrlFetcher.fetchOptions);
       const dom = new JSDOM(await res.text()).window.document;
 
       const links = [...dom.getElementsByTagName("a")]
@@ -91,17 +93,21 @@ class StandardUrlFetcher implements IUrlFetcher {
 
       const titles = [...dom.getElementsByTagName("title")]
         .map((e) => e.innerHTML)
-        .map((t) => t.slice(0, StandardUrlFetcher.TITLE_MAX_LENGTH));
+        .map((t) => t.slice(0, UrlFetcher.TITLE_MAX_LENGTH));
 
-      return { title: titles[0] ?? null, links: links, crawlTime: crawlTime };
+      return {
+        title: titles[0] ?? null,
+        links: [...links.reduce((acc, l) => acc.add(l), new Set<string>())],
+        crawlTime: crawlTime
+      };
     }
     catch (_) { return { title: null, links: [], crawlTime: crawlTime }; }
   }
 }
 
-/**
- * Factory function.
- */
-export function getUrlFetcher(): IUrlFetcher {
-  return new MockUrlFetcher();
+export class FetcherFactory {
+
+  public static getUrlFetcher(): IUrlFetcher {
+    return new UrlFetcher();
+  }
 }

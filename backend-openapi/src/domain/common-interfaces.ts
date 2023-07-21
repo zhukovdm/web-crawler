@@ -50,14 +50,14 @@ export type FetchPackType = {
   title: string | null;
 
   /**
-   * Links found in the page.
-   */
-  links: string[];
-
-  /**
    * Time of fetch.
    */
   crawlTime: string | null;
+
+  /**
+   * Links found in the page.
+   */
+  links: string[];
 };
 
 export interface IUrlFetcher {

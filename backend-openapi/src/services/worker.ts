@@ -2,12 +2,8 @@ import { parentPort } from "worker_threads";
 import { getCurrentTime } from "../primitives/functions";
 import { Crawler } from "../primitives/crawler";
 import { ICrawlerModel } from "../domain/model-interfaces";
-import { getUrlFetcher } from "../primitives/fetcher";
+import { FetcherFactory } from "../primitives/fetcher";
 import { ModelFactory } from "../models";
-
-function reportCrawling(exeId: number, wrkId: number): void {
-  console.log(` > [Worker ${wrkId}] Crawling ${exeId}.`);
-}
 
 function reportUnexpectedError(exeId: number, wrkId: number, err: any): void {
   console.log(
@@ -17,19 +13,19 @@ function reportUnexpectedError(exeId: number, wrkId: number, err: any): void {
 
 parentPort?.on("message", async (msg) => {
   const { exeId, wrkId } = msg;
-  reportCrawling(exeId, wrkId);
-
   let model: ICrawlerModel | undefined = undefined;
 
   try {
-    const fetcher = getUrlFetcher();
     model = ModelFactory.getCrawlerModel();
+    const fetcher = FetcherFactory.getUrlFetcher();
 
-    await new Crawler(model, fetcher).crawl(exeId);
+    await new Crawler(exeId, model, fetcher).crawl();
     await model.finishExecution(exeId, "SUCCESS", getCurrentTime());
+    await model.deleteNodes(exeId);
   }
-  catch (_) {
+  catch (ex: any) {
     try {
+      reportUnexpectedError(exeId, wrkId, ex);
       await model?.finishExecution(exeId, "FAILURE", getCurrentTime());
     }
     catch (ex: any) {

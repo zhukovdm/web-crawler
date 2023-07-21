@@ -29,7 +29,7 @@ export type ExecutionFullType = RecordIdType & {
   status: ExecutionStatus;
   createTime: string;
   finishTime: string | null;
-  nodCount: number;
+  sitesCrawl: number;
 };
 
 export type NodeBaseType = {

@@ -10,59 +10,68 @@ import { BoundaryUrlMatcher } from "./matcher";
 
 export class Crawler {
 
+  private readonly exeId: number;
   private readonly queue: IQueue<string>;
   private readonly model: ICrawlerModel;
   private readonly fetcher: IUrlFetcher;
 
-  private readonly nodes = new Map<string, { nodId: number, links: string[] }>();
+  private readonly nodes = new Map<string, { nodId: number, processed: boolean }>();
 
-  constructor(model: ICrawlerModel, fetcher: IUrlFetcher) {
+  constructor(exeId: number, model: ICrawlerModel, fetcher: IUrlFetcher) {
+    this.exeId = exeId;
+
+    /**
+     * Contains URLs that are not processed.
+     */
     this.queue = new LinkedListQueue();
     this.model = model;
     this.fetcher = fetcher;
   }
 
-  public async crawl(exeId: number): Promise<void> {
-    const boundary = await this.model.getExecutionBoundary(exeId);
+  private async ensureNode(url: string): Promise<void> {
 
-    // the execution has been removed
-    if (!boundary) { return; }
+    if (!this.nodes.has(url)) {
+      this.nodes.set(url, {
+        processed: false,
+        ...(await this.model.createNode(this.exeId, url))
+      });
+    }
+  }
 
-    const { url: baseUrl, regexp } = boundary;
-    this.queue.enqueue(baseUrl);
-    const matcher = new BoundaryUrlMatcher(baseUrl, regexp);
+  public async crawl(): Promise<void> {
+    let counter = 0;
+    const boundary = await this.model.getExecutionBoundary(this.exeId);
 
-    while (!this.queue.empty()) {
+    if (!boundary) { return; } // removed exeId
+
+    const { url: sourceUrl, regexp } = boundary;
+
+    this.queue.enqueue(sourceUrl);
+    await this.ensureNode(sourceUrl);
+    const matcher = new BoundaryUrlMatcher(sourceUrl, regexp);
+
+    do {
       const url = this.queue.dequeue()!;
+      const node = this.nodes.get(url)!;
 
-      if (!this.nodes.has(url)) {
+      if (node.processed) { continue; }
 
-        const { title, links, crawlTime } = matcher.match(url)
-          ? (await this.fetcher.fetch(url))
-          : { title: null, links: [], crawlTime: null };
+      node.processed = true;
+      const { links, title, crawlTime } = matcher.match(url)
+        ? (await this.fetcher.fetch(url))
+        : { title: null, crawlTime: null, links: [] };
 
-        const { nodId } = await this.model.createNode({
-          exeId: exeId, url: url, title: title, crawlTime: crawlTime
-        });
-
-        // the execution has been removed
-        if (nodId === null) { return; }
-
-        this.nodes.set(url, { nodId: nodId, links: links });
-        links.forEach((link) => this.queue.enqueue(link));
+      if (matcher.match(url)) {
+        await this.model.updateExecutionSitesCrawl(this.exeId, ++counter);
       }
-    }
 
-    for (const node of this.nodes.keys()) {
-      const { nodId: nodFr, links } = this.nodes.get(node)!;
+      await this.model.updateNode(node.nodId, title, crawlTime);
 
-      for (const link of links) {
-        const { nodId: nodTo } = this.nodes.get(link)!;
-        const { created } = await this.model.createLink(nodFr, nodTo);
-
-        // the execution has been removed
-        if (!created) { return; }
+      for(const link of links) {
+        this.queue.enqueue(link);
+        await this.ensureNode(link);
+        await this.model.createLink(node.nodId, this.nodes.get(link)!.nodId);
       }
-    }
+    } while (!this.queue.empty());
   }
 }

@@ -115,6 +115,5 @@ export class Executor implements IExecutor {
 
   public reportCrawled(exeId: number): void {
     this.crawled.enqueue(exeId);
-    console.log(` > [Executor] ${exeId} crawled.`);
   }
 }

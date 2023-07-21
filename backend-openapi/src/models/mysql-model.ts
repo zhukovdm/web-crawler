@@ -10,7 +10,6 @@ import {
 import {
   ExecutionFullType,
   ExecutionStatus,
-  NodeBaseType,
   RecordBaseType,
   RecordFullType
 } from "../domain/types";
@@ -289,12 +288,22 @@ export class MySqlCrawlerModel implements ICrawlerModel {
     });
   }
 
-  public createNode(node: NodeBaseType): Promise<{ nodId: number | null; }> {
-    const queryString = `CALL createNode (?, ?, ?, ?, @nodId);
+  public updateExecutionSitesCrawl(exeId: number, sitesCrawl: number): Promise<void> {
+    const queryString = `CALL updateExecutionSitesCrawl (?, ?);`;
+
+    return new Promise((res, rej) => {
+      this.conn.query(queryString, [exeId, sitesCrawl], (err) => {
+        (err) ? rej(err) : res();
+      });
+    });
+  }
+
+  public createNode(exeId: number, url: string): Promise<{ nodId: number }> {
+    const queryString = `CALL createNodeUnsafe (?, ?, @nodId);
       SELECT @nodId AS nodId;`;
 
     return new Promise((res, rej) => {
-      this.conn.query(queryString, [node.exeId, node.url, node.title, node.crawlTime], (err, results) => {
+      this.conn.query(queryString, [exeId, url], (err, results) => {
         (err)
           ? rej(err)
           : res(getOutputParamsUnsafe(results));
@@ -302,29 +311,49 @@ export class MySqlCrawlerModel implements ICrawlerModel {
     });
   }
 
-  public createLink(nodFr: number, nodTo: number): Promise<{ created: boolean; }> {
-    const queryString = `CALL createLink (?, ?, @count);
-      SELECT @count AS count;`;
+  public updateNode(nodId: number, title: string | null, crawlTime: string | null): Promise<void> {
+    const queryString = `CALL updateNode (?, ?, ?, @count);
+      SELECT @count AS count`;
 
     return new Promise((res, rej) => {
-      this.conn.query(queryString, [nodFr, nodTo], (err, results) => {
-        (err)
-          ? rej(err)
-          : res({ created: getOutputParamsUnsafe(results).count > 0 });
+      this.conn.query(queryString, [nodId, title, crawlTime], (err, results) => {
+        (err || getOutputParamsUnsafe(results).count === 0)
+          ? rej(err ?? new Error("missing website record"))
+          : res();
+      });
+    })
+  }
+
+  public deleteNodes(exeId: number): Promise<void> {
+    const queryString = `CALL deleteNodes (?);`;
+
+    return new Promise((res, rej) => {
+      this.conn.query(queryString, [exeId], (err) => {
+        (err) ? rej(err) : res();
+      });
+    })
+  }
+
+  public createLink(nodFr: number, nodTo: number): Promise<void> {
+    const queryString = `CALL createLinkUnsafe (?, ?);`;
+
+    return new Promise((res, rej) => {
+      this.conn.query(queryString, [nodFr, nodTo], (err) => {
+        (err) ? rej(err) : res();
       });
     });
   }
 
   public finishExecution(
-    exeId: number, status: ExecutionStatus, finishTime: string): Promise<{ finished: boolean; }> {
+    exeId: number, status: ExecutionStatus, finishTime: string): Promise<void> {
     const queryString = `CALL finishExecution (?, ?, ?, @count);
       SELECT @count AS count;`;
 
     return new Promise((res, rej) => {
       this.conn.query(queryString, [exeId, status, finishTime], (err, results) => {
-        (err)
-          ? rej(err)
-          : res({ finished: getOutputParamsUnsafe(results).count > 0 });
+        (err || getOutputParamsUnsafe(results).count === 0)
+          ? rej(err ?? new Error("missing website record"))
+          : res();
       });
     });
   }

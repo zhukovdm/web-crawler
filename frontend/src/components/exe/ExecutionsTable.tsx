@@ -81,8 +81,8 @@ export default function ExecutionsTable({ exes }: ExecutionsTableType): JSX.Elem
                 <TableCell>{e.label}</TableCell>
                 <TableCell>{e.status}</TableCell>
                 <TableCell>{e.createTime}</TableCell>
-                <TableCell>{e.finishTime}</TableCell>
-                <TableCell>{e.nodCount}</TableCell>
+                <TableCell>{e.finishTime ?? "N/A"}</TableCell>
+                <TableCell>{e.sitesCrawl}</TableCell>
               </TableRow>
             ))}
           </TableBody>

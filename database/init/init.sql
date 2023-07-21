@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS `exe` (
                 NOT NULL,
   `createTime`  DATETIME(3) NOT NULL,
   `finishTime`  DATETIME(3),
+  `sitesCrawl`  INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`exeId`),
   FOREIGN KEY (`recId`) REFERENCES `rec`(`recId`)
     ON DELETE CASCADE
@@ -194,27 +195,14 @@ END$
 CREATE PROCEDURE IF NOT EXISTS `getAllExecutions` ()
 BEGIN
   SELECT
-    `r0`.`recId`,
-    `e1`.`exeId`,
-    `r0`.`label`,
-    `e1`.`status`,
-    `e1`.`createTime`,
-    `e1`.`finishTime`,
-    `e1`.`nodCount`
-  FROM `rec` AS `r0` INNER JOIN (
-    SELECT
-      `e0`.*,
-      `n0`.`nodCount`
-    FROM `exe` AS `e0` INNER JOIN (
-      SELECT
-        `nod`.`exeId`,
-        COUNT(`nod`.`nodId`) AS `nodCount`
-      FROM `nod`
-      GROUP BY `exeId`
-    ) AS `n0`
-    ON `e0`.`exeId` = `n0`.`exeId`
-  ) AS `e1`
-  ON `r0`.`recId` = `e1`.`recId`;
+    `rec`.`recId`,
+    `exe`.`exeId`,
+    `rec`.`label`,
+    `exe`.`status`,
+    `exe`.`createTime`,
+    `exe`.`finishTime`,
+    `exe`.`sitesCrawl`
+  FROM `rec` INNER JOIN `exe` ON `rec`.`recId` = `exe`.`recId`;
 END$
 
 /**
@@ -294,6 +282,16 @@ BEGIN
 END$
 
 /**
+ * Counter of sites crawled.
+ */
+CREATE PROCEDURE IF NOT EXISTS `updateExecutionSitesCrawl` (
+  IN  `i_exeId`       BIGINT,
+  IN  `i_sitesCrawl`  BIGINT)
+BEGIN
+  UPDATE `exe` SET `sitesCrawl` = `i_sitesCrawl` WHERE `exeId` = `i_exeId`;
+END$
+
+/**
  * Create waiting execution if the record is still active, and no other incom-
  * plete executions exist. Covers transition from 'FAILURE' or 'SUCCESS' to
  * a new 'WAITING' execution.
@@ -331,13 +329,11 @@ BEGIN
 END$
 
 /**
- * Create newly crawled node.
+ * Create new node.
  */
 CREATE PROCEDURE IF NOT EXISTS `createNode` (
   IN  `i_exeId`       BIGINT,
   IN  `i_url`         VARCHAR(2048),
-  IN  `i_title`       VARCHAR(1024),
-  IN  `i_crawlTime`   DATETIME(3),
   OUT `o_nodId`       BIGINT)
 BEGIN
   INSERT INTO `nod` (`exeId`, `url`, `title`, `crawlTime`)
@@ -347,6 +343,31 @@ BEGIN
   IF (ROW_COUNT () > 0) THEN
     SELECT LAST_INSERT_ID () INTO `o_nodId`;
   END IF;
+END$
+
+/**
+ * Create a node, the procedure may throw.
+ */
+CREATE PROCEDURE IF NOT EXISTS `createNodeUnsafe` (
+  IN  `i_exeId`       BIGINT,
+  IN  `i_url`         VARCHAR(2048),
+  OUT `o_nodId`       BIGINT)
+BEGIN
+  INSERT INTO `nod` (`exeId`, `url`) VALUES (`i_exeId`, `i_url`);
+  SELECT LAST_INSERT_ID () INTO `o_nodId`;
+END$
+
+/**
+ * Update a node.
+ */
+CREATE PROCEDURE IF NOT EXISTS `updateNode` (
+  IN  `i_nodId`       BIGINT,
+  IN  `i_title`       VARCHAR(1024),
+  IN  `i_crawlTime`   DATETIME(3),
+  OUT `o_count`       INT)
+BEGIN
+  UPDATE `nod` SET `title` = `i_title`, `crawlTime` = `i_crawlTime` WHERE `nodId` = `i_nodId`;
+  SELECT ROW_COUNT() INTO `o_count`;
 END$
 
 /**
@@ -370,6 +391,16 @@ BEGIN
 END$
 
 /**
+ * Create a directed link, can throw upon record removal.
+ */
+CREATE PROCEDURE IF NOT EXISTS `createLinkUnsafe` (
+  IN  `i_nodFr`       BIGINT,
+  IN  `i_nodTo`       BIGINT)
+BEGIN
+  INSERT INTO `lnk` (`nodFr`, `nodTo`) VALUES (`i_nodFr`, `i_nodTo`);
+END$
+
+/**
  * Finish a possibly existing execution with provided time and status.
  */
 CREATE PROCEDURE IF NOT EXISTS `finishExecution` (
@@ -380,6 +411,24 @@ CREATE PROCEDURE IF NOT EXISTS `finishExecution` (
 BEGIN
   UPDATE `exe` SET `status` = `i_status`, `finishTime` = `i_finishTime` WHERE `exeId` = `i_exeId`;
   SELECT ROW_COUNT () INTO `o_count`;
+END$
+
+/**
+ * Delete all nodes associated with the same record that are associated
+ * with hierarchically earlier executions.
+ */
+CREATE PROCEDURE IF NOT EXISTS `deleteNodes` (
+  IN `i_exeId`        BIGINT)
+BEGIN
+  DELETE FROM `nod` WHERE `nodId` IN (
+  SELECT `nodId` FROM (
+    SELECT
+      `nod`.`nodId` AS `nodId`
+    FROM `nod` INNER JOIN `exe`
+      ON `nod`.`exeId` = `exe`.`exeId`
+    WHERE `nod`.`exeId` < `i_exeId`
+      AND `recId` IN (
+        SELECT `recId` FROM `exe` WHERE `exeId` = `i_exeId`)) AS `tab`);
 END$
 
 DELIMITER ;

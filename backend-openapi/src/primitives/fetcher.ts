@@ -6,40 +6,6 @@ import {
 import { HttpUrlMatcher } from "./matcher";
 import { getCurrentTime } from "./functions";
 
-class MockUrlFetcher implements IUrlFetcher {
-
-  private readonly map: Map<string, FetchPackType>;
-
-  private static readonly links: string[] = [
-    "http://www.example.com/1", "http://www.example.com/2", "http://www.example.com/3"
-  ];
-
-  private static readonly crawlTime: string = getCurrentTime();
-
-  public constructor() {
-    this.map = new Map<string, FetchPackType>([
-      [
-        "http://www.example.com/1",
-        { title: "Example web 1", links: MockUrlFetcher.links, crawlTime: MockUrlFetcher.crawlTime }
-      ],
-      [
-        "http://www.example.com/2",
-        { title: "Example web 2", links: MockUrlFetcher.links, crawlTime: MockUrlFetcher.crawlTime }
-      ],
-      [
-        "http://www.example.com/3",
-        { title: "Example web 3", links: MockUrlFetcher.links, crawlTime: MockUrlFetcher.crawlTime }
-      ]
-    ]);
-  }
-
-  public fetch(baseUrl: string): Promise<FetchPackType> {
-    return new Promise((res, _) => {
-      res(this.map.get(baseUrl) ?? { title: null, links: [], crawlTime: MockUrlFetcher.crawlTime });
-    });
-  }
-}
-
 class UrlFetcher implements IUrlFetcher {
 
   /**

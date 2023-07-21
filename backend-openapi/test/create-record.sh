@@ -5,14 +5,14 @@ createRecord() {
     -v \
     -H 'Content-Type: application/json' \
     -d '{
-      "url": "http://www.example.com/1",
-      "regexp": ".*",
-      "period": 3,
-      "label": "Example website",
+      "url": "https://www.csun.edu/~sk36711/WWW/tutorials/",
+      "regexp": "^https://www.csun.edu/~sk36711/WWW/tutorials/",
+      "period": 5,
+      "label": "Digital Humanities Tutorials",
       "active": false,
-      "tags": [ "a", "b", "c" ]
+      "tags": [ "digital", "humanities", "tutorials" ]
     }' \
-    http://127.0.0.1:3000/api/v1/records
+    http://127.0.0.1:3001/api/v1/records
 }
 
 createRecord

@@ -25,8 +25,7 @@ export interface IRecordModel extends IDisposable {
    * Accommodate user-defined updates into a record. Possible create a new
    * execution if the record is active after update.
    */
-  updateRecord(
-    recId: number, record: RecordBaseType): Promise<{ updated: boolean, exeId: number | null }>;
+  updateRecord(recId: number, record: RecordBaseType): Promise<{ updated: boolean, exeId: number | null }>;
 
   /**
    * Delete record with the given identifier.

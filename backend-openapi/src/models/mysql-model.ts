@@ -344,8 +344,7 @@ export class MySqlCrawlerModel implements ICrawlerModel {
     });
   }
 
-  public finishExecution(
-    exeId: number, status: ExecutionStatus, finishTime: string): Promise<void> {
+  public finishExecution(exeId: number, status: ExecutionStatus, finishTime: string): Promise<void> {
     const queryString = `CALL finishExecution (?, ?, ?, @count);
       SELECT @count AS count;`;
 

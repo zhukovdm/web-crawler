@@ -19,14 +19,19 @@ import {
   WebsiteReducedType
 } from "../../domain/types";
 import {
+  useAppDispatch,
   useAppSelector
 } from "../../store";
+import {
+  VisModeType,
+  setVisMode
+} from "../../store/visSlice";
 import {
   GraphQlService
 } from "../../services/graphql";
 import Drawing from "./Drawing";
 
-type ModeType = "static" | "live";
+const MINIMUM_REFRESH_FREQUENCY = 5;
 
 type ViewType = "domain" | "website";
 
@@ -54,14 +59,16 @@ function getTitle(nodeTitle: string | null, view: ViewType): string | null {
 
 export default function Visualisation(): JSX.Element {
 
+  const dispatch = useAppDispatch();
   const {
+    mode,
     websites,
     selection
   } = useAppSelector((state) => state.vis);
 
-  const [tick, setTick] = useState(3);
+  const [load, setLoad] = useState<boolean>(false);
+  const [tick, setTick] = useState(MINIMUM_REFRESH_FREQUENCY);
   const [nods, setNods] = useState<NodeType[]>([]);
-  const [mode, setMode] = useState<ModeType>("static");
   const [view, setView] = useState<ViewType>("website");
 
   useEffect(() => {
@@ -71,47 +78,60 @@ export default function Visualisation(): JSX.Element {
         .filter(([s, _]) => s)
         .map(([_, i]) => websites[i]!.recId);
 
-      const ns = (await GraphQlService.getNodes(ws))
-        .sort(timeComparator)
-        .reduce((acc, n) => {
+      try {
+        const ns = (await GraphQlService.getNodes(ws))
+          .sort(timeComparator)
+          .reduce((acc, n) => {
 
-          const url = getView(n.url, view);
-          const title = getTitle(n.title, view);
-          const {
-            crawlTime,
-            owner
-          } = n;
-          const crawlable = new RegExp(n.owner.regexp).test(n.url);
-          const links = n.links.map((link) => getView(link.url, view));
+            const url = getView(n.url, view);
+            const title = getTitle(n.title, view);
+            const {
+              crawlTime,
+              owner
+            } = n;
+            const crawlable = new RegExp(n.owner.regexp).test(n.url);
+            const links = n.links.map((link) => getView(link.url, view));
 
-          const baseNode: NodeType = acc.get(url) ?? {
-            url: url,
-            title: title,
-            crawlTime: crawlTime,
-            crawlable: crawlable,
-            links: new Set(links),
-            owners: new Map<number, WebsiteReducedType>(
-              [[owner.recId, owner]])
-          };
+            const baseNode: NodeType = acc.get(url) ?? {
+              url: url,
+              title: title,
+              crawlTime: crawlTime,
+              crawlable: crawlable,
+              links: new Set(links),
+              owners: new Map<number, WebsiteReducedType>(
+                [[owner.recId, owner]])
+            };
 
-          baseNode.title = baseNode.title ?? title;
-          baseNode.crawlTime = baseNode.crawlTime ?? crawlTime;
-          baseNode.crawlable = baseNode.crawlable || crawlable;
-          links.forEach((link) => baseNode.links.add(link));
-          baseNode.owners.set(owner.recId, owner);
+            baseNode.title = baseNode.title ?? title;
+            baseNode.crawlTime = baseNode.crawlTime ?? crawlTime;
+            baseNode.crawlable = baseNode.crawlable || crawlable;
+            links.forEach((link) => baseNode.links.add(link));
+            baseNode.owners.set(owner.recId, owner);
 
-          // remove loops
-          baseNode.links.delete(baseNode.url);
+            // remove loops
+            baseNode.links.delete(baseNode.url);
 
-          return acc.set(baseNode.url, baseNode);
+            return acc.set(baseNode.url, baseNode);
+          }, new Map<string, NodeType>());
 
-        }, new Map<string, NodeType>());
-
-      setNods([...ns.values()]);
+        setNods([...ns.values()]);
+      }
+      catch (ex: any) { alert(ex?.message); }
     };
 
     f();
-  }, [websites, selection, view]);
+  }, [websites, selection, view, load]);
+
+  useEffect(() => {
+    const f = async () => {
+      if (mode === "live") {
+        await new Promise((res) => setTimeout(res, tick * 1000));
+        setLoad(!load);
+      }
+    };
+
+    f();
+  }, [nods, mode, load, tick]);
 
   return (
     <Stack direction={"column"} gap={2}>
@@ -147,7 +167,7 @@ export default function Visualisation(): JSX.Element {
             row
             value={mode}
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
-              setMode(e.target.value as ModeType);
+              dispatch(setVisMode(e.target.value as VisModeType));
             }}
           >
             <FormControlLabel
@@ -169,7 +189,7 @@ export default function Visualisation(): JSX.Element {
             value={tick.toString()}
             label={"Interval"}
             sx={{ width: "8rem" }}
-            onChange={(e) => setTick(Math.max(3, parseInt(e.target.value)))}
+            onChange={(e) => setTick(Math.max(MINIMUM_REFRESH_FREQUENCY, parseInt(e.target.value)))}
           />
         </Box>
       </Stack>

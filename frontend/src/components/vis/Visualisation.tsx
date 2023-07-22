@@ -48,6 +48,10 @@ function getView(nodeUrl: string, view: ViewType): string {
     : new URL(nodeUrl).hostname;
 }
 
+function getTitle(nodeTitle: string | null, view: ViewType): string | null {
+  return view === "website" ? nodeTitle : null;
+}
+
 export default function Visualisation(): JSX.Element {
 
   const {
@@ -72,8 +76,8 @@ export default function Visualisation(): JSX.Element {
         .reduce((acc, n) => {
 
           const url = getView(n.url, view);
+          const title = getTitle(n.title, view);
           const {
-            title,
             crawlTime,
             owner
           } = n;

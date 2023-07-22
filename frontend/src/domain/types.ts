@@ -56,3 +56,9 @@ export type NodeType = NodeBaseType & {
   links: Set<string>;
   owners: Map<number, WebsiteReducedType>;
 };
+
+export type NodeStoreType = NodeBaseType & {
+  crawlable: boolean;
+  links: string[];
+  owners: WebsiteReducedType[];
+}

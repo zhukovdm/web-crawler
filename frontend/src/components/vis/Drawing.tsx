@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 import { Paper } from "@mui/material";
 import { Edge, Network, Node, Options } from "vis-network";
 import { NodeType } from "../../domain/types";
+import { useAppDispatch } from "../../store";
+import { setNode } from "../../store/visSlice";
 
 type DrawingType = {
   nods: NodeType[];
@@ -14,6 +16,7 @@ interface DrawingNode extends Node {
 
 export default function Drawing({ nods }: DrawingType): JSX.Element {
 
+  const dispatch = useAppDispatch();
   const vis = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -28,9 +31,9 @@ export default function Drawing({ nods }: DrawingType): JSX.Element {
       }
     ));
 
-    const items = nodes.reduce((acc, node, i) => acc.set(node.url, i), new Map<string, number>())
+    const items = nodes.reduce((acc, nod, i) => acc.set(nod.url, i), new Map<string, number>())
 
-    const edges: Edge[] = nodes.map((node, i) => node.links.map((link) => (
+    const edges: Edge[] = nodes.map((nod, i) => nod.links.map((link) => (
       { from: i, to: items.get(link)! }
     ))).flat();
 
@@ -46,6 +49,7 @@ export default function Drawing({ nods }: DrawingType): JSX.Element {
         arrows: {
           to: {
             enabled: true,
+            scaleFactor: 0.5,
           }
         },
         color: {
@@ -71,15 +75,25 @@ export default function Drawing({ nods }: DrawingType): JSX.Element {
     };
 
     const network = vis.current && new Network(vis.current, { nodes, edges }, options);
-    network?.on("doubleClick", (e) => console.log(e));
     network?.stabilize(10);
+    network?.on("doubleClick", (e) => {
+      const i = e.nodes[0];
+      if (i !== undefined) {
 
-  }, [nods, vis]);
+        const nod = nods[i]!;
+        dispatch(setNode({
+          ...nod,
+          links: [...nod.links],
+          owners: [...nod.owners.values()]
+        }));
+      }
+    });
+  }, [dispatch, vis, nods]);
 
   return (
     <Paper
-        ref={vis}
-        sx={{ width: "100%", height: "500px" }}
-      />
+      ref={vis}
+      sx={{ width: "100%", height: "500px" }}
+    />
   );
 }

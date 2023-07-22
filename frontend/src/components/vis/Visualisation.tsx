@@ -24,7 +24,7 @@ import {
 } from "../../store";
 import {
   VisModeType,
-  setVisMode
+  setMode
 } from "../../store/visSlice";
 import {
   GraphQlService
@@ -167,7 +167,7 @@ export default function Visualisation(): JSX.Element {
             row
             value={mode}
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
-              dispatch(setVisMode(e.target.value as VisModeType));
+              dispatch(setMode(e.target.value as VisModeType));
             }}
           >
             <FormControlLabel

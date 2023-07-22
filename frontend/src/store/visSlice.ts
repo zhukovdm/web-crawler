@@ -1,29 +1,37 @@
 import {
   PayloadAction,
-  createSlice,
+  createSlice
 } from "@reduxjs/toolkit";
-import { WebsiteType, } from "../domain/types";
+import {
+  NodeStoreType,
+  WebsiteType
+} from "../domain/types";
 
 export type VisModeType = "static" | "live";
 
 type VisInitialStateType = {
   mode: VisModeType;
-  websites: WebsiteType[];
+  node: NodeStoreType | undefined;
   selection: boolean[];
+  websites: WebsiteType[];
 };
 
 const initialState = (): VisInitialStateType => ({
   mode: "static",
-  websites: [],
+  node: undefined,
   selection: [],
+  websites: []
 });
 
 export const visSlice = createSlice({
   name: "vis",
   initialState: (initialState()),
   reducers: {
-    setVisMode: (state, action: PayloadAction<VisModeType>) => {
+    setMode: (state, action: PayloadAction<VisModeType>) => {
       state.mode = action.payload;
+    },
+    setNode: (state, action: PayloadAction<NodeStoreType | undefined>) => {
+      state.node = action.payload;
     },
     setWebsites: (state, action: PayloadAction<WebsiteType[]>) => {
       state.websites = action.payload;
@@ -32,14 +40,15 @@ export const visSlice = createSlice({
     setSelection: (state, action: PayloadAction<{ value: boolean, index: number }>) => {
       const { value, index } = action.payload;
       state.selection = [...state.selection.slice(0, index), value, ...state.selection.slice(index + 1)];
-    },
+    }
   },
 });
 
 export const {
-  setVisMode,
+  setMode,
+  setNode,
   setWebsites,
-  setSelection,
+  setSelection
 } = visSlice.actions;
 
 export default visSlice.reducer;

@@ -38,6 +38,7 @@ export class GraphQlService {
     }
     return (await res.json()).data.websites.map((page: any) => ({
       ...page,
+      recId: parseInt(page.recId),
       tags: [],
       active: false,
       period: Number.MAX_SAFE_INTEGER
@@ -65,6 +66,12 @@ export class GraphQlService {
     if (!res.ok) {
       throw new Error(getErrorMessage(res));
     }
-    return (await res.json()).data.nodes;
+
+    const nodes = (await res.json()).data.nodes;
+    nodes.forEach((node: any) => {
+      node.owner.recId = parseInt(node.owner.recId);
+    });
+
+    return nodes;
   }
 }

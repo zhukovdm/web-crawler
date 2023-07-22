@@ -29,7 +29,7 @@ export class OpenApiService {
 
   public static async getAllRecords(): Promise<RecordType[]> {
     const res = await fetch(OPENAPI_REC_ADDR, this.getOptions("GET", undefined));
-    if (res.status !== 200) {
+    if (!res.ok) {
       throw new Error(getErrorMessage(res));
     }
     return await res.json();
@@ -37,7 +37,7 @@ export class OpenApiService {
 
   public static async createRecord(record: RecordBaseType): Promise<RecordIdType> {
     const res = await fetch(OPENAPI_REC_ADDR, this.getOptions("POST", record));
-    if (res.status !== 201) {
+    if (!res.ok) {
       throw new Error(getErrorMessage(res));
     }
     return await res.json();
@@ -45,21 +45,21 @@ export class OpenApiService {
 
   public static async updateRecord(recId: number, record: RecordBaseType): Promise<void> {
     const res = await fetch(`${OPENAPI_REC_ADDR}/${recId}`, this.getOptions("PUT", record));
-    if (res.status !== 204) {
+    if (!res.ok) {
       throw new Error(getErrorMessage(res));
     }
   }
 
   public static async deleteRecord(recId: number): Promise<void> {
     const res = await fetch(`${OPENAPI_REC_ADDR}/${recId}`, this.getOptions("DELETE", undefined));
-    if (res.status !== 204) {
+    if (!res.ok) {
       throw new Error(getErrorMessage(res));
     }
   }
 
   public static async getAllExecutions(): Promise<ExecutionType[]> {
     const res = await fetch(OPENAPI_EXE_ADDR, this.getOptions("GET", undefined));
-    if (res.status !== 200) {
+    if (!res.ok) {
       throw new Error(getErrorMessage(res));
     }
     return await res.json();
@@ -67,7 +67,7 @@ export class OpenApiService {
 
   public static async createExecution(recId: number): Promise<void> {
     const res = await fetch(OPENAPI_EXE_ADDR, this.getOptions("POST", { recId: recId }))
-    if (res.status !== 204) {
+    if (!res.ok) {
       throw new Error(getErrorMessage(res));
     }
   }

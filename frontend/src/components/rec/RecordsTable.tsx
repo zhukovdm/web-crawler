@@ -16,6 +16,7 @@ import {
   TableHead,
   TableRow
 } from "@mui/material";
+import { Circle } from "@mui/icons-material";
 import { RecordFullType } from "../../domain/types";
 import {
   minutesToDdhhmm,
@@ -142,6 +143,7 @@ export default function RecordsTable(): JSX.Element {
           </colgroup> */}
           <TableHead>
             <TableRow>
+              <TableCell>Act</TableCell>
               <TableCell>Label</TableCell>
               <TableCell>URL</TableCell>
               <TableCell>Tags</TableCell>
@@ -154,6 +156,9 @@ export default function RecordsTable(): JSX.Element {
           <TableBody>
             {curRecs.map(([r, i]) => (
               <TableRow key={r.recId}>
+                <TableCell>
+                  <Circle fontSize={"small"} htmlColor={r.active ? "green" : "gray"} />
+                </TableCell>
                 <TableCell>{r.label}</TableCell>
                 <TableCell>{r.url}</TableCell>
                 <TableCell>

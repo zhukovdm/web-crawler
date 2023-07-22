@@ -1,7 +1,6 @@
 import {
   ChangeEvent,
   useEffect,
-  useRef,
   useState
 } from "react";
 import {
@@ -9,62 +8,106 @@ import {
   FormControl,
   FormControlLabel,
   FormLabel,
-  Paper,
   Radio,
   RadioGroup,
   Stack,
   TextField
 } from "@mui/material";
 import {
-  useAppDispatch,
+  NodeApiType,
+  NodeType,
+  WebsiteReducedType
+} from "../../domain/types";
+import {
   useAppSelector
 } from "../../store";
-import { Network } from "vis-network";
+import {
+  GraphQlService
+} from "../../services/graphql";
+import Drawing from "./Drawing";
 
 type ModeType = "static" | "live";
 
 type ViewType = "domain" | "website";
 
+function timeComparator(ln: NodeApiType, rn: NodeApiType): number {
+  if (ln.crawlTime === null) { return +1; }
+  if (rn.crawlTime === null) { return -1; }
+
+  const ld = new Date(ln.crawlTime);
+  const rd = new Date(rn.crawlTime);
+
+  if (ld > rd) { return -1; }
+  if (rd > ld) { return +1; }
+  return 0;
+}
+
+function getView(nodeUrl: string, view: ViewType): string {
+  return view === "website"
+    ? nodeUrl
+    : new URL(nodeUrl).hostname;
+}
+
 export default function Visualisation(): JSX.Element {
 
-  const dispatch = useAppDispatch();
-  const { selection } = useAppSelector((state) => state.vis);
+  const {
+    websites,
+    selection
+  } = useAppSelector((state) => state.vis);
 
   const [tick, setTick] = useState(3);
+  const [nods, setNods] = useState<NodeType[]>([]);
   const [mode, setMode] = useState<ModeType>("static");
   const [view, setView] = useState<ViewType>("website");
 
-  const vis = useRef<HTMLInputElement>(null);
-
   useEffect(() => {
+    const f = async () => {
 
-    const nodes = [
-      { id: 1, label: "Node 1" },
-      { id: 2, label: "Node 2" },
-      { id: 3, label: "Node 3" },
-      { id: 4, label: "Node 4" },
-      { id: 5, label: "Node 5" },
-    ];
+      const ws = (selection.map((s, i) => [s, i]) as [boolean, number][])
+        .filter(([s, _]) => s)
+        .map(([_, i]) => websites[i]!.recId);
 
-    const edges = [
-      { from: 1, to: 3, arrows: "to" },
-      { from: 1, to: 2, arrows: "to" },
-      { from: 2, to: 1, arrows: "to" },
-      { from: 2, to: 4 },
-      { from: 2, to: 5 },
-      { from: 3, to: 3 },
-    ];
+      const ns = (await GraphQlService.getNodes(ws))
+        .sort(timeComparator)
+        .reduce((acc, n) => {
 
-    const options = {
-      nodes: {
-        size: 10,
-        shape: "dot"
-      }
+          const url = getView(n.url, view);
+          const {
+            title,
+            crawlTime,
+            owner
+          } = n;
+          const crawlable = new RegExp(n.owner.regexp).test(n.url);
+          const links = n.links.map((link) => getView(link.url, view));
+
+          const baseNode: NodeType = acc.get(url) ?? {
+            url: url,
+            title: title,
+            crawlTime: crawlTime,
+            crawlable: crawlable,
+            links: new Set(links),
+            owners: new Map<number, WebsiteReducedType>(
+              [[owner.recId, owner]])
+          };
+
+          baseNode.title = baseNode.title ?? title;
+          baseNode.crawlTime = baseNode.crawlTime ?? crawlTime;
+          baseNode.crawlable = baseNode.crawlable || crawlable;
+          links.forEach((link) => baseNode.links.add(link));
+          baseNode.owners.set(owner.recId, owner);
+
+          // remove loops
+          baseNode.links.delete(baseNode.url);
+
+          return acc.set(baseNode.url, baseNode);
+
+        }, new Map<string, NodeType>());
+
+      setNods([...ns.values()]);
     };
 
-    const network = vis.current && new Network(vis.current, { nodes, edges }, options);
-    network?.on("doubleClick", (e) => console.log(e));
-  }, [vis, mode]);
+    f();
+  }, [websites, selection, view]);
 
   return (
     <Stack direction={"column"} gap={2}>
@@ -126,10 +169,7 @@ export default function Visualisation(): JSX.Element {
           />
         </Box>
       </Stack>
-      <Paper
-        ref={vis}
-        sx={{ width: "100%", height: "500px" }}
-      />
+      <Drawing nods={nods} />
     </Stack>
   );
 }

@@ -14,13 +14,15 @@ type VisInitialStateType = {
   node: NodeStoreType | undefined;
   selection: boolean[];
   websites: WebsiteType[];
+  executAction: boolean;
 };
 
 const initialState = (): VisInitialStateType => ({
   mode: "static",
   node: undefined,
   selection: [],
-  websites: []
+  websites: [],
+  executAction: false
 });
 
 export const visSlice = createSlice({
@@ -40,6 +42,9 @@ export const visSlice = createSlice({
     setSelection: (state, action: PayloadAction<{ value: boolean, index: number }>) => {
       const { value, index } = action.payload;
       state.selection = [...state.selection.slice(0, index), value, ...state.selection.slice(index + 1)];
+    },
+    setExecutAction: (state, action: PayloadAction<boolean>) => {
+      state.executAction = action.payload;
     }
   },
 });
@@ -48,7 +53,8 @@ export const {
   setMode,
   setNode,
   setWebsites,
-  setSelection
+  setSelection,
+  setExecutAction
 } = visSlice.actions;
 
 export default visSlice.reducer;

@@ -8,7 +8,7 @@ Tech stack: `TypeScript`, `Node.js`, `MySQL`, `OpenAPI`, `GraphQL`.
 
 Run the following commands:
 
-```console
+```bash
 git clone https://gitlab.mff.cuni.cz/zhukovd/web-crawler.git
 cd web-crawler/ && docker compose up
 ```

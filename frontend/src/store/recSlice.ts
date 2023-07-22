@@ -2,10 +2,10 @@ import {
   PayloadAction,
   createSlice
 } from "@reduxjs/toolkit";
-import { RecordFullType } from "../domain/types";
+import { RecordType } from "../domain/types";
 
 type RecInitialStateType = {
-  records: RecordFullType[];
+  records: RecordType[];
   createAction: boolean;
   executAction: boolean;
   updateAction: boolean;
@@ -44,13 +44,13 @@ export const recSlice = createSlice({
   name: "rec",
   initialState: (initialState()),
   reducers: {
-    setRecords: (state, action: PayloadAction<RecordFullType[]>) => {
+    setRecords: (state, action: PayloadAction<RecordType[]>) => {
       state.records = action.payload;
     },
-    appendRecord: (state, action: PayloadAction<RecordFullType>) => {
+    appendRecord: (state, action: PayloadAction<RecordType>) => {
       state.records.push(action.payload);
     },
-    updateRecord: (state, action: PayloadAction<{ index: number, record: RecordFullType }>) => {
+    updateRecord: (state, action: PayloadAction<{ index: number, record: RecordType }>) => {
       const { index, record } = action.payload;
       state.records = [...state.records.slice(0, index), record, ...state.records.slice(index + 1)];
     },

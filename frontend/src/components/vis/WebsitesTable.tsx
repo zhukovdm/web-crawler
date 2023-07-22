@@ -12,9 +12,9 @@ import {
   TableHead,
   TableRow
 } from "@mui/material";
-import { getPageCount } from "../_shared/paginate";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { setSelection } from "../../store/visSlice";
+import { getPageCount } from "../_shared/paginate";
 
 export default function WebsitesTable(): JSX.Element {
 
@@ -60,7 +60,6 @@ export default function WebsitesTable(): JSX.Element {
               <TableRow key={i}>
                 <TableCell>
                   <Checkbox
-                    size={"small"}
                     checked={selection[i]}
                     onChange={() => dispatch(setSelection({ value: !selection[i], index: i }))}
                   />

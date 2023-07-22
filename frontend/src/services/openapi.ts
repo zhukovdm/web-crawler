@@ -1,7 +1,7 @@
 import {
-  ExecutionFullType,
+  ExecutionType,
   RecordBaseType,
-  RecordFullType,
+  RecordType,
   RecordIdType
 } from "../domain/types";
 import {
@@ -27,7 +27,7 @@ export class OpenApiService {
     };
   }
 
-  public static async getAllRecords(): Promise<RecordFullType[]> {
+  public static async getAllRecords(): Promise<RecordType[]> {
     const res = await fetch(OPENAPI_REC_ADDR, this.getOptions("GET", undefined));
     if (res.status !== 200) {
       throw new Error(getErrorMessage(res));
@@ -57,7 +57,7 @@ export class OpenApiService {
     }
   }
 
-  public static async getAllExecutions(): Promise<ExecutionFullType[]> {
+  public static async getAllExecutions(): Promise<ExecutionType[]> {
     const res = await fetch(OPENAPI_EXE_ADDR, this.getOptions("GET", undefined));
     if (res.status !== 200) {
       throw new Error(getErrorMessage(res));

@@ -4,11 +4,22 @@ An implementation of web crawler based on the [specification](https://webik.ms.m
 
 Tech stack: `TypeScript`, `Node.js`, `MySQL`, `OpenAPI`, `GraphQL`.
 
-# deployment
+## Deployment
 
-- http://localhost:4000/graphql
+Run the following commands:
 
-# references
+```console
+git clone https://gitlab.mff.cuni.cz/zhukovd/web-crawler.git
+cd web-crawler/ && docker compose up
+```
+
+| Service           | URL                           |
+|-------------------|-------------------------------|
+| React frontend    | http://localhost:3000         |
+| OpenAPI backend   | http://localhost:3001         |
+| GraphQL backend   | http://localhost:3002/graphql |
+
+## References
 
 - https://www.typescriptlang.org/docs/handbook/intro.html
 - https://redux-toolkit.js.org/

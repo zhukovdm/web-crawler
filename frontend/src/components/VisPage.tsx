@@ -7,6 +7,7 @@ import {
 import { useAppDispatch } from "../store";
 import { setWebsites } from "../store/visSlice";
 import { GraphQlService } from "../services/graphql";
+import NodeDialog from "./vis/NodeDialog";
 import WebsitesTable from "./vis/WebsitesTable";
 import Visualisation from "./vis/Visualisation";
 
@@ -34,6 +35,7 @@ export default function VisPage(): JSX.Element {
             <CircularProgress />
           </Box>
         : <Stack gap={4}>
+            <NodeDialog />
             <WebsitesTable />
             <Visualisation />
           </Stack>

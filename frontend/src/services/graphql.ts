@@ -1,5 +1,5 @@
 import {
-  NodeType,
+  NodeApiType,
   WebsiteType
 } from "../domain/types";
 import {
@@ -33,13 +33,13 @@ export class GraphQlService {
 
   public static async getWebsites(): Promise<WebsiteType[]> {
     const res = await fetch(GRAPHQL_ADDR, this.getOptions({ query: this.webQuery }));
-    if (res.status !== 200) {
+    if (!res.ok) {
       throw new Error(getErrorMessage(res));
     }
     return (await res.json()).data.websites.map((page: any) => ({
       ...page,
       tags: [],
-      active: true,
+      active: false,
       period: Number.MAX_SAFE_INTEGER
     }));
   }
@@ -54,13 +54,15 @@ export class GraphQlService {
       }
       owner {
         recId: identifier
+        regexp
+        label
       }
     }
   }`;
 
-  public static async getNodes(websites: number[]): Promise<NodeType[]> {
+  public static async getNodes(websites: number[]): Promise<NodeApiType[]> {
     const res = await fetch(GRAPHQL_ADDR, this.getOptions({ query: this.nodQueryBuilder(websites) }));
-    if (res.status !== 200) {
+    if (!res.ok) {
       throw new Error(getErrorMessage(res));
     }
     return (await res.json()).data.nodes;

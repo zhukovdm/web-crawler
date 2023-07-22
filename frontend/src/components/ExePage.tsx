@@ -5,7 +5,7 @@ import {
   Divider,
   Stack
 } from "@mui/material";
-import { ExecutionFullType } from "../domain/types";
+import { ExecutionType } from "../domain/types";
 import { OpenApiService } from "../services/openapi";
 import FilterConfig from "./exe/FilterConfig";
 import ExecutionsTable from "./exe/ExecutionsTable";
@@ -13,7 +13,7 @@ import ExecutionsTable from "./exe/ExecutionsTable";
 export default function ExePage(): JSX.Element {
 
   const [load, setLoad] = useState(true);
-  const [exes, setExes] = useState<ExecutionFullType[]>([]);
+  const [exes, setExes] = useState<ExecutionType[]>([]);
 
   useEffect(() => {
     const f = async () => {

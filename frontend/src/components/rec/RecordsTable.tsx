@@ -17,7 +17,7 @@ import {
   TableRow
 } from "@mui/material";
 import { Circle } from "@mui/icons-material";
-import { RecordFullType } from "../../domain/types";
+import { RecordType } from "../../domain/types";
 import {
   minutesToDdhhmm,
   stringToTags
@@ -62,7 +62,7 @@ export default function RecordsTable(): JSX.Element {
   const fsRecords = useMemo(() => {
 
     let rs = records
-      .map((r, i) => [r, i] as [RecordFullType, number])
+      .map((r, i) => [r, i] as [RecordType, number])
       .filter(([r, _]) => !labFilterAct || r.label.toLowerCase().includes(labFilterCon))
       .filter(([r, _]) => !urlFilterAct || r.label.toLowerCase().includes(urlFilterCon))
       .filter(([r, _]) => {

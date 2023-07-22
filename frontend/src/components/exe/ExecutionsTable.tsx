@@ -12,7 +12,7 @@ import {
   TableRow
 } from "@mui/material";
 import { useAppSelector } from "../../store";
-import { ExecutionFullType } from "../../domain/types";
+import { ExecutionType } from "../../domain/types";
 import {
   getFirstPage,
   getPageCount,
@@ -20,7 +20,7 @@ import {
 } from "../_shared/paginate";
 
 type ExecutionsTableType = {
-  exes: ExecutionFullType[];
+  exes: ExecutionType[];
 };
 
 export default function ExecutionsTable({ exes }: ExecutionsTableType): JSX.Element {
@@ -32,7 +32,7 @@ export default function ExecutionsTable({ exes }: ExecutionsTableType): JSX.Elem
 
   const fsExecutions = useMemo(() => {
     return exes
-      .map((e, i) => [e, i] as [ExecutionFullType, number])
+      .map((e, i) => [e, i] as [ExecutionType, number])
       .filter(([e, _]) => !exeFilterAct || e.recId === exeFilterCon);
   }, [exes, exeFilterAct, exeFilterCon]);
 

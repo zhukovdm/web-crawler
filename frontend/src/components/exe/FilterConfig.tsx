@@ -9,7 +9,7 @@ import {
   Stack,
   Typography
 } from "@mui/material";
-import { ExecutionFullType } from "../../domain/types";
+import { ExecutionType } from "../../domain/types";
 import {
   useAppDispatch,
   useAppSelector
@@ -18,7 +18,7 @@ import { setExeFilterAct, setExeFilterCon } from "../../store/exeSlice";
 
 type FilterConfigType = {
   load: boolean;
-  exes: ExecutionFullType[];
+  exes: ExecutionType[];
 }
 
 export default function FilterConfig({ load, exes }: FilterConfigType): JSX.Element {

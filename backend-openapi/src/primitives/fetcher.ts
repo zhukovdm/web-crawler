@@ -30,7 +30,7 @@ class UrlFetcher implements IUrlFetcher {
   /**
    * Try parse url and remove possible http #fragment.
    */
-  private normalizaUrl(url: string, baseUrl: string) {
+  private normalizeUrl(url: string, baseUrl: string) {
     try {
       const o = new URL(url, baseUrl);
       o.hash = "";
@@ -54,7 +54,7 @@ class UrlFetcher implements IUrlFetcher {
 
       const links = [...dom.getElementsByTagName("a")]
         .map((a) => a.href)
-        .map((u) => this.normalizaUrl(u, baseUrl))
+        .map((u) => this.normalizeUrl(u, baseUrl))
         .filter((n) => n !== undefined) as string[];
 
       const titles = [...dom.getElementsByTagName("title")]

@@ -20,10 +20,10 @@ export type RecordLastExecType = {
   lastExecFinishTime: string | null;
 };
 
-export type RecordFullType =
+export type RecordType =
   RecordIdType & RecordBaseType & RecordLastExecType;
 
-export type ExecutionFullType = RecordIdType & {
+export type ExecutionType = RecordIdType & {
   exeId: number;
   recId: number;
   label: string;
@@ -35,10 +35,24 @@ export type ExecutionFullType = RecordIdType & {
 
 export type WebsiteType = RecordIdType & RecordBaseType;
 
-export type NodeType = {
+export type WebsiteReducedType = RecordIdType & {
+  regexp: string;
+  label: string;
+};
+
+export type NodeBaseType = {
   url: string;
   title: string | null;
   crawlTime: string | null;
+};
+
+export type NodeApiType = NodeBaseType & {
   links: { url: string }[];
-  owner: { recId: string };
+  owner: WebsiteReducedType;
+};
+
+export type NodeType = NodeBaseType & {
+  crawlable: boolean;
+  links: Set<string>;
+  owners: Map<number, WebsiteReducedType>;
 };

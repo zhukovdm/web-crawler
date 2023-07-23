@@ -1,8 +1,5 @@
 import { JSDOM } from "jsdom";
-import {
-  FetchPackType,
-  IUrlFetcher
-} from "../domain/common-interfaces";
+import { FetchPackType, IUrlFetcher } from "../domain/common-interfaces";
 import { HttpUrlMatcher } from "./matcher";
 import { getCurrentTime } from "./functions";
 

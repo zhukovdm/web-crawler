@@ -1,12 +1,10 @@
 import {
-  IDisposable
-} from "./common-interfaces";
-import {
   ExecutionFullType,
   ExecutionStatus,
   RecordBaseType,
   RecordFullType
 } from "./types";
+import { IDisposable } from "./common-interfaces";
 
 export interface IRecordModel extends IDisposable {
 

@@ -1,21 +1,5 @@
 import { IQueue } from "../domain/common-interfaces";
 
-/**
- * Use for small collections.
- */
-export class ArrayQueue<T> implements IQueue<T> {
-
-  private readonly arr: T[] = [];
-
-  public empty(): boolean { return this.arr.length === 0; }
-
-  public prepend(item: T): void { this.arr.unshift(item); }
-
-  public enqueue(item: T): void { this.arr.push(item); }
-
-  public dequeue(): T | undefined { return this.arr.shift(); }
-}
-
 type LinkedListItem<T> = {
   item: T;
   next: LinkedListItem<T> | undefined;

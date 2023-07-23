@@ -1,9 +1,6 @@
 import { IExecutor } from "../domain/common-interfaces";
-import {
-  IExecutionModel,
-  IRecordModel
-} from "../domain/model-interfaces";
-import { ArrayQueue } from "../primitives/queue";
+import { IExecutionModel, IRecordModel } from "../domain/model-interfaces";
+import { LinkedListQueue } from "../primitives/queue";
 import { ArrayWorkerPool } from "./worker-pool";
 
 export class Executor implements IExecutor {
@@ -14,8 +11,8 @@ export class Executor implements IExecutor {
   private static readonly TICK_INTERVAL = 1000;
 
   private readonly model: IExecutionModel;
-  private readonly planned = new ArrayQueue<number>();
-  private readonly crawled = new ArrayQueue<number>();
+  private readonly planned = new LinkedListQueue<number>();
+  private readonly crawled = new LinkedListQueue<number>();
   private readonly wrkPool = ArrayWorkerPool.getInstance(this);
 
   /**
@@ -72,8 +69,8 @@ export class Executor implements IExecutor {
 
   private constructor(model: IExecutionModel, planned: number[]) {
     this.model = model;
-    this.planned = new ArrayQueue<number>();
-    this.crawled = new ArrayQueue<number>();
+    this.planned = new LinkedListQueue<number>();
+    this.crawled = new LinkedListQueue<number>();
 
     planned.forEach((exeId) => this.planned.enqueue(exeId));
   }

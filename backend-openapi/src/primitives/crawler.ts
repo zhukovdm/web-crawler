@@ -1,10 +1,5 @@
-import {
-  IQueue,
-  IUrlFetcher,
-} from "../domain/common-interfaces";
-import {
-  ICrawlerModel,
-} from "../domain/model-interfaces";
+import { IQueue, IUrlFetcher } from "../domain/common-interfaces";
+import { ICrawlerModel } from "../domain/model-interfaces";
 import { LinkedListQueue } from "./queue";
 import { BoundaryUrlMatcher } from "./matcher";
 

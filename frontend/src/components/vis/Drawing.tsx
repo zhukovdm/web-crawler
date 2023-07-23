@@ -40,42 +40,42 @@ export default function Drawing({ nods }: DrawingType): JSX.Element {
     const options: Options = {
       nodes: {
         font: {
-          size: 10,
+          size: 10
         },
-        size: 15,
         shape: "dot",
+        size: 15
       },
       edges: {
         arrows: {
           to: {
             enabled: true,
-            scaleFactor: 0.5,
+            scaleFactor: 0.5
           }
         },
         color: {
           color: "lightgray",
-          opacity: 0.5,
+          opacity: 0.5
         },
         length: 1000,
-        smooth: true,
+        smooth: true
       },
       interaction: {
-        hideEdgesOnDrag: true,
+        hideEdgesOnDrag: true
       },
       layout: {
         randomSeed: 0,
-        improvedLayout: false,
+        improvedLayout: false
       },
       physics: {
         enabled: false,
         repulsion: {
-          nodeDistance: 1000,
+          nodeDistance: 1000
         }
       }
     };
 
     const network = vis.current && new Network(vis.current, { nodes, edges }, options);
-    network?.stabilize(10);
+    network?.stabilize(30);
     network?.on("doubleClick", (e) => {
       const i = e.nodes[0];
       if (i !== undefined) {

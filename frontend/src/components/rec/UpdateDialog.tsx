@@ -6,12 +6,9 @@ import {
 import { Update } from "@mui/icons-material";
 import { RecordBaseType } from "../../domain/types";
 import { useAppDispatch, useAppSelector } from "../../store";
-import {
-  setUpdateAction,
-  updateRecord
-} from "../../store/recSlice";
+import { setUpdateAction, updateRecord } from "../../store/recSlice";
 import { OpenApiService } from "../../services/openapi";
-import RecordDialog from "./RecordDialog";
+import RecordDialog from "../_shared/RecordDialog";
 
 type UpdateDialogType = {
   index: number;

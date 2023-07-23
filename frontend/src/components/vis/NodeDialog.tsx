@@ -8,20 +8,21 @@ import {
   Stack,
   Typography
 } from "@mui/material";
-import { LoadingButton } from "@mui/lab";
-import { Launch, Send } from "@mui/icons-material";
+import { Launch } from "@mui/icons-material";
 import { useAppDispatch, useAppSelector } from "../../store";
-import { setNode } from "../../store/visSlice";
-import { NodeStoreType } from "../../domain/types";
-import { setExecutAction } from "../../store/recSlice";
+import { NodeStoreType, RecordBaseType } from "../../domain/types";
+import { appendWebsite, setNode } from "../../store/visSlice";
+import { setCreateAction, setExecutAction } from "../../store/recSlice";
 import { OpenApiService } from "../../services/openapi";
+import RecordDialog from "../_shared/RecordDialog";
 
 type CrawledNodeDialogType = {
-  node: NodeStoreType;
+  show: boolean;
   hide: () => void;
+  node: NodeStoreType;
 };
 
-function CrawledNodeDialog({ node, hide }: CrawledNodeDialogType): JSX.Element {
+function CrawledNodeDialog({ show, hide, node }: CrawledNodeDialogType): JSX.Element {
 
   const dispatch = useAppDispatch();
   const {
@@ -41,7 +42,7 @@ function CrawledNodeDialog({ node, hide }: CrawledNodeDialogType): JSX.Element {
   };
 
   return (
-    <>
+    <Dialog open={show}>
       <DialogContent>
         <Stack direction={"column"} gap={2}>
           <Stack direction={"row"} gap={2}>
@@ -82,39 +83,16 @@ function CrawledNodeDialog({ node, hide }: CrawledNodeDialogType): JSX.Element {
           <span>Close</span>
         </Button>
       </DialogActions>
-    </>
+    </Dialog>
   );
-}
-
-type UnknownNodeDialogType = CrawledNodeDialogType;
-
-function UnknownNodeDialog({ node, hide }: UnknownNodeDialogType): JSX.Element {
-
-  return (
-    <>
-      <DialogContent>
-        {node.url}
-      </DialogContent>
-      <DialogActions>
-        <Button
-          color={"error"}
-          onClick={hide}
-        >
-          <span>Close</span>
-        </Button>
-        <LoadingButton startIcon={<Send />}>
-          <span>Send</span>
-        </LoadingButton>
-      </DialogActions>
-    </>
-  )
 }
 
 export default function NodeDialog(): JSX.Element {
 
   const dispatch = useAppDispatch();
   const {
-    node
+    node,
+    createAction
   } = useAppSelector((state) => state.vis);
 
   const [show, setShow] = useState(false);
@@ -126,10 +104,44 @@ export default function NodeDialog(): JSX.Element {
     dispatch(setNode(undefined));
   };
 
+  const callback = async (record: RecordBaseType) => {
+    dispatch(setCreateAction(true));
+    try {
+      const { recId } = await OpenApiService.createRecord(record);
+      if (!record.active) {
+        await OpenApiService.createExecution(recId);
+      }
+      dispatch(appendWebsite({ ...record, recId: recId }));
+      hide();
+    }
+    catch (ex: any) { alert(ex?.message); }
+    finally {
+      dispatch(setCreateAction(false));
+    }
+  };
+
   return (
-    <Dialog open={show}>
-      <>{!!node &&  node.crawlable && <CrawledNodeDialog node={node} hide={hide} />}</>
-      <>{!!node && !node.crawlable && <UnknownNodeDialog node={node} hide={hide} />}</>
-    </Dialog>
+    <>
+      {!!node &&  node.crawlable &&
+        <CrawledNodeDialog node={node} show={show} hide={hide} />
+      }
+      {!!node && !node.crawlable &&
+        <RecordDialog
+          show={show}
+          hide={hide}
+          action={"create"}
+          record={{
+            url: node.url,
+            regexp: ".*",
+            period: 5,
+            label: "",
+            active: false,
+            tags: []
+          }}
+          callback={callback}
+          remoteAction={createAction}
+        />
+      }
+    </>
   );
 }

@@ -5,15 +5,9 @@ import {
 } from "@mui/material";
 import { RecordBaseType } from "../../domain/types";
 import { OpenApiService } from "../../services/openapi";
-import {
-  useAppDispatch,
-  useAppSelector
-} from "../../store";
-import {
-  appendRecord,
-  setCreateAction
-} from "../../store/recSlice";
-import RecordDialog from "./RecordDialog";
+import { useAppDispatch, useAppSelector } from "../../store";
+import { appendRecord, setCreateAction } from "../../store/recSlice";
+import RecordDialog from "../_shared/RecordDialog";
 
 export default function CreateDialog(): JSX.Element {
 

@@ -1,8 +1,4 @@
-import {
-  ChangeEvent,
-  useEffect,
-  useState
-} from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import {
   Box,
   FormControl,
@@ -13,22 +9,10 @@ import {
   Stack,
   TextField
 } from "@mui/material";
-import {
-  NodeApiType,
-  NodeType,
-  WebsiteReducedType
-} from "../../domain/types";
-import {
-  useAppDispatch,
-  useAppSelector
-} from "../../store";
-import {
-  VisModeType,
-  setMode
-} from "../../store/visSlice";
-import {
-  GraphQlService
-} from "../../services/graphql";
+import { NodeApiType, NodeType, WebsiteReducedType } from "../../domain/types";
+import { useAppDispatch, useAppSelector } from "../../store";
+import { VisModeType, setMode } from "../../store/visSlice";
+import { GraphQlService } from "../../services/graphql";
 import Drawing from "./Drawing";
 
 const MINIMUM_REFRESH_FREQUENCY = 5;

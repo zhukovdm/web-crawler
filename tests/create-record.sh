@@ -1,6 +1,6 @@
 #!/bin/bash
 
-createRecord() {
+createRecord1() {
   curl \
     -v \
     -H 'Content-Type: application/json' \
@@ -15,4 +15,20 @@ createRecord() {
     http://127.0.0.1:3001/api/v1/records
 }
 
-createRecord
+createRecord2() {
+  curl \
+    -v \
+    -H 'Content-Type: application/json' \
+    -d '{
+      "url": "https://d3s.mff.cuni.cz/teaching/nprg043/",
+      "regexp": "^https://d3s.mff.cuni.cz/teaching/nprg043/",
+      "period": 5,
+      "label": "Best Practices in Programming",
+      "active": false,
+      "tags": [ "university", "school", "course" ]
+    }' \
+    http://127.0.0.1:3001/api/v1/records
+}
+
+createRecord1
+createRecord2

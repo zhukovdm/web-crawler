@@ -469,7 +469,7 @@ BEGIN
   FROM `nod` AS `n1` INNER JOIN (
     SELECT `e0`.`exeId`
       FROM `rec` AS `r0` INNER JOIN `exe` AS `e0` ON `r0`.`recId` = `e0`.`recId`
-      WHERE `r0`.`recId` = `i_recId`
+      WHERE `r0`.`recId` = `i_recId` AND `e0`.`status` IN ('CRAWLING', 'SUCCESS')
       ORDER BY `e0`.`exeId` DESC LIMIT 1
   ) AS `e1`
   ON `n1`.`exeId` = `e1`.`exeId`;

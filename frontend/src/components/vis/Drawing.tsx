@@ -12,7 +12,7 @@ type DrawingType = {
 interface DrawingNode extends Node {
   url: string;
   links: string[];
-};
+}
 
 export default function Drawing({ nods }: DrawingType): JSX.Element {
 

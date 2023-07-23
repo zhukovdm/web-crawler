@@ -18,6 +18,7 @@ import {
   getPageCount,
   updatePage
 } from "../_shared/paginate";
+import { escapeHtml } from "../../domain/functions";
 
 type ExecutionsTableType = {
   exes: ExecutionType[];
@@ -63,9 +64,6 @@ export default function ExecutionsTable({ exes }: ExecutionsTableType): JSX.Elem
       </Box>
       <TableContainer component={Paper}>
         <Table sx={{ width: "100%" }} aria-label={"table of executions"}>
-          {/* <colgroup>
-            <col width={"100%"} />
-          </colgroup> */}
           <TableHead>
             <TableRow>
               <TableCell>Label</TableCell>
@@ -78,7 +76,7 @@ export default function ExecutionsTable({ exes }: ExecutionsTableType): JSX.Elem
           <TableBody>
             {curExes.map(([e]) => (
               <TableRow key={e.exeId}>
-                <TableCell>{e.label}</TableCell>
+                <TableCell>{escapeHtml(e.label)}</TableCell>
                 <TableCell>{e.status}</TableCell>
                 <TableCell>{e.createTime}</TableCell>
                 <TableCell>{e.finishTime ?? "N/A"}</TableCell>

@@ -4,10 +4,7 @@ import {
   TextField,
   Typography
 } from "@mui/material";
-import {
-  useAppDispatch,
-  useAppSelector
-} from "../../store";
+import { useAppDispatch, useAppSelector } from "../../store";
 import {
   setLabFilterAct,
   setLabFilterCon,
@@ -41,7 +38,8 @@ export default function FilterConfig(): JSX.Element {
           />
           <TextField
             size={"small"}
-            label={"Label (substr)"}
+            label={"Label"}
+            placeholder={"Label (substr)"}
             value={labFilterCon}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               dispatch(setLabFilterCon(e.target.value));
@@ -55,7 +53,8 @@ export default function FilterConfig(): JSX.Element {
           />
           <TextField
             size={"small"}
-            label={"URL (substr)"}
+            label={"URL"}
+            placeholder={"URL (substr)"}
             value={urlFilterCon}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               dispatch(setUrlFilterCon(e.target.value));
@@ -69,7 +68,8 @@ export default function FilterConfig(): JSX.Element {
           />
           <TextField
             size={"small"}
-            label={"Tags (any of)"}
+            label={"Tags"}
+            placeholder={"Tags (any of)"}
             value={tagFilterCon}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               dispatch(setTagFilterCon(e.target.value));

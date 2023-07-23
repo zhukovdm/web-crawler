@@ -7,14 +7,8 @@ import {
   Stack,
   Typography
 } from "@mui/material";
-import {
-  ArrowCircleDown,
-  ArrowCircleUp
-} from "@mui/icons-material";
-import {
-  useAppDispatch,
-  useAppSelector
-} from "../../store";
+import { ArrowCircleDown, ArrowCircleUp } from "@mui/icons-material";
+import { useAppDispatch, useAppSelector } from "../../store";
 import {
   setSorterAct,
   setSorterCon,

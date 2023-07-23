@@ -15,6 +15,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../../store";
 import { setSelection } from "../../store/visSlice";
 import { getPageCount } from "../_shared/paginate";
+import { escapeHtml } from "../../domain/functions";
 
 export default function WebsitesTable(): JSX.Element {
 
@@ -64,7 +65,7 @@ export default function WebsitesTable(): JSX.Element {
                     onChange={() => dispatch(setSelection({ value: !selection[i], index: i }))}
                   />
                 </TableCell>
-                <TableCell>{site.label}</TableCell>
+                <TableCell>{escapeHtml(site.label)}</TableCell>
                 <TableCell>{site.url}</TableCell>
               </TableRow>
             ))}

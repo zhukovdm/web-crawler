@@ -1,8 +1,4 @@
-import {
-  useEffect,
-  useMemo,
-  useState
-} from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Box,
   Chip,
@@ -18,16 +14,9 @@ import {
 } from "@mui/material";
 import { Circle } from "@mui/icons-material";
 import { RecordType } from "../../domain/types";
-import {
-  minutesToDdhhmm,
-  stringToTags
-} from "../../domain/functions";
+import { minutesToDdhhmm, stringToTags } from "../../domain/functions";
 import { useAppSelector } from "../../store";
-import {
-  getFirstPage,
-  getPageCount,
-  updatePage
-} from "../_shared/paginate";
+import { getFirstPage, getPageCount, updatePage } from "../_shared/paginate";
 import UpdateDialog from "./UpdateDialog";
 import DeleteDialog from "./DeleteDialog";
 import ExecutDialog from "./ExecutDialog";

@@ -36,7 +36,8 @@ function isValidLab(label: string): boolean {
 
 function isValidUrl(url: string): boolean {
   try {
-    new URL(url); return true;
+    new URL(url);
+    return /^https?:\/\//i.test(url);
   }
   catch (_) { return false; }
 }

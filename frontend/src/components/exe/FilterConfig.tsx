@@ -10,10 +10,7 @@ import {
   Typography
 } from "@mui/material";
 import { ExecutionType } from "../../domain/types";
-import {
-  useAppDispatch,
-  useAppSelector
-} from "../../store";
+import { useAppDispatch, useAppSelector } from "../../store";
 import { setExeFilterAct, setExeFilterCon } from "../../store/exeSlice";
 
 type FilterConfigType = {

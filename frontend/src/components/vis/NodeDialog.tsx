@@ -15,6 +15,7 @@ import { appendWebsite, setNode } from "../../store/visSlice";
 import { setCreateAction, setExecutAction } from "../../store/recSlice";
 import { OpenApiService } from "../../services/openapi";
 import RecordDialog from "../_shared/RecordDialog";
+import { escapeHtml } from "../../domain/functions";
 
 type CrawledNodeDialogType = {
   show: boolean;
@@ -61,7 +62,7 @@ function CrawledNodeDialog({ show, hide, node }: CrawledNodeDialogType): JSX.Ele
           </Stack>
           {node.owners.map((owner, i) => (
             <Stack key={i} direction={"row"} gap={2} alignItems={"center"}>
-              <Typography>{owner.label}</Typography>
+              <Typography>{escapeHtml(owner.label)}</Typography>
               <Button
                 size={"small"}
                 variant={"outlined"}

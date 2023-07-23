@@ -34,7 +34,7 @@ function timeComparator(ln: NodeApiType, rn: NodeApiType): number {
 function getView(nodeUrl: string, view: ViewType): string {
   return view === "website"
     ? nodeUrl
-    : new URL(nodeUrl).hostname;
+    : new URL(nodeUrl).origin;
 }
 
 function getTitle(nodeTitle: string | null, view: ViewType): string | null {

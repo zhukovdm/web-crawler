@@ -1,9 +1,9 @@
 require("dotenv").config();
 
+import express from "express";
+import cors from "cors";
 import morgan from "morgan";
 import bodyParser from "body-parser";
-import cors from "cors";
-import express from "express";
 import * as validator from "express-openapi-validator";
 import { Executor } from "./services/executor";
 import { Controller } from "./services/controller";
@@ -20,13 +20,17 @@ import { ModelFactory } from "./models";
   const wapp = express();
   wapp.disable("x-powered-by");
 
-  const { OPENAPI_PORT, OPENAPI_SPEC } = process.env;
+  const OPENAPI_PORT = parseInt(process.env.OPENAPI_PORT!);
 
   wapp
     .use(cors())
     .use(morgan("dev"))
     .use(bodyParser.json())
-    .use(validator.middleware({ apiSpec: OPENAPI_SPEC! }));
+    .use(validator.middleware({ apiSpec: process.env.OPENAPI_SPEC! }));
+
+  wapp.get("/healthcheck", (_, res) => {
+    res.status(200).end();
+  });
 
   wapp.get("/api/v1/records", async (req, res) => {
     await Controller.getAllRecords(req, res, recModel);
@@ -59,7 +63,7 @@ import { ModelFactory } from "./models";
     });
   });
 
-  wapp.listen(OPENAPI_PORT!, () => {
+  wapp.listen(OPENAPI_PORT, () => {
     console.log(`backend-openapi is listening on port ${OPENAPI_PORT!}.`);
   });
 })();

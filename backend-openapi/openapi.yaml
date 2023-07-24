@@ -1,9 +1,15 @@
 openapi: '3.0.0'
 info:
-  title: web-crawler
+  title: web-crawler OpenAPI endpoint
   description: HTTP-based endpoint
   version: '1.0.0'
 paths:
+  /healthcheck:
+    get:
+      operationId: healthCheck
+      responses:
+        '200':
+          description: 'OK'
   /api/v1/records:
     get:
       operationId: getAllRecords

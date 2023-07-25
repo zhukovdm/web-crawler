@@ -93,15 +93,15 @@ export class Executor implements IExecutor {
 
     // for each record, create waiting execution.
 
-    const records = (await recModel.getAllRecords())
-      .filter((rec) => rec.active).map((rec) => rec.recId);
+    // const records = (await recModel.getAllRecords())
+    //   .filter((rec) => rec.active).map((rec) => rec.recId);
 
     const exes: number[] = [];
 
-    for (const recId of records) {
-      const { exeId } = await exeModel.createExecution(recId);
-      if (exeId !== null) { exes.push(exeId); }
-    }
+    // for (const recId of records) {
+    //   const { exeId } = await exeModel.createExecution(recId);
+    //   if (exeId !== null) { exes.push(exeId); }
+    // }
 
     return new Executor(exeModel, exes).withEvents();
   }

@@ -15,9 +15,8 @@ import { ModelFactory } from "./models";
    * Service migth start just after MySQL is healthy, but before tables are
    * initialized (init.sql). */
 
-  await new Promise((res) => setTimeout(res, 60_000));
-
-  await ModelFactory.init();
+  // await new Promise((res) => setTimeout(res, 60_000));
+  // await ModelFactory.init();
 
   const recModel = ModelFactory.getRecordModel();
   const exeModel = ModelFactory.getExecutionModel();

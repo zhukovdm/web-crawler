@@ -1,6 +1,6 @@
 #!/bin/bash
 
-createRecord1() {
+createRecords() {
   curl \
     -v \
     -H 'Content-Type: application/json' \
@@ -13,9 +13,7 @@ createRecord1() {
       "tags": [ "digital", "humanities", "tutorials" ]
     }' \
     http://127.0.0.1:3001/api/v1/records
-}
 
-createRecord2() {
   curl \
     -v \
     -H 'Content-Type: application/json' \
@@ -30,5 +28,4 @@ createRecord2() {
     http://127.0.0.1:3001/api/v1/records
 }
 
-createRecord1
-createRecord2
+createRecords

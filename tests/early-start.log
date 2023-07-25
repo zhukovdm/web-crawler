@@ -1,0 +1,70 @@
+web-crawler-database         | 2023-07-25 12:22:02+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.33-1.el8 started.
+web-crawler-database         | 2023-07-25 12:22:03+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+web-crawler-database         | 2023-07-25 12:22:03+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.33-1.el8 started.
+web-crawler-database         | 2023-07-25 12:22:03+00:00 [Note] [Entrypoint]: Initializing database files
+web-crawler-database         | 2023-07-25T12:22:03.801129Z 0 [Warning] [MY-011068] [Server] The syntax '--skip-host-cache' is deprecated and will be removed in a future release. Please use SET GLOBAL host_cache_size=0 instead.
+web-crawler-database         | 2023-07-25T12:22:03.802325Z 0 [Warning] [MY-010918] [Server] 'default_authentication_plugin' is deprecated and will be removed in a future release. Please use authentication_policy instead.
+web-crawler-database         | 2023-07-25T12:22:03.802352Z 0 [System] [MY-013169] [Server] /usr/sbin/mysqld (mysqld 8.0.33) initializing of server in progress as process 80
+web-crawler-database         | 2023-07-25T12:22:03.836883Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+web-crawler-database         | 2023-07-25T12:22:11.493968Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+web-crawler-database         | 2023-07-25T12:22:17.584647Z 6 [Warning] [MY-010453] [Server] root@localhost is created with an empty password ! Please consider switching off the --initialize-insecure option.
+web-crawler-database         | 2023-07-25 12:22:25+00:00 [Note] [Entrypoint]: Database files initialized
+web-crawler-database         | 2023-07-25 12:22:25+00:00 [Note] [Entrypoint]: Starting temporary server
+web-crawler-database         | 2023-07-25T12:22:25.756816Z 0 [Warning] [MY-011068] [Server] The syntax '--skip-host-cache' is deprecated and will be removed in a future release. Please use SET GLOBAL host_cache_size=0 instead.
+web-crawler-database         | 2023-07-25T12:22:25.758548Z 0 [Warning] [MY-010918] [Server] 'default_authentication_plugin' is deprecated and will be removed in a future release. Please use authentication_policy instead.
+web-crawler-database         | 2023-07-25T12:22:25.758582Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.0.33) starting as process 128
+web-crawler-database         | 2023-07-25T12:22:25.792119Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+web-crawler-database         | 2023-07-25T12:22:26.370242Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+web-crawler-database         | 2023-07-25T12:22:28.796807Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+web-crawler-database         | 2023-07-25T12:22:28.797143Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+web-crawler-database         | 2023-07-25T12:22:28.808199Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+web-crawler-database         | 2023-07-25T12:22:28.874653Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Socket: /var/run/mysqld/mysqlx.sock
+web-crawler-database         | 2023-07-25T12:22:28.887136Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.0.33'  socket: '/var/run/mysqld/mysqld.sock'  port: 0  MySQL Community Server - GPL.
+web-crawler-database         | 2023-07-25 12:22:28+00:00 [Note] [Entrypoint]: Temporary server started.
+web-crawler-database         | '/var/lib/mysql/mysql.sock' -> '/var/run/mysqld/mysqld.sock'
+web-crawler-database         | Warning: Unable to load '/usr/share/zoneinfo/iso3166.tab' as time zone. Skipping it.
+web-crawler-database         | Warning: Unable to load '/usr/share/zoneinfo/leap-seconds.list' as time zone. Skipping it.
+web-crawler-database         | Warning: Unable to load '/usr/share/zoneinfo/leapseconds' as time zone. Skipping it.
+web-crawler-database         | Warning: Unable to load '/usr/share/zoneinfo/tzdata.zi' as time zone. Skipping it.
+web-crawler-database         | Warning: Unable to load '/usr/share/zoneinfo/zone.tab' as time zone. Skipping it.
+web-crawler-database         | Warning: Unable to load '/usr/share/zoneinfo/zone1970.tab' as time zone. Skipping it.
+web-crawler-database         | 
+web-crawler-database         | 
+web-crawler-database         | 2023-07-25 12:22:33+00:00 [Note] [Entrypoint]: /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/init.sql
+web-crawler-database         | 
+web-crawler-database         | 
+web-crawler-database         | 
+web-crawler-database         | 2023-07-25 12:22:34+00:00 [Note] [Entrypoint]: Stopping temporary server
+web-crawler-database         | 2023-07-25T12:22:35.025490Z 12 [System] [MY-013172] [Server] Received SHUTDOWN from user root. Shutting down mysqld (Version: 8.0.33).
+web-crawler-backend-graphql  | 
+web-crawler-backend-graphql  | > backend-graphql@1.0.0 serve
+web-crawler-backend-graphql  | > node ./dist/app.js
+web-crawler-backend-graphql  | 
+web-crawler-backend-graphql  | 
+web-crawler-backend-openapi  | 
+web-crawler-backend-openapi  | > backend-openapi@1.0.0 serve
+web-crawler-backend-openapi  | > node ./dist/app.js
+web-crawler-backend-openapi  | 
+web-crawler-backend-openapi  | 
+web-crawler-backend-graphql  | backend-graphql is listening on port 3002.
+web-crawler-database         | 2023-07-25T12:22:38.576552Z 0 [System] [MY-010910] [Server] /usr/sbin/mysqld: Shutdown complete (mysqld 8.0.33)  MySQL Community Server - GPL.
+web-crawler-backend-openapi  | backend-openapi is listening on port 3001.
+web-crawler-database         | 2023-07-25 12:22:39+00:00 [Note] [Entrypoint]: Temporary server stopped
+web-crawler-database         | 
+web-crawler-database         | 
+web-crawler-database         | 2023-07-25 12:22:39+00:00 [Note] [Entrypoint]: MySQL init process done. Ready for start up.
+web-crawler-database         | 
+web-crawler-database         | 
+web-crawler-database         | 2023-07-25T12:22:39.403096Z 0 [Warning] [MY-011068] [Server] The syntax '--skip-host-cache' is deprecated and will be removed in a future release. Please use SET GLOBAL host_cache_size=0 instead.
+web-crawler-database         | 2023-07-25T12:22:39.404885Z 0 [Warning] [MY-010918] [Server] 'default_authentication_plugin' is deprecated and will be removed in a future release. Please use authentication_policy instead.
+web-crawler-database         | 2023-07-25T12:22:39.404924Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.0.33) starting as process 1
+web-crawler-database         | 2023-07-25T12:22:39.435538Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+web-crawler-database         | 2023-07-25T12:22:40.051661Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+web-crawler-database         | 2023-07-25T12:22:42.099847Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+web-crawler-database         | 2023-07-25T12:22:42.099883Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+web-crawler-database         | 2023-07-25T12:22:42.111513Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+web-crawler-database         | 2023-07-25T12:22:42.207747Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Bind-address: '::' port: 33060, socket: /var/run/mysqld/mysqlx.sock
+web-crawler-database         | 2023-07-25T12:22:42.215519Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.0.33'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  MySQL Community Server - GPL.
+web-crawler-backend-graphql  | GET /healthcheck 200 0.675 ms - -
+web-crawler-backend-openapi  | GET /healthcheck 200 32.414 ms - -
+web-crawler-frontend         |  INFO  Accepting connections at http://localhost:3000

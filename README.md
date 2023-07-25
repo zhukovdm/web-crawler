@@ -2,7 +2,7 @@
 
 An implementation of web crawler based on the [specification](https://webik.ms.mff.cuni.cz/nswi153/seminar-project.html).
 
-Tech stack: `TypeScript`, `React`, `Redux`, `Node.js`, `MySQL`, `OpenAPI`, `GraphQL`.
+Tech stack: `TypeScript`, `React`, `Redux`, `Express`, `Node.js`, `OpenAPI`, `GraphQL`, `MySQL`, `Docker`.
 
 ## Deployment
 
@@ -21,6 +21,11 @@ The application consists of four components.
 | OpenAPI backend   | http://localhost:3001         |
 | GraphQL backend   | http://localhost:3002/graphql |
 | MySQL database    | http://localhost:3306/        |
+
+The deployment procedure uses healthchecks to ensure the components are started in an acceptable order. `MySQL`
+database could become available before the instance is initialized (see [init.sql](./database/init/init.sql) file).
+There is no clear approach in `Docker` how to postpone container start once all dependencies are healthy. An example
+of an early start is presented at [early-start.log](./tests/early-start.log).
 
 ## References
 

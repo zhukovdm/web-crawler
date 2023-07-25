@@ -10,7 +10,6 @@ WORKDIR /opt/frontend
 
 COPY --from=build /opt/frontend/build ./
 RUN npm install -g serve
-RUN npm config set update-notifier false
 
 EXPOSE 3000
 

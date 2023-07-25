@@ -65,8 +65,8 @@ export class MySqlModelInitializer {
   public static async init(): Promise<void> {
     const queryString = `CALL deleteIncompleteExecutions ();`;
 
-    /* Ensure consistent state so that all executions are complete ('FINISHED'
-     * or 'FAILURE' statuses are acceptable). */
+    /* Ensure consistent state so that all executions are complete (only
+     * 'FINISHED' or 'FAILURE' statuses are acceptable). */
 
     const conn = createConnection(getConnectionConfig(MYSQL_CONFIG));
 

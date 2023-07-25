@@ -7,4 +7,4 @@ RUN npm run build
 
 EXPOSE 3001
 
-CMD ["npm", "run", "serve"]
+ENTRYPOINT ["npm", "run", "serve"]

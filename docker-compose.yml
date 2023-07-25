@@ -12,7 +12,7 @@ services:
     volumes:
       - ./database/init:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD", 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'root', '-p$$MYSQL_ROOT_PASSWORD']
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'root', '-p$${MYSQL_ROOT_PASSWORD}']
       interval: 15s
       retries: 10
       start_period: 2m
@@ -32,7 +32,7 @@ services:
       database:
         condition: service_healthy
     healthcheck:
-      test: curl -f http://localhost:3001/healthcheck
+      test: ['CMD', 'curl', '-f', 'http://localhost:3001/healthcheck']
       interval: 15s
       retries: 100
       start_period: 2m
@@ -52,8 +52,8 @@ services:
       database:
         condition: service_healthy
     healthcheck:
-      test: curl -f http://localhost:3002/healthcheck
-      interval: 30s
+      test: ['CMD', 'curl', '-f', 'http://localhost:3002/healthcheck']
+      interval: 15s
       retries: 100
       start_period: 2m
       timeout: 10s

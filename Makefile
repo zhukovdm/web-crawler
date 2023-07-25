@@ -1,7 +1,7 @@
-up:
+start:
 	sudo docker compose up
 
-down:
+stop:
 	sudo docker compose down
 
 clean:

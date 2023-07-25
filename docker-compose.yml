@@ -60,10 +60,13 @@ services:
     networks:
       - backend
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        REACT_APP_OPENAPI_PORT: 3001
+        REACT_APP_GRAPHQL_PORT: 3002
+        REACT_APP_BACKEND_ADDR: localhost
     container_name: web-crawler-frontend
-    env_file:
-      - ./frontend/.env
     ports:
       - '3000:3000'
     depends_on:

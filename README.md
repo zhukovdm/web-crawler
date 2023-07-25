@@ -27,6 +27,16 @@ database could become available before the instance is initialized (see [init.sq
 There is no clear approach in `Docker` how to postpone container start once all dependencies are healthy. An example
 of an early start is presented at [early-start.log](./tests/early-start.log).
 
+## User interface
+
+![hom.png](./docs/assets/pics/hom.png)
+
+![rec.png](./docs/assets/pics/rec.png)
+
+![exe.png](./docs/assets/pics/exe.png)
+
+![vis.png](./docs/assets/pics/vis.png)
+
 ## References
 
 - https://www.typescriptlang.org/docs/handbook/intro.html

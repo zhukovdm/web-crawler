@@ -6,7 +6,9 @@ module.exports = {
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:react/recommended"
+    "plugin:react/recommended",
+    "react-app",
+    "react-app/jest"
   ],
   "overrides": [
     {

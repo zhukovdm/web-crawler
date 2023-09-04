@@ -1,8 +1,8 @@
 require("dotenv").config();
 
 import { Pool, createPool } from "mysql";
-import { NodeBaseType, WebPageType } from "../domain/types";
 import { IModel } from "../domain/interfaces";
+import { NodeBase, WebPage } from "../domain/types";
 
 const {
   MYSQL_HOST,
@@ -20,6 +20,9 @@ const MYSQL_CONFIG = {
   password: MYSQL_PASSWORD!
 };
 
+/**
+ * Wrapper over MySql database with connection pool.
+ */
 export class MySqlModel implements IModel {
 
   /**
@@ -42,21 +45,21 @@ export class MySqlModel implements IModel {
     });
   }
 
-  private unpackPage(page: any): WebPageType {
+  private unpackWebPage(page: any): WebPage {
     return { ...page, active: page.active === 1, tags: JSON.parse(page.tags) };
   }
 
-  public getAllWebPages(): Promise<WebPageType[]> {
+  public getAllWebPages(): Promise<WebPage[]> {
     const queryString = `CALL getAllWebPages ();`;
 
     return new Promise((res, rej) => {
       this.pool.query(queryString, [], (err, results) => {
-        (err) ? rej(err) : res(results[0].map((page: any) => (this.unpackPage(page))));
+        (err) ? rej(err) : res(results[0].map((page: any) => (this.unpackWebPage(page))));
       });
     });
   }
 
-  public getWebPage(recId: number): Promise<WebPageType | undefined> {
+  public getWebPage(recId: number): Promise<WebPage | undefined> {
     const queryString = `CALL getWebPage (?);`;
 
     return new Promise((res, rej) => {
@@ -64,13 +67,13 @@ export class MySqlModel implements IModel {
         if (err) { rej(err); }
         else {
           const page = results[0][0];
-          res(page ? this.unpackPage(page) : undefined);
+          res(page ? this.unpackWebPage(page) : undefined);
         }
       });
     });
   }
 
-  public getLatestNodes(recId: number): Promise<NodeBaseType[]> {
+  public getLatestNodes(recId: number): Promise<NodeBase[]> {
     const queryString = `CALL getLatestNodes (?);`;
 
     return new Promise((res, rej) => {
@@ -80,7 +83,7 @@ export class MySqlModel implements IModel {
     })
   }
 
-  public getNode(nodId: number): Promise<NodeBaseType | undefined> {
+  public getNode(nodId: number): Promise<NodeBase | undefined> {
     const queryString = `CALL getNode (?)`;
 
     return new Promise((res, rej) => {

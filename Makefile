@@ -1,12 +1,6 @@
-start:
-	sudo docker compose up
-
-stop:
-	sudo docker compose down
-
-clean:
-	sudo docker image rm web-crawler-frontend
-	sudo docker image rm web-crawler-backend-openapi
-	sudo docker image rm web-crawler-backend-graphql
-	sudo docker builder prune
-	sudo docker system prune --volumes
+unsafe-clean:
+	docker image rm web-crawler-frontend
+	docker image rm web-crawler-backend-openapi
+	docker image rm web-crawler-backend-graphql
+	docker builder prune
+	docker system prune --volumes

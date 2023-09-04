@@ -446,7 +446,7 @@ BEGIN
 END$
 
 /**
- * Get a web page by identifier.
+ * Get webpage by identifier.
  */
 CREATE PROCEDURE IF NOT EXISTS `getWebPage` (
   `i_recId`           BIGINT)
@@ -485,7 +485,7 @@ BEGIN
 END$
 
 /**
- * Get out edges for a given node.
+ * Get out-edges for a given node.
  */
 CREATE PROCEDURE IF NOT EXISTS `getNodeLinks` (
   IN `i_nodFr`        BIGINT)

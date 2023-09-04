@@ -14,6 +14,10 @@ import {
   resolveWebPages
 } from "./resolver";
 
+/* Resolver function signature: (source, args, context, info) => ...
+ *  - https://graphql.org/learn/execution/#root-fields-resolvers
+ */
+
 const WebPageType = new GraphQLObjectType({
   name: "WebPage",
   fields: {

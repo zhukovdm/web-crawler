@@ -6,6 +6,10 @@ import { BoundaryUrlMatcher } from "./matcher";
 export class Crawler {
 
   private readonly exeId: number;
+
+  /**
+   * URLs that have not been processed yet.
+   */
   private readonly queue: IQueue<string>;
   private readonly model: ICrawlerModel;
   private readonly fetcher: IUrlFetcher;
@@ -14,10 +18,6 @@ export class Crawler {
 
   constructor(exeId: number, model: ICrawlerModel, fetcher: IUrlFetcher) {
     this.exeId = exeId;
-
-    /**
-     * Contains URLs that are not processed.
-     */
     this.queue = new LinkedListQueue();
     this.model = model;
     this.fetcher = fetcher;

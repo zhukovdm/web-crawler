@@ -1,15 +1,31 @@
-import { NodeBaseType, WebPageType } from "./types";
+import { NodeBase, WebPage } from "./types";
 
 export interface IModel {
 
-  getAllWebPages(): Promise<WebPageType[]>;
+  /**
+   * Get all webpages available in the database.
+   */
+  getAllWebPages(): Promise<WebPage[]>;
 
-  getWebPage(recId: number): Promise<WebPageType | undefined>;
+  /**
+   * Get webpage by identifier.
+   */
+  getWebPage(recId: number): Promise<WebPage | undefined>;
 
-  getLatestNodes(recId: number): Promise<NodeBaseType[]>;
+  /**
+   * Get the list of crawled nodes created during the latest execution
+   * (possibly unfinished) corresponding to a given webpage.
+   */
+  getLatestNodes(recId: number): Promise<NodeBase[]>;
 
-  getNode(nodId: number): Promise<NodeBaseType | undefined>;
+  /**
+   * Get node by identifier.
+   */
+  getNode(nodId: number): Promise<NodeBase | undefined>;
 
+  /**
+   * Get out-edges for a given node identifier.
+   */
   getNodeLinks(nodFr: number): Promise<number[]>;
 
   /**

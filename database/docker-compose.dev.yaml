@@ -9,5 +9,11 @@ services:
       - MYSQL_ROOT_PASSWORD=password
     ports:
       - '3306:3306'
+    healthcheck:
+      test: mysql --host=localhost --user=root --password=$${MYSQL_ROOT_PASSWORD} --execute='USE db;'
+      interval: 15s
+      retries: 10
+      start_period: 2m
+      timeout: 5s
     volumes:
       - ./init:/docker-entrypoint-initdb.d

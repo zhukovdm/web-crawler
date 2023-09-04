@@ -22,11 +22,6 @@ The application consists of four components.
 | GraphQL backend   | http://localhost:3002/graphql |
 | MySQL database    | http://localhost:3306/        |
 
-The deployment procedure uses healthchecks to ensure the components are started in an acceptable order. `MySQL`
-database could become available before the instance is initialized (see [init.sql](./database/init/init.sql) file).
-There is no clear approach in `Docker` how to postpone container start once all dependencies are healthy. An example
-of an early start is presented at [early-start.log](./tests/early-start.log).
-
 ## Conceptual model
 
 ![conceptual-model.svg](docs/assets/uml/conceptual-model.svg)

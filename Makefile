@@ -1,4 +1,4 @@
-.PHONY: check-clean unsafe-clean-check unsafe-clean-volumes
+.PHONY: create-test-data unsafe-clean-volumes unsafe-clean-check unsafe-clean
 
 create-test-data:
 	./tests/create-records.sh

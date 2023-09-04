@@ -13,12 +13,12 @@ import { ExecutionType } from "../../domain/types";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { setExeFilterAct, setExeFilterCon } from "../../store/exeSlice";
 
-type FilterConfigType = {
+type FilterConfigProps = {
   load: boolean;
   exes: ExecutionType[];
-}
+};
 
-export default function FilterConfig({ load, exes }: FilterConfigType): JSX.Element {
+export default function FilterConfig({ load, exes }: FilterConfigProps): JSX.Element {
 
   const dispatch = useAppDispatch();
   const {

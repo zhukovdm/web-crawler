@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
-import {
-  Box,
-  CircularProgress,
-  Divider,
-  Stack
-} from "@mui/material";
+import Divider from "@mui/material/Divider";
+import Stack from "@mui/material/Stack";
 import { ExecutionType } from "../domain/types";
 import { OpenApiService } from "../services/openapi";
+import LoadStub from "./_shared/LoadStub";
 import FilterConfig from "./exe/FilterConfig";
 import ExecutionsTable from "./exe/ExecutionsTable";
 
@@ -16,15 +13,21 @@ export default function ExePage(): JSX.Element {
   const [exes, setExes] = useState<ExecutionType[]>([]);
 
   useEffect(() => {
+    let ignore = false;
+
     const f = async () => {
       try {
-        setExes(await OpenApiService.getAllExecutions());
-        setLoad(false);
+        const exes = await OpenApiService.getAllExecutions();
+        if (!ignore) { setExes(exes); }
       }
-      catch (ex: any) { alert(ex?.message); }
+      catch (ex: any) { alert(ex); }
+      finally {
+        if (!ignore) { setLoad(false); }
+      }
     };
 
     f();
+    return () => { ignore = true; };
   }, []);
 
   return (
@@ -32,9 +35,7 @@ export default function ExePage(): JSX.Element {
       <FilterConfig load={load} exes={exes} />
       <Divider light />
       {load
-        ? <Box display={"flex"} justifyContent={"center"}>
-            <CircularProgress />
-          </Box>
+        ? <LoadStub />
         : <ExecutionsTable exes={exes} />
       }
     </Stack>

@@ -1,13 +1,10 @@
 import { useEffect, useState } from "react";
-import {
-  Box,
-  CircularProgress,
-  Divider,
-  Stack
-} from "@mui/material";
+import Divider from "@mui/material/Divider";
+import Stack from "@mui/material/Stack";
 import { useAppDispatch } from "../store";
 import { setRecords } from "../store/recSlice";
 import { OpenApiService } from "../services/openapi";
+import LoadStub from "./_shared/LoadStub";
 import CreateDialog from "./rec/CreateDialog";
 import RecordsTable from "./rec/RecordsTable";
 import FilterConfig from "./rec/FilterConfig";
@@ -16,19 +13,25 @@ import SorterConfig from "./rec/SorterConfig";
 export default function RecPage(): JSX.Element {
 
   const dispatch = useAppDispatch();
-  const [loading, setLoading] = useState(true);
+  const [load, setLoad] = useState(true);
 
   useEffect(() => {
+    let ignore = false;
+
     const f = async () => {
       try {
-        dispatch(setRecords(await OpenApiService.getAllRecords()));
-        setLoading(false);
+        const recs = await OpenApiService.getAllRecords();
+        if (!ignore) { dispatch(setRecords(recs)); }
       }
       catch (ex: any) { alert(ex?.message); }
+      finally {
+        if (!ignore) { setLoad(false); }
+      }
     };
 
-    if (loading) { f(); }
-  }, [dispatch, loading]);
+    f();
+    return () => { ignore = true };
+  }, [dispatch]);
 
   return (
     <Stack sx={{ m: 4 }} gap={4}>
@@ -42,10 +45,8 @@ export default function RecPage(): JSX.Element {
         <FilterConfig />
       </Stack>
       <Divider light />
-      {loading
-        ? <Box display={"flex"} justifyContent={"center"}>
-            <CircularProgress />
-          </Box>
+      {load
+        ? <LoadStub />
         : <RecordsTable />
       }
     </Stack>

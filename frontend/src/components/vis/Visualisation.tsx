@@ -64,7 +64,7 @@ export default function Visualisation(): JSX.Element {
 
       try {
         const ns = (await GraphQlService.getNodes(ws))
-          .sort(timeComparator)
+          .sort(timeComparator) // ensure latest!
           .reduce((acc, n) => {
 
             const url = getView(n.url, view);
@@ -95,12 +95,12 @@ export default function Visualisation(): JSX.Element {
             // remove loops
             baseNode.links.delete(baseNode.url);
 
-            return acc.set(baseNode.url, baseNode);
+            return acc.set(baseNode.url, baseNode); // ensure latest!
           }, new Map<string, NodeType>());
 
         setNods([...ns.values()]);
       }
-      catch (ex: any) { alert(ex?.message); }
+      catch (ex: any) { alert(ex); }
     };
 
     f();
@@ -109,7 +109,7 @@ export default function Visualisation(): JSX.Element {
   useEffect(() => {
     const f = async () => {
       if (mode === "live") {
-        await new Promise((res) => setTimeout(res, tick * 1000));
+        await new Promise((res) => setTimeout(res, tick * 1000.0));
         setLoad(!load);
       }
     };

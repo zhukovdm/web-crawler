@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import {
   Box,
-  CircularProgress,
   Stack
 } from "@mui/material";
 import { useAppDispatch } from "../store";
 import { setWebsites } from "../store/visSlice";
 import { GraphQlService } from "../services/graphql";
+import LoadStub from "./_shared/LoadStub";
 import NodeDialog from "./vis/NodeDialog";
 import WebsitesTable from "./vis/WebsitesTable";
 import Visualisation from "./vis/Visualisation";
@@ -17,23 +17,27 @@ export default function VisPage(): JSX.Element {
   const [load, setLoad] = useState(true);
 
   useEffect(() => {
+    let ignore = false;
+
     const f = async () => {
       try {
-        dispatch(setWebsites(await GraphQlService.getWebsites()));
-        setLoad(false);
+        const webs = await GraphQlService.getWebsites();
+        if (!ignore) { dispatch(setWebsites(webs)); }
       }
       catch (ex: any) { alert(ex?.message); }
+      finally {
+        if (!ignore) { setLoad(false); }
+      }
     }
 
-    if (load) { f(); }
-  }, [dispatch, load]);
+    f();
+    return () => { ignore = true; }
+  }, [dispatch]);
 
   return (
     <Box sx={{ m: 4 }}>
       {load
-        ? <Box display={"flex"} justifyContent={"center"}>
-            <CircularProgress />
-          </Box>
+        ? <LoadStub />
         : <Stack gap={4}>
             <NodeDialog />
             <WebsitesTable />

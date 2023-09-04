@@ -4,10 +4,14 @@ import {
 } from "@reduxjs/toolkit";
 
 type ExeInitialStateType = {
+
+  /**
+   * filter activation
+   */
   exeFilterAct: boolean;
 
   /**
-   * recId of the corresponding record.
+   * recId of the corresponding record
    */
   exeFilterCon: number | undefined;
 };

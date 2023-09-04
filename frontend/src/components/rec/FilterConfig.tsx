@@ -42,7 +42,7 @@ export default function FilterConfig(): JSX.Element {
             placeholder={"Label (substr)"}
             value={labFilterCon}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              dispatch(setLabFilterCon(e.target.value));
+              dispatch(setLabFilterCon(e.target.value.toLocaleLowerCase()));
             }}
           />
         </Stack>
@@ -69,7 +69,7 @@ export default function FilterConfig(): JSX.Element {
           <TextField
             size={"small"}
             label={"Tags"}
-            placeholder={"Tags (any of)"}
+            placeholder={"Tags (any of a, b, ...)"}
             value={tagFilterCon}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               dispatch(setTagFilterCon(e.target.value));

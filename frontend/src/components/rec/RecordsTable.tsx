@@ -53,7 +53,7 @@ export default function RecordsTable(): JSX.Element {
     let rs = records
       .map((r, i) => [r, i] as [RecordType, number])
       .filter(([r, _]) => !labFilterAct || r.label.toLowerCase().includes(labFilterCon))
-      .filter(([r, _]) => !urlFilterAct || r.label.toLowerCase().includes(urlFilterCon))
+      .filter(([r, _]) => !urlFilterAct || r.url.includes(urlFilterCon))
       .filter(([r, _]) => {
         const rt = new Set(stringToTags(tagFilterCon))
         return !tagFilterAct || r.tags.reduce((acc, t) => acc || rt.has(t), false);

@@ -5,8 +5,8 @@ module.exports = {
   },
   "extends": [
     "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended",
     "react-app",
     "react-app/jest"
   ],
@@ -29,14 +29,13 @@ module.exports = {
     "sourceType": "module"
   },
   "plugins": [
-    "@typescript-eslint",
-    "react"
+    "react",
+    "@typescript-eslint"
   ],
   "rules": {
     "react/react-in-jsx-scope": "off",
     "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-non-null-assertion": "off",
-    "@typescript-eslint/no-unused-vars": "off"
+    "@typescript-eslint/no-non-null-assertion": "off"
   },
   "settings": {
     "react": {

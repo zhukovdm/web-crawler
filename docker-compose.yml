@@ -68,7 +68,7 @@ services:
         REACT_APP_BACKEND_ADDR: localhost
     container_name: web-crawler-frontend
     ports:
-      - '3000:3000'
+      - '3000:80'
     depends_on:
       backend-openapi:
         condition: service_healthy

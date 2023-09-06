@@ -13,12 +13,8 @@ COPY ./ ./
 RUN npm ci
 RUN npm run build
 
-FROM node:18.17-bookworm
-WORKDIR /opt/frontend
+FROM nginx:1.25.2
 
-COPY --from=build /opt/frontend/build ./
-RUN npm install -g serve
-
-EXPOSE 3000
-
-ENTRYPOINT ["serve", "--single", ".", "--listen", "3000"]
+COPY --from=build /opt/frontend/build /usr/share/nginx/html
+COPY ./config/nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80

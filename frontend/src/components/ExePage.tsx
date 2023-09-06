@@ -20,7 +20,7 @@ export default function ExePage(): JSX.Element {
         const exes = await OpenApiService.getAllExecutions();
         if (!ignore) { setExes(exes); }
       }
-      catch (ex: any) { alert(ex); }
+      catch (ex: unknown) { alert(ex); }
       finally {
         if (!ignore) { setLoad(false); }
       }

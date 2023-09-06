@@ -24,7 +24,7 @@ export default function VisPage(): JSX.Element {
         const webs = await GraphQlService.getWebsites();
         if (!ignore) { dispatch(setWebsites(webs)); }
       }
-      catch (ex: any) { alert(ex?.message); }
+      catch (ex: unknown) { alert(ex); }
       finally {
         if (!ignore) { setLoad(false); }
       }

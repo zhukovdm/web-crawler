@@ -40,7 +40,7 @@ export default function DeleteDialog({ index }: DeleteDialogType): JSX.Element {
       setShow(false);
       dispatch(deleteRecord(index));
     }
-    catch (ex: any) { alert(ex); }
+    catch (ex: unknown) { alert(ex); }
     finally {
       dispatch(setDeleteAction(false));
     }

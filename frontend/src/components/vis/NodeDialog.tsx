@@ -36,7 +36,7 @@ function CrawledNodeDialog({ show, hide, node }: CrawledNodeDialogType): JSX.Ele
     try {
       await OpenApiService.createExecution(recId);
     }
-    catch (ex: any) { alert(ex.message); }
+    catch (ex: unknown) { alert(ex); }
     finally {
       dispatch(setExecutAction(false));
     }
@@ -115,7 +115,7 @@ export default function NodeDialog(): JSX.Element {
       dispatch(appendWebsite({ ...record, recId: recId }));
       hide();
     }
-    catch (ex: any) { alert(ex?.message); }
+    catch (ex: unknown) { alert(ex); }
     finally {
       dispatch(setCreateAction(false));
     }

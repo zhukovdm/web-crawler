@@ -29,7 +29,7 @@ export default function CreateDialog(): JSX.Element {
       }));
       setShow(false);
     }
-    catch (ex: any) { alert(ex?.message); }
+    catch (ex: unknown) { alert(ex); }
     finally {
       dispatch(setCreateAction(false));
     }

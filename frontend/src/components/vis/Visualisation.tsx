@@ -100,7 +100,7 @@ export default function Visualisation(): JSX.Element {
 
         setNods([...ns.values()]);
       }
-      catch (ex: any) { alert(ex); }
+      catch (ex: unknown) { alert(ex); }
     };
 
     f();

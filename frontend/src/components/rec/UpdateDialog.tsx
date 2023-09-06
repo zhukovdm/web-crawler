@@ -36,7 +36,7 @@ export default function UpdateDialog({ index }: UpdateDialogType): JSX.Element {
       }));
       setShow(false);
     }
-    catch (ex: any) { alert(ex?.message); }
+    catch (ex: unknown) { alert(ex); }
     finally {
       dispatch(setUpdateAction(false));
     }

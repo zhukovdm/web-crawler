@@ -36,7 +36,7 @@ export default function ExecutDialog({ index }: ExecutDialogType): JSX.Element {
       await OpenApiService.createExecution(record.recId);
       setShow(false);
     }
-    catch (ex: any) { alert(ex); }
+    catch (ex: unknown) { alert(ex); }
     finally {
       dispatch(setExecutAction(false));
     }

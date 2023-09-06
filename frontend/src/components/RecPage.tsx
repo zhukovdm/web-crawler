@@ -23,7 +23,7 @@ export default function RecPage(): JSX.Element {
         const recs = await OpenApiService.getAllRecords();
         if (!ignore) { dispatch(setRecords(recs)); }
       }
-      catch (ex: any) { alert(ex?.message); }
+      catch (ex: unknown) { alert(ex); }
       finally {
         if (!ignore) { setLoad(false); }
       }

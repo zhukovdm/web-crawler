@@ -28,11 +28,19 @@ The application consists of four components.
 
 ## User interface
 
+### Home page
+
 ![hom.png](./docs/assets/pics/hom.png)
+
+### Records
 
 ![rec.png](./docs/assets/pics/rec.png)
 
+### Executions
+
 ![exe.png](./docs/assets/pics/exe.png)
+
+### Visualization
 
 ![vis.png](./docs/assets/pics/vis.png)
 

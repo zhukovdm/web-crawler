@@ -1,15 +1,15 @@
 # web-crawler
 
-An implementation of web crawler based on the [Specification](https://webik.ms.mff.cuni.cz/nswi153/seminar-project.html).
+An implementation[^1] of web crawler based on the [Specification](https://webik.ms.mff.cuni.cz/nswi153/seminar-project.html).
 
-Tech stack: `TypeScript`, `React`, `Redux`, `Express`, `Node.js`, `OpenAPI`, `GraphQL`, `MySQL`, `Docker`.
+[^1]: This repository is a mirror of the original (archived) one located at https://gitlab.mff.cuni.cz/zhukovd/web-crawler.git.
 
 ## Deployment
 
 Run the following commands to start up a self-contained instance of the crawler:
 
 ```bash
-git clone https://gitlab.mff.cuni.cz/zhukovd/web-crawler.git
+git clone https://github.com/zhukovdm/web-crawler.git
 cd web-crawler/ && docker compose up
 ```
 

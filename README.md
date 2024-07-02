@@ -1,6 +1,6 @@
 # web-crawler
 
-An implementation[^1] of web crawler based on the [Specification](https://webik.ms.mff.cuni.cz/nswi153/seminar-project.html).
+An implementation[^1] of web crawler based on the [Specification](https://webik.ms.mff.cuni.cz/nswi153/seminar-project-webcrawler.html).
 
 [^1]: This repository is a mirror of the original (archived) one located at https://gitlab.mff.cuni.cz/zhukovd/web-crawler.git.
 
